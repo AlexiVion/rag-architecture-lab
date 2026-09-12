@@ -6,9 +6,12 @@ import re
 from datetime import UTC, datetime
 from pathlib import Path
 
+from raglab.context import ContextBuilder
 from raglab.datasets import load_ir_dataset
 from raglab.embeddings import SentenceTransformerEmbeddings
 from raglab.evaluation.benchmark import run_benchmark
+from raglab.generation import LocalTransformersGenerator
+from raglab.rag import RAGPipeline
 from raglab.retrieval import (
     BM25Retriever,
     CrossEncoderScorer,
@@ -19,6 +22,7 @@ from raglab.retrieval import (
 
 DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 DEFAULT_RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+DEFAULT_GENERATION_MODEL = "Qwen/Qwen2.5-0.5B-Instruct"
 PIPELINES = [
     "bm25",
     "dense",
@@ -27,6 +31,7 @@ PIPELINES = [
     "dense-rerank",
     "hybrid-rerank",
 ]
+ANSWER_PIPELINES = ["hybrid", "hybrid-rerank"]
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -51,6 +56,29 @@ def _build_parser() -> argparse.ArgumentParser:
     benchmark.add_argument("--rrf-constant", type=int, default=60)
     benchmark.add_argument("--rerank-candidates", type=int, default=50)
     benchmark.add_argument("--output-dir", default="benchmarks/results")
+
+    answer = subparsers.add_parser(
+        "answer",
+        help="Run the V2 local grounded-generation pipeline",
+    )
+    answer.add_argument("--dataset", default="beir/scifact/test")
+    query_group = answer.add_mutually_exclusive_group()
+    query_group.add_argument("--query", default=None)
+    query_group.add_argument("--query-id", default=None)
+    answer.add_argument("--pipeline", choices=ANSWER_PIPELINES, default="hybrid")
+    answer.add_argument("--top-k", type=int, default=5)
+    answer.add_argument("--embedding-model", default=DEFAULT_EMBEDDING_MODEL)
+    answer.add_argument("--rerank-model", default=DEFAULT_RERANK_MODEL)
+    answer.add_argument("--rerank-candidates", type=int, default=10)
+    answer.add_argument("--hybrid-candidates", type=int, default=100)
+    answer.add_argument("--rrf-constant", type=int, default=60)
+    answer.add_argument("--bm25-k1", type=float, default=1.5)
+    answer.add_argument("--bm25-b", type=float, default=0.75)
+    answer.add_argument("--model", default=DEFAULT_GENERATION_MODEL)
+    answer.add_argument("--max-new-tokens", type=int, default=220)
+    answer.add_argument("--context-max-chars", type=int, default=10_000)
+    answer.add_argument("--source-max-chars", type=int, default=2_200)
+    answer.add_argument("--output-dir", default="runs/v2")
     return parser
 
 
@@ -179,11 +207,112 @@ def _benchmark(args: argparse.Namespace) -> int:
     return 0
 
 
+def _select_question(dataset, query: str | None, query_id: str | None) -> tuple[str, str | None]:
+    if query is not None:
+        return query, None
+    if query_id is not None:
+        for item in dataset.queries:
+            if item.id == query_id:
+                return item.text, item.id
+        raise ValueError(f"Query id {query_id!r} was not found in dataset {dataset.id!r}")
+    selected = dataset.queries[0]
+    return selected.text, selected.id
+
+
+def _answer(args: argparse.Namespace) -> int:
+    if args.top_k <= 0:
+        raise ValueError("top-k must be positive")
+    if args.rerank_candidates < args.top_k and args.pipeline == "hybrid-rerank":
+        raise ValueError("rerank-candidates must be >= top-k for hybrid-rerank")
+
+    dataset = load_ir_dataset(args.dataset)
+    question, selected_query_id = _select_question(dataset, args.query, args.query_id)
+
+    bm25 = BM25Retriever(k1=args.bm25_k1, b=args.bm25_b)
+    embeddings = SentenceTransformerEmbeddings(args.embedding_model)
+    dense = DenseRetriever(embeddings)
+    hybrid = HybridRetriever(
+        dense=dense,
+        sparse=bm25,
+        candidate_k=args.hybrid_candidates,
+        rrf_constant=args.rrf_constant,
+    )
+
+    if args.pipeline == "hybrid-rerank":
+        scorer = CrossEncoderScorer(args.rerank_model)
+        retriever = RerankingRetriever(
+            base=hybrid,
+            scorer=scorer,
+            candidate_k=args.rerank_candidates,
+            name="hybrid-rerank",
+        )
+    else:
+        retriever = hybrid
+
+    context_builder = ContextBuilder(
+        max_chars=args.context_max_chars,
+        per_source_chars=args.source_max_chars,
+    )
+    generator = LocalTransformersGenerator(args.model)
+    pipeline = RAGPipeline(
+        documents=dataset.documents,
+        retriever=retriever,
+        context_builder=context_builder,
+        generator=generator,
+        top_k=args.top_k,
+        max_new_tokens=args.max_new_tokens,
+    )
+
+    if selected_query_id is not None:
+        print(f"Selected benchmark query: {selected_query_id}")
+    print(f"Question: {question}")
+    print(f"Indexing {len(dataset.documents)} documents with {retriever.name}...")
+    pipeline.index()
+    print("Generating grounded answer locally...")
+    result = pipeline.answer(question)
+
+    print("\nAnswer\n")
+    print(result.answer)
+    print("\nSources\n")
+    for source in result.sources:
+        title = source.title or "(untitled)"
+        print(f"{source.citation} rank={source.rank} doc_id={source.doc_id} title={title}")
+
+    report = result.citation_report
+    print("\nCitation integrity\n")
+    print(f"citations: {report.citation_count}")
+    print(f"valid citations: {report.valid_citation_count}")
+    print(f"invalid labels: {list(report.invalid_labels)}")
+    print(f"sentence citation coverage: {report.sentence_coverage:.1%}")
+
+    print("\nTiming (ms)\n")
+    for name, value in result.timings_ms.items():
+        print(f"{name}: {value:.2f}")
+
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    output_path = output_dir / f"answer_{timestamp}.json"
+    payload = {
+        "experiment": "v2-grounded-generation-smoke",
+        "dataset": args.dataset,
+        "query_id": selected_query_id,
+        "pipeline": args.pipeline,
+        "model": args.model,
+        "result": result.to_dict(),
+    }
+    output_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"\nSaved: {output_path}")
+    return 0
+
+
 def main() -> int:
     parser = _build_parser()
     args = parser.parse_args()
     if args.command == "benchmark":
         return _benchmark(args)
+    if args.command == "answer":
+        return _answer(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 
