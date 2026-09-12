@@ -2,9 +2,9 @@
 
 A from-first-principles lab for implementing, benchmarking, and comparing Retrieval-Augmented Generation retrieval architectures under controlled conditions.
 
-> **V0 and V1 complete — Retrieval + Reranking Benchmarks**
+> **Current state**
 >
-> Dense retrieval vs. BM25 vs. Hybrid RRF, followed by a controlled cross-encoder reranking experiment on the same public benchmark.
+> V0 retrieval benchmarking is complete. V1 cross-encoder reranking is implemented and has a preliminary reference run; its canonical benchmark will be reproduced on the local Windows machine/server before the architecture decision is finalized.
 
 ## Why this project exists
 
@@ -51,24 +51,15 @@ Research question:
 
 **Does reranking Hybrid RRF candidates with a local cross-encoder improve top-K retrieval quality enough to justify its additional latency?**
 
-V1 keeps the V0 Hybrid pipeline as the first stage, retrieves 50 candidates, and reranks them with the pretrained local model `cross-encoder/ms-marco-MiniLM-L-6-v2`.
+V1 keeps the V0 Hybrid pipeline as the first stage, retrieves a configurable candidate set, and reranks it with the pretrained local model `cross-encoder/ms-marco-MiniLM-L-6-v2`.
 
 ```text
-Dense + BM25 -> RRF -> top 50 candidates -> Cross-Encoder -> top K
+Dense + BM25 -> RRF -> candidate set -> Cross-Encoder -> top K
 ```
 
-### V1 results
+The reranking implementation is complete. A preliminary 50-candidate run improved several ranking metrics, but that run used a GitHub-hosted CPU runner and is therefore treated only as a reference. The canonical latency result will come from the local Windows machine/server.
 
-| Pipeline | MRR@10 | nDCG@10 | Recall@5 | Recall@10 | Mean latency |
-|---|---:|---:|---:|---:|---:|
-| Hybrid RRF | 0.6484 | 0.6865 | **0.7571** | 0.8179 | **45.91 ms** |
-| Hybrid + Cross-Encoder | **0.6615** | **0.6944** | 0.7449 | **0.8272** | 3896.99 ms |
-
-The reranker improved MRR@10 by about **2.0% relative**, nDCG@10 by about **1.2%**, and Recall@10 by about **1.1%**, but mean latency increased roughly **84.9x** on the recorded CPU runner. Recall@5 decreased by about **1.6% relative**.
-
-**Decision:** the current 50-candidate cross-encoder configuration is a **NO-GO as the default architecture** because its modest quality gain does not justify several seconds of query latency. The research result is still useful: a smaller candidate-depth efficiency ablation is justified before moving to generation.
-
-See [`benchmarks/V1_RESULTS.md`](benchmarks/V1_RESULTS.md) for the complete V1 result and interpretation.
+See [`benchmarks/V1_RESULTS.md`](benchmarks/V1_RESULTS.md) for the preliminary reference result and [`docs/LOCAL_EXECUTION.md`](docs/LOCAL_EXECUTION.md) for the local execution policy.
 
 ## Benchmark
 
@@ -86,52 +77,39 @@ For a very fast smoke test, `nano-beir/scifact` can also be used.
 2. **From first principles where it matters.** BM25, cosine retrieval, RRF, evaluation metrics, and pipeline orchestration are implemented here.
 3. **Models are dependencies; system architecture is ours.** Local pretrained models may provide embeddings or pairwise relevance scores, but the retrieval system around them is implemented in this project.
 4. **No paid API required.** Current experiments use public benchmark data and local open-source models.
-5. **Measure before expanding.** New components are added only when they answer a concrete experimental question.
+5. **Benchmark locally.** Canonical benchmark computation and latency measurements run on the same local machine/server, not on GitHub-hosted Actions runners.
+6. **Measure before expanding.** New components are added only when they answer a concrete experimental question.
 
-## Quick start
+## Quick start — Windows local machine/server
 
-Requirements: Python 3.11+
+Requirements: Python 3.11+ and PowerShell.
 
-```bash
-python -m venv .venv
-# Windows
-.venv\Scripts\activate
-# macOS/Linux
-# source .venv/bin/activate
-
-pip install -e ".[benchmark]"
+```powershell
+git clone https://github.com/AlexiVion/rag-architecture-lab.git
+cd rag-architecture-lab
+Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\setup-local.ps1
 ```
 
-Run a quick retrieval benchmark:
+Run V1 locally:
 
-```bash
-raglab benchmark --dataset nano-beir/scifact --pipelines bm25 dense hybrid --k 5 10
+```powershell
+.\scripts\run-v1-local.ps1
 ```
 
-Run the full V0 SciFact benchmark:
+Run the V1.1 candidate-depth ablation locally:
 
-```bash
-raglab benchmark --dataset beir/scifact/test --pipelines bm25 dense hybrid --k 5 10
+```powershell
+.\scripts\run-v1-1-local.ps1
 ```
 
-Run the V1 reranking comparison:
+Generated JSON benchmark results are written to:
 
-```bash
-raglab benchmark \
-  --dataset beir/scifact/test \
-  --pipelines hybrid hybrid-rerank \
-  --k 5 10 \
-  --rerank-candidates 50
+```text
+benchmarks/results/
 ```
 
 The first model-backed run downloads the configured open-source models locally. No paid API key is needed.
-
-For development:
-
-```bash
-pip install -e ".[dev]"
-pytest
-```
 
 ## Project structure
 
@@ -145,30 +123,33 @@ src/raglab/
   evaluation/    Retrieval metrics and benchmark runner
   cli.py         Command-line interface
 
+scripts/         Local Windows setup and benchmark runners
 tests/           Unit tests for algorithms and pipeline behavior
-docs/            Scope, architecture, and experiment methodology
+docs/            Scope, architecture, methodology, and local execution policy
 benchmarks/       Recorded experiment summaries and generated JSON results
 ```
 
 ## Reproducibility
 
-Each benchmark result records the dataset, pipeline configuration, K values, model configuration, aggregate metrics, per-query rankings, latency, and runtime environment. Local runs write timestamped JSON artifacts to `benchmarks/results/`. GitHub Actions workflows reproduce the V0 and V1 experiments.
+Each benchmark result records the dataset, pipeline configuration, K values, model configuration, aggregate metrics, per-query rankings, latency, and runtime environment. Local runs write timestamped JSON artifacts to `benchmarks/results/`.
+
+Canonical experiment summaries should also record the local hardware, operating system, Python version, and Git commit SHA so latency comparisons remain meaningful.
 
 ## Roadmap
 
 - ✅ **V0:** Dense vs. BM25 vs. Hybrid retrieval
-- ✅ **V1:** Cross-encoder reranking and quality/latency trade-off
-- **V1.1:** Candidate-depth efficiency ablation
+- 🧪 **V1:** Cross-encoder reranking — implementation complete, canonical local reproduction pending
+- **V1.1:** Candidate-depth efficiency ablation on the local server
 - **V2:** Generation, context construction, and citations
 - **V3:** Trace/observability model and interactive inspection
 - **V4:** Web observatory and benchmark visualization
 - **Later experiments:** query rewriting, multi-query retrieval, parent-child retrieval, contextual retrieval, adaptive/agentic RAG, GraphRAG
 
-See [`docs/SCOPE.md`](docs/SCOPE.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), and [`docs/EXPERIMENTS.md`](docs/EXPERIMENTS.md).
+See [`docs/SCOPE.md`](docs/SCOPE.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/EXPERIMENTS.md`](docs/EXPERIMENTS.md), and [`docs/LOCAL_EXECUTION.md`](docs/LOCAL_EXECUTION.md).
 
 ## Cost
 
-V0 and V1 run at **$0 paid API cost**. They use public benchmark data and local open-source models. The recorded experiments were reproduced through GitHub Actions and can also run locally without a paid API or managed vector database.
+The current experiments run at **$0 paid API cost**. They use public benchmark data and local open-source models. No managed vector database or paid LLM API is required.
 
 ## References
 
@@ -179,4 +160,4 @@ V0 and V1 run at **$0 paid API cost**. They use public benchmark data and local 
 
 ## Status
 
-V0 and V1 are complete. V1 showed that a cross-encoder can improve ranking quality but that the tested 50-candidate CPU configuration is not efficient enough to adopt as the default. The next experiment is **V1.1: candidate-depth efficiency ablation** before deciding whether reranking remains in the architecture or the project moves directly to generation.
+V0 is complete. V1 reranking is implemented. The next required step is to reproduce V1 locally and then run the V1.1 candidate-depth ablation on the same machine before making the final reranking GO/NO-GO decision.
