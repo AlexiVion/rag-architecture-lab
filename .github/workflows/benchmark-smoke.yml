@@ -1,0 +1,28 @@
+name: benchmark-smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/benchmark-smoke.yml"
+
+jobs:
+  nano-scifact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install benchmark dependencies
+        run: pip install -e ".[benchmark]"
+      - name: Run NanoBEIR SciFact benchmark
+        run: raglab benchmark --dataset nano-beir/scifact --pipelines bm25 dense hybrid --k 5 10
+      - name: Upload benchmark result
+        uses: actions/upload-artifact@v4
+        with:
+          name: nano-beir-scifact-results
+          path: benchmarks/results/*.json
+          if-no-files-found: error
