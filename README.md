@@ -4,7 +4,7 @@ A from-first-principles lab for implementing, benchmarking, and comparing Retrie
 
 > **Current state**
 >
-> V0 retrieval benchmarking is complete. V1 cross-encoder reranking is implemented and has a preliminary reference run; its canonical benchmark will be reproduced on the local Windows machine/server before the architecture decision is finalized.
+> V0 retrieval benchmarking is complete. V1 cross-encoder reranking has now been reproduced on the designated local Windows machine and has a canonical quality/latency result. The next experiment is V1.1: a small candidate-depth efficiency ablation.
 
 ## Why this project exists
 
@@ -31,19 +31,21 @@ Metrics:
 - nDCG@K
 - Mean and p95 query latency
 
-### V0 results
+### V0 quality results
 
 Full benchmark: **BEIR SciFact test — 5,183 documents, 300 queries**.
 
-| Pipeline | MRR@10 | nDCG@10 | Recall@5 | Recall@10 | Mean latency |
-|---|---:|---:|---:|---:|---:|
-| BM25 | 0.6328 | 0.6647 | 0.7243 | 0.7849 | 7.52 ms |
-| Dense | 0.6047 | 0.6451 | 0.7379 | 0.7833 | 26.17 ms |
-| **Hybrid RRF** | **0.6484** | **0.6865** | **0.7571** | **0.8179** | 51.86 ms |
+| Pipeline | MRR@10 | nDCG@10 | Recall@5 | Recall@10 |
+|---|---:|---:|---:|---:|
+| BM25 | 0.6328 | 0.6647 | 0.7243 | 0.7849 |
+| Dense | 0.6047 | 0.6451 | 0.7379 | 0.7833 |
+| **Hybrid RRF** | **0.6484** | **0.6865** | **0.7571** | **0.8179** |
 
-Under this dataset and configuration, Hybrid RRF produced the strongest reported quality metrics while trading additional latency for better ranking and recall. BM25 remained substantially faster and outperformed Dense on MRR@10, while Dense achieved slightly higher Recall@5 than BM25.
+Hybrid RRF produced the strongest reported quality metrics under the V0 configuration. BM25 outperformed Dense on MRR@10, while Dense achieved slightly higher Recall@5 than BM25.
 
-See [`benchmarks/V0_RESULTS.md`](benchmarks/V0_RESULTS.md) for the full methodology, interpretation, and go/no-go decision.
+The original V0 run predates the local-only benchmark policy, so its latency values are retained in the detailed experiment record but are not used as canonical hardware comparisons. V1 and later latency decisions use the designated local machine.
+
+See [`benchmarks/V0_RESULTS.md`](benchmarks/V0_RESULTS.md) for the full methodology and original V0 record.
 
 ## V1 — Cross-encoder reranking
 
@@ -51,15 +53,33 @@ Research question:
 
 **Does reranking Hybrid RRF candidates with a local cross-encoder improve top-K retrieval quality enough to justify its additional latency?**
 
-V1 keeps the V0 Hybrid pipeline as the first stage, retrieves a configurable candidate set, and reranks it with the pretrained local model `cross-encoder/ms-marco-MiniLM-L-6-v2`.
+V1 keeps the V0 Hybrid pipeline as the first stage, retrieves 50 candidates, and reranks them with the pretrained local model `cross-encoder/ms-marco-MiniLM-L-6-v2`.
 
 ```text
-Dense + BM25 -> RRF -> candidate set -> Cross-Encoder -> top K
+Dense + BM25 -> RRF -> top 50 candidates -> Cross-Encoder -> top K
 ```
 
-The reranking implementation is complete. A preliminary 50-candidate run improved several ranking metrics, but that run used a GitHub-hosted CPU runner and is therefore treated only as a reference. The canonical latency result will come from the local Windows machine/server.
+### Canonical local environment
 
-See [`benchmarks/V1_RESULTS.md`](benchmarks/V1_RESULTS.md) for the preliminary reference result and [`docs/LOCAL_EXECUTION.md`](docs/LOCAL_EXECUTION.md) for the local execution policy.
+- CPU: AMD Ryzen 7 5700U with Radeon Graphics
+- 8 cores / 16 logical processors
+- RAM: ~15.3 GiB
+- Windows 11 64-bit
+- Python 3.11.9
+- Paid APIs: none
+
+### V1 canonical local results
+
+| Pipeline | MRR@10 | nDCG@10 | Recall@5 | Recall@10 | Mean latency | p95 latency |
+|---|---:|---:|---:|---:|---:|---:|
+| Hybrid RRF | 0.6484 | 0.6865 | **0.7571** | 0.8179 | **34.53 ms** | **53.09 ms** |
+| Hybrid + Cross-Encoder | **0.6615** | **0.6944** | 0.7449 | **0.8272** | 3706.43 ms | 4184.39 ms |
+
+The reranker improved MRR@10 by about **2.0% relative**, nDCG@10 by about **1.2%**, and Recall@10 by about **1.1%**, while Recall@5 decreased about **1.6%**. Mean latency increased roughly **107.3x** on the canonical local CPU environment.
+
+**V1 decision:** 50-candidate cross-encoder reranking is a **NO-GO as the default architecture** on this machine. The quality gain is real but too small to justify several seconds of query latency. One focused candidate-depth ablation remains justified before moving to generation.
+
+See [`benchmarks/V1_RESULTS.md`](benchmarks/V1_RESULTS.md) for the complete canonical result and interpretation.
 
 ## Benchmark
 
@@ -69,7 +89,7 @@ The default benchmark is **BEIR SciFact (test)** via `ir_datasets`.
 - 300 test queries
 - relevance judgments (qrels) for objective retrieval evaluation
 
-For a very fast smoke test, `nano-beir/scifact` can also be used.
+For a fast smoke test, `nano-beir/scifact` can also be used.
 
 ## Principles
 
@@ -133,13 +153,13 @@ benchmarks/       Recorded experiment summaries and generated JSON results
 
 Each benchmark result records the dataset, pipeline configuration, K values, model configuration, aggregate metrics, per-query rankings, latency, and runtime environment. Local runs write timestamped JSON artifacts to `benchmarks/results/`.
 
-Canonical experiment summaries should also record the local hardware, operating system, Python version, and Git commit SHA so latency comparisons remain meaningful.
+Canonical experiment summaries also record the local hardware, operating system, Python version, and experiment configuration so latency comparisons remain meaningful.
 
 ## Roadmap
 
 - ✅ **V0:** Dense vs. BM25 vs. Hybrid retrieval
-- 🧪 **V1:** Cross-encoder reranking — implementation complete, canonical local reproduction pending
-- **V1.1:** Candidate-depth efficiency ablation on the local server
+- ✅ **V1:** Cross-encoder reranking — canonical local benchmark complete
+- 🧪 **V1.1:** Candidate-depth efficiency ablation: 10 vs. 20 vs. the V1 reference at 50 candidates
 - **V2:** Generation, context construction, and citations
 - **V3:** Trace/observability model and interactive inspection
 - **V4:** Web observatory and benchmark visualization
@@ -160,4 +180,4 @@ The current experiments run at **$0 paid API cost**. They use public benchmark d
 
 ## Status
 
-V0 is complete. V1 reranking is implemented. The next required step is to reproduce V1 locally and then run the V1.1 candidate-depth ablation on the same machine before making the final reranking GO/NO-GO decision.
+V0 and V1 are complete. V1 establishes that cross-encoder reranking improves ranking quality on SciFact but that reranking 50 candidates is too expensive on the canonical CPU environment. V1.1 will test 10 and 20 candidates before the project makes its final reranking decision and moves to V2.
