@@ -1,8 +1,8 @@
 # V1 Results — Cross-Encoder Reranking
 
-> **Status: preliminary reference run.**
+> **Status: canonical local benchmark.**
 >
-> This result was produced on a GitHub-hosted Ubuntu runner before the project switched to a local-execution policy. It is useful as an initial reference, but it is **not the canonical latency benchmark**. V1 must be reproduced on the local Windows machine/server before its final architectural decision is locked.
+> V1 was reproduced on the project’s designated local Windows machine. The quality and latency values below are the canonical V1 reference for this repository.
 
 ## Experiment
 
@@ -12,15 +12,17 @@ Research question:
 
 Command:
 
-```bash
-raglab benchmark \
-  --dataset beir/scifact/test \
-  --pipelines hybrid hybrid-rerank \
-  --k 5 10 \
-  --rerank-candidates 50
+```powershell
+.\scripts\run-v1-local.ps1
 ```
 
-Recorded preliminary environment:
+Equivalent benchmark command:
+
+```text
+raglab benchmark --dataset beir/scifact/test --pipelines hybrid hybrid-rerank --k 5 10 --rerank-candidates 50
+```
+
+## Canonical environment
 
 - Dataset: `beir/scifact/test`
 - Documents: 5,183
@@ -31,20 +33,29 @@ Recorded preliminary environment:
 - Hybrid candidate depth: 100 per component retriever
 - RRF constant: 60
 - Rerank candidate depth: 50
-- Python: 3.11
-- Runner: GitHub-hosted Ubuntu 24.04
+- Python: 3.11.9
+- CPU: AMD Ryzen 7 5700U with Radeon Graphics
+- CPU cores / logical processors: 8 / 16
+- RAM: 16,469,520,384 bytes (~15.3 GiB)
+- OS: Microsoft Windows 11, version 10.0.26200, 64-bit
 - Paid APIs: none
 
-## Preliminary results
+Generated result artifact:
+
+```text
+benchmarks/results/beir_scifact_test_20260912T193618Z.json
+```
+
+## Canonical results
 
 | Pipeline | MRR@5 | MRR@10 | nDCG@5 | nDCG@10 | Recall@5 | Recall@10 | Mean latency | p95 latency |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Hybrid RRF | 0.6407 | 0.6484 | 0.6653 | 0.6865 | **0.7571** | 0.8179 | **45.91 ms** | **106.95 ms** |
-| Hybrid + Cross-Encoder | **0.6521** | **0.6615** | **0.6665** | **0.6944** | 0.7449 | **0.8272** | 3896.99 ms | 4335.35 ms |
+| Hybrid RRF | 0.6407 | 0.6484 | 0.6653 | 0.6865 | **0.7571** | 0.8179 | **34.53 ms** | **53.09 ms** |
+| Hybrid + Cross-Encoder | **0.6521** | **0.6615** | **0.6665** | **0.6944** | 0.7449 | **0.8272** | 3706.43 ms | 4184.39 ms |
 
-## Preliminary delta from reranking
+## Delta from reranking
 
-Compared with the Hybrid baseline, the cross-encoder reranker changed the aggregate metrics by:
+Compared with the Hybrid baseline, the 50-candidate cross-encoder reranker changed aggregate retrieval quality by:
 
 - MRR@10: **+0.0131 absolute** (~2.0% relative)
 - MRR@5: **+0.0114 absolute** (~1.8% relative)
@@ -53,38 +64,41 @@ Compared with the Hybrid baseline, the cross-encoder reranker changed the aggreg
 - Recall@10: **+0.0093 absolute** (~1.1% relative)
 - Recall@5: **-0.0122 absolute** (~1.6% relative decrease)
 
-On that runner, mean query latency increased from **45.91 ms to 3896.99 ms**, roughly **84.9x**. p95 latency increased from **106.95 ms to 4335.35 ms**, roughly **40.5x**.
+Mean query latency increased from **34.53 ms to 3706.43 ms**, roughly **107.3x**. p95 latency increased from **53.09 ms to 4184.39 ms**, roughly **78.8x**.
 
 ## Interpretation
 
-The preliminary run suggests that the reranker is doing real work: it improved MRR@5, MRR@10, nDCG@5, nDCG@10, and Recall@10. Jointly scoring the query and candidate document therefore appears capable of improving final ranking quality over Hybrid RRF alone.
+The reranker is clearly doing real work. Joint query-document scoring improves MRR@5, MRR@10, nDCG@5, nDCG@10, and Recall@10 over the Hybrid RRF baseline on this benchmark.
 
-However, latency is hardware- and runtime-dependent. Because the recorded latency came from a GitHub-hosted runner, the project will not use it as the final basis for an architectural decision.
+However, the gain is modest relative to its CPU cost. On the canonical local machine, reranking 50 candidates increases mean query latency from tens of milliseconds to several seconds. For an interactive retrieval path, that trade-off is not attractive in this configuration.
 
-Recall@5 decreased in the preliminary run. This is possible because reranking changes ordering: documents that the cross-encoder considers more relevant can displace other qrel-relevant documents from the first five positions even while MRR, nDCG, and Recall@10 improve.
+Recall@5 decreases even while ranking metrics and Recall@10 improve. This is consistent with reranking changing the order of candidates: some qrel-relevant documents are displaced outside the first five positions while the first relevant result and broader top-10 ordering improve.
 
-## Current decision status
+## V1 decision
 
-**Pending local reproduction.**
+### Architectural adoption: NO-GO for the 50-candidate configuration
 
-The initial cloud result makes candidate-depth efficiency worth testing, but the final GO/NO-GO decision will be based on local-server runs under a controlled machine environment.
+Do **not** make 50-candidate cross-encoder reranking the default retrieval path on the canonical CPU environment.
 
-Run locally with:
+The measured quality gain does not justify the roughly 107x increase in mean query latency.
 
-```powershell
-.\scripts\run-v1-local.ps1
-```
+### Research direction: GO for one small efficiency ablation
 
-Then continue with the candidate-depth ablation:
+Reranking is not rejected as a technique. V1 shows that it improves ranking quality, so one focused follow-up is justified: test whether candidate depths **10** and **20** preserve most of the gain while materially reducing latency.
 
-```powershell
-.\scripts\run-v1-1-local.ps1
-```
+That experiment is V1.1. After it, the project should either select an efficient reranking configuration or move on to V2 generation/context construction without further reranking optimization.
 
-See [`../docs/LOCAL_EXECUTION.md`](../docs/LOCAL_EXECUTION.md) for the local benchmark policy and workflow.
+## What V1 establishes
+
+1. Second-stage cross-encoder reranking can improve Hybrid RRF ranking quality on SciFact.
+2. More sophisticated ranking is not automatically a better system architecture.
+3. Latency and compute are first-class evaluation dimensions, not afterthoughts.
+4. Candidate depth is now the most justified variable to ablate.
 
 ## Interpretation limits
 
-These preliminary results are specific to BEIR SciFact, this embedding model, this cross-encoder, candidate depth 50, and the recorded GitHub-hosted CPU environment. They do not establish that cross-encoder reranking is universally too slow or universally beneficial.
+These results are specific to BEIR SciFact, the selected embedding model, the selected cross-encoder, candidate depth 50, and the canonical local CPU environment.
 
-GPU inference, batching, smaller candidate sets, different rerankers, quantization, or production-serving optimizations could materially change the latency trade-off.
+They do not establish that cross-encoder reranking is universally too slow or universally beneficial. GPU inference, batching, smaller candidate sets, different rerankers, quantization, or production-serving optimizations could materially change the trade-off.
+
+See [`../docs/LOCAL_EXECUTION.md`](../docs/LOCAL_EXECUTION.md) for the benchmark execution policy.
