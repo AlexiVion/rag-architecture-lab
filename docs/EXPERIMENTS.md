@@ -69,30 +69,115 @@ query -> BM25 ranking -----+
 
 These are starting conditions, not claims of optimality.
 
+### V0 result
+
+V0 passed its go/no-go review. On the recorded BEIR SciFact run, Hybrid RRF produced the strongest quality metrics, while BM25 remained substantially faster. See [`../benchmarks/V0_RESULTS.md`](../benchmarks/V0_RESULTS.md).
+
+---
+
+## Experiment V1 — Cross-encoder reranking
+
+### What reranking changes
+
+Retrieval and reranking solve different stages of the search problem.
+
+A first-stage retriever must search the whole corpus efficiently. A reranker receives only a much smaller candidate set and can therefore use a more expensive model that reads the query and each candidate document together.
+
+```text
+whole corpus
+    |
+    v
+Hybrid retrieval
+    |
+    | top 50 candidates
+    v
+Cross-encoder reranker
+    |
+    v
+top K final ranking
+```
+
+The cross-encoder does **not** replace retrieval. It cannot practically score every document in the corpus for every query. Its role is to improve the ordering of candidates that the first-stage retriever already found.
+
+### Research question
+
+> **Does reranking Hybrid RRF candidates with a local cross-encoder improve top-K retrieval quality enough to justify its additional latency?**
+
+### Hypothesis
+
+Because a cross-encoder jointly models the query and candidate text, it may distinguish relevance more precisely than the independent embedding and lexical scores used by the first-stage retrievers. We expect ranking metrics such as MRR and nDCG to improve if the relevant documents are already present in the candidate set.
+
+Recall may improve at small K because reranking can move relevant candidates upward, but reranking cannot recover a relevant document that was absent from the candidate pool.
+
+### Controlled variables
+
+Keep fixed:
+
+- BEIR SciFact test corpus and 300 queries
+- relevance judgments
+- K values: 5 and 10
+- Hybrid retrieval configuration from V0
+- embedding model: `sentence-transformers/all-MiniLM-L6-v2`
+- machine/environment for within-run latency comparison
+
+Change:
+
+- add a reranking stage after Hybrid retrieval
+
+### Compared pipelines
+
+**Hybrid baseline**
+
+```text
+Dense + BM25 -> RRF -> top K
+```
+
+**Hybrid + reranking**
+
+```text
+Dense + BM25 -> RRF -> top 50 candidates
+                         |
+                         v
+            local cross-encoder
+                         |
+                         v
+                       top K
+```
+
+### Default reranker
+
+`cross-encoder/ms-marco-MiniLM-L-6-v2`
+
+This is used as an external pretrained model dependency. The experiment does not claim to train the reranker from scratch. The architecture, candidate orchestration, evaluation, and comparison are implemented in this repository.
+
+### Default V1 parameters
+
+- Hybrid candidate depth per component: 100
+- RRF constant: 60
+- Rerank candidate depth: 50
+- Evaluation K: 5, 10
+- Paid API usage: none
+
+### Go / No-Go criteria
+
+V1 is useful if it gives a measurable answer to the quality/latency trade-off. A GO does not require reranking to win every metric; it requires the experiment to reveal whether the extra computation creates a meaningful quality benefit under the controlled setup.
+
+Possible next steps after V1 depend on the result:
+
+- if reranking adds useful quality: test candidate depth and/or reranker size
+- if gains are marginal: keep the simpler Hybrid pipeline and move to generation/context construction
+- if gains are concentrated in specific query types: investigate adaptive reranking rather than applying it universally
+
 ### Reproducibility
 
-Every CLI benchmark writes a timestamped JSON result containing:
+The V1 benchmark command is:
 
-- dataset ID
-- pipeline names
-- pipeline configuration
-- aggregate metrics
-- latency summary
-- per-query rankings and metrics
-- runtime environment metadata
+```bash
+raglab benchmark \
+  --dataset beir/scifact/test \
+  --pipelines hybrid hybrid-rerank \
+  --k 5 10 \
+  --rerank-candidates 50
+```
 
-### Interpretation rules
-
-Do not conclude that an architecture is universally better from one dataset.
-
-A useful V0 conclusion sounds like:
-
-> Under SciFact and this configuration, pipeline A improved metric X while increasing latency Y; pipeline B remained stronger on a particular query class.
-
-An invalid conclusion sounds like:
-
-> Hybrid RAG is the best RAG architecture.
-
-### Next experiment only after Go decision
-
-If V0 is useful, V1 will introduce a reranking stage and test whether improving candidate ordering justifies its additional compute and latency.
+The generated JSON records aggregate metrics, per-query rankings, latency, model configuration, and runtime environment metadata.
