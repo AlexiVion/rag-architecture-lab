@@ -158,26 +158,93 @@ This is used as an external pretrained model dependency. The experiment does not
 - Evaluation K: 5, 10
 - Paid API usage: none
 
-### Go / No-Go criteria
+### V1 result
 
-V1 is useful if it gives a measurable answer to the quality/latency trade-off. A GO does not require reranking to win every metric; it requires the experiment to reveal whether the extra computation creates a meaningful quality benefit under the controlled setup.
+The 50-candidate reranker improved most ranking metrics over Hybrid RRF, including MRR@10 (0.6484 -> 0.6615), nDCG@10 (0.6865 -> 0.6944), and Recall@10 (0.8179 -> 0.8272). However, mean query latency increased from 45.91 ms to 3896.99 ms on the recorded CPU runner, roughly 84.9x.
 
-Possible next steps after V1 depend on the result:
+**Architecture decision:** NO-GO for this exact 50-candidate CPU configuration as the default retrieval path.
 
-- if reranking adds useful quality: test candidate depth and/or reranker size
-- if gains are marginal: keep the simpler Hybrid pipeline and move to generation/context construction
-- if gains are concentrated in specific query types: investigate adaptive reranking rather than applying it universally
+**Research decision:** GO for one targeted efficiency ablation before deciding whether reranking stays in the architecture.
+
+See [`../benchmarks/V1_RESULTS.md`](../benchmarks/V1_RESULTS.md) for the full table and interpretation.
+
+---
+
+## Experiment V1.1 — Reranking candidate-depth ablation
+
+### Research question
+
+> **Can a smaller reranking candidate set preserve most of V1's ranking improvement while materially reducing latency?**
+
+### Why candidate depth matters
+
+Cross-encoder cost scales approximately with the number of query-document pairs that must be scored. V1 reranked 50 candidates for each query and produced useful but modest quality gains at several seconds of CPU latency.
+
+Reducing the candidate pool changes two things at once:
+
+1. fewer query-document pairs are scored, so reranking should be faster;
+2. documents outside the candidate pool can no longer be promoted into the final top K.
+
+This creates a direct quality/latency frontier rather than a single yes/no reranking result.
+
+### Candidate depths
+
+V1.1 tests:
+
+- **10 candidates** — cheapest configuration; can reorder the existing first-stage top 10 but cannot promote ranks 11+ into the final top 10.
+- **20 candidates** — intermediate configuration; can promote documents from ranks 11–20 while requiring substantially fewer pair scores than V1's 50-candidate setup.
+- **50 candidates** — V1 reference point; results are already recorded and do not need to be recomputed for the main conclusion.
+
+### Controlled variables
+
+Keep fixed:
+
+- dataset: `beir/scifact/test`
+- 5,183 documents / 300 test queries
+- K values: 5 and 10
+- Hybrid RRF configuration
+- dense model: `sentence-transformers/all-MiniLM-L6-v2`
+- reranker: `cross-encoder/ms-marco-MiniLM-L-6-v2`
+- all other retrieval parameters
+
+Change:
+
+- rerank candidate depth only
+
+### Evaluation
+
+For each candidate depth, compare:
+
+- MRR@5 and MRR@10
+- nDCG@5 and nDCG@10
+- Recall@5 and Recall@10
+- mean query latency
+- p95 query latency
+
+The main decision is not simply which candidate depth has the highest quality. We want the smallest candidate pool that captures a meaningful fraction of V1's ranking gain without inheriting its extreme latency penalty.
+
+### Decision rule
+
+After V1.1:
+
+- if 10 or 20 candidates retain most of the ranking gain with a large latency reduction, keep reranking as an optional or adaptive stage;
+- if latency remains disproportionate to quality gains, remove reranking from the default path and move to V2 generation/context construction;
+- do not increase model complexity again until the efficiency question is resolved.
 
 ### Reproducibility
 
-The V1 benchmark command is:
+Example commands:
 
 ```bash
 raglab benchmark \
   --dataset beir/scifact/test \
   --pipelines hybrid hybrid-rerank \
   --k 5 10 \
-  --rerank-candidates 50
-```
+  --rerank-candidates 10
 
-The generated JSON records aggregate metrics, per-query rankings, latency, model configuration, and runtime environment metadata.
+raglab benchmark \
+  --dataset beir/scifact/test \
+  --pipelines hybrid hybrid-rerank \
+  --k 5 10 \
+  --rerank-candidates 20
+```
