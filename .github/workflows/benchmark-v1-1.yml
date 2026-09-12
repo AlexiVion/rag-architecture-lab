@@ -1,0 +1,37 @@
+name: benchmark-v1-1
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/benchmark-v1-1.yml"
+
+jobs:
+  candidate-depth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        rerank_candidates: [10, 20]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install benchmark dependencies
+        run: pip install -e ".[benchmark]"
+      - name: Run V1.1 candidate-depth benchmark
+        run: >-
+          raglab benchmark
+          --dataset beir/scifact/test
+          --pipelines hybrid hybrid-rerank
+          --k 5 10
+          --rerank-candidates ${{ matrix.rerank_candidates }}
+      - name: Upload benchmark result
+        uses: actions/upload-artifact@v4
+        with:
+          name: beir-scifact-v1-1-candidates-${{ matrix.rerank_candidates }}
+          path: benchmarks/results/*.json
+          if-no-files-found: error
