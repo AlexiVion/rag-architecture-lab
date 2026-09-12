@@ -15,7 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 benchmark = [
-  "ir-datasets>=0.5.11,<1",
+  "ir-datasets[pyarrow]>=0.5.11,<1",
   "sentence-transformers>=3,<6",
 ]
 dev = [
