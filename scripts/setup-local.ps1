@@ -13,8 +13,8 @@ $Python = Join-Path $RepoRoot ".venv\Scripts\python.exe"
 Write-Host "Upgrading pip..."
 & $Python -m pip install --upgrade pip
 
-Write-Host "Installing benchmark and development dependencies..."
-& $Python -m pip install -e ".[benchmark,dev]"
+Write-Host "Installing benchmark, generation, and development dependencies..."
+& $Python -m pip install -e ".[benchmark,generation,dev]"
 
 Write-Host "Running unit tests..."
 & $Python -m pytest
