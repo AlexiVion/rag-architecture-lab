@@ -9,9 +9,24 @@ from pathlib import Path
 from raglab.datasets import load_ir_dataset
 from raglab.embeddings import SentenceTransformerEmbeddings
 from raglab.evaluation.benchmark import run_benchmark
-from raglab.retrieval import BM25Retriever, DenseRetriever, HybridRetriever
+from raglab.retrieval import (
+    BM25Retriever,
+    CrossEncoderScorer,
+    DenseRetriever,
+    HybridRetriever,
+    RerankingRetriever,
+)
 
 DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+DEFAULT_RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+PIPELINES = [
+    "bm25",
+    "dense",
+    "hybrid",
+    "bm25-rerank",
+    "dense-rerank",
+    "hybrid-rerank",
+]
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -23,16 +38,18 @@ def _build_parser() -> argparse.ArgumentParser:
     benchmark.add_argument(
         "--pipelines",
         nargs="+",
-        choices=["bm25", "dense", "hybrid"],
+        choices=PIPELINES,
         default=["bm25", "dense", "hybrid"],
     )
     benchmark.add_argument("--k", nargs="+", type=int, default=[5, 10])
     benchmark.add_argument("--limit-queries", type=int, default=None)
     benchmark.add_argument("--embedding-model", default=DEFAULT_EMBEDDING_MODEL)
+    benchmark.add_argument("--rerank-model", default=DEFAULT_RERANK_MODEL)
     benchmark.add_argument("--bm25-k1", type=float, default=1.5)
     benchmark.add_argument("--bm25-b", type=float, default=0.75)
     benchmark.add_argument("--hybrid-candidates", type=int, default=100)
     benchmark.add_argument("--rrf-constant", type=int, default=60)
+    benchmark.add_argument("--rerank-candidates", type=int, default=50)
     benchmark.add_argument("--output-dir", default="benchmarks/results")
     return parser
 
@@ -67,22 +84,54 @@ def _benchmark(args: argparse.Namespace) -> int:
     requested = list(dict.fromkeys(args.pipelines))
 
     bm25 = BM25Retriever(k1=args.bm25_k1, b=args.bm25_b)
-    needs_dense = "dense" in requested or "hybrid" in requested
+    dense_pipeline_names = {"dense", "hybrid", "dense-rerank", "hybrid-rerank"}
+    needs_dense = any(pipeline in dense_pipeline_names for pipeline in requested)
     dense = None
     if needs_dense:
         embeddings = SentenceTransformerEmbeddings(args.embedding_model)
         dense = DenseRetriever(embeddings)
 
-    retrievers = {
-        "bm25": bm25,
-        "dense": dense,
-        "hybrid": HybridRetriever(
-            dense=dense,  # type: ignore[arg-type]
+    hybrid = (
+        HybridRetriever(
+            dense=dense,
             sparse=bm25,
             candidate_k=args.hybrid_candidates,
             rrf_constant=args.rrf_constant,
         )
         if dense is not None
+        else None
+    )
+
+    needs_reranker = any(pipeline.endswith("-rerank") for pipeline in requested)
+    scorer = CrossEncoderScorer(args.rerank_model) if needs_reranker else None
+
+    retrievers = {
+        "bm25": bm25,
+        "dense": dense,
+        "hybrid": hybrid,
+        "bm25-rerank": RerankingRetriever(
+            base=bm25,
+            scorer=scorer,  # type: ignore[arg-type]
+            candidate_k=args.rerank_candidates,
+            name="bm25-rerank",
+        )
+        if scorer is not None
+        else None,
+        "dense-rerank": RerankingRetriever(
+            base=dense,  # type: ignore[arg-type]
+            scorer=scorer,
+            candidate_k=args.rerank_candidates,
+            name="dense-rerank",
+        )
+        if scorer is not None and dense is not None
+        else None,
+        "hybrid-rerank": RerankingRetriever(
+            base=hybrid,  # type: ignore[arg-type]
+            scorer=scorer,
+            candidate_k=args.rerank_candidates,
+            name="hybrid-rerank",
+        )
+        if scorer is not None and hybrid is not None
         else None,
     }
 
@@ -93,12 +142,19 @@ def _benchmark(args: argparse.Namespace) -> int:
             raise RuntimeError(f"Pipeline {pipeline!r} could not be initialized")
         print(f"\nRunning {pipeline} on {dataset.id} ({len(dataset.queries)} queries)...")
         result = run_benchmark(dataset, retriever, args.k)
+
+        uses_dense = pipeline in dense_pipeline_names
+        uses_bm25 = pipeline in {"bm25", "hybrid", "bm25-rerank", "hybrid-rerank"}
+        uses_hybrid = pipeline in {"hybrid", "hybrid-rerank"}
+        uses_rerank = pipeline.endswith("-rerank")
         result["configuration"] = {
-            "embedding_model": args.embedding_model if pipeline in {"dense", "hybrid"} else None,
-            "bm25_k1": args.bm25_k1 if pipeline in {"bm25", "hybrid"} else None,
-            "bm25_b": args.bm25_b if pipeline in {"bm25", "hybrid"} else None,
-            "hybrid_candidates": args.hybrid_candidates if pipeline == "hybrid" else None,
-            "rrf_constant": args.rrf_constant if pipeline == "hybrid" else None,
+            "embedding_model": args.embedding_model if uses_dense else None,
+            "bm25_k1": args.bm25_k1 if uses_bm25 else None,
+            "bm25_b": args.bm25_b if uses_bm25 else None,
+            "hybrid_candidates": args.hybrid_candidates if uses_hybrid else None,
+            "rrf_constant": args.rrf_constant if uses_hybrid else None,
+            "rerank_model": args.rerank_model if uses_rerank else None,
+            "rerank_candidates": args.rerank_candidates if uses_rerank else None,
         }
         results.append(result)
 
@@ -110,7 +166,10 @@ def _benchmark(args: argparse.Namespace) -> int:
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     output_path = output_dir / f"{_safe_name(args.dataset)}_{timestamp}.json"
     payload = {
-        "experiment": "v0-retrieval-comparison",
+        "experiment": (
+            "v1-reranking" if any(pipeline.endswith("-rerank") for pipeline in requested)
+            else "v0-retrieval-comparison"
+        ),
         "dataset": args.dataset,
         "pipelines": requested,
         "results": results,
