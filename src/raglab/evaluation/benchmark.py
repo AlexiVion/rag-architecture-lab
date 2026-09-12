@@ -4,7 +4,7 @@ import platform
 import statistics
 import time
 from collections.abc import Iterable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import numpy as np
@@ -19,7 +19,7 @@ def run_benchmark(
     retriever: Retriever,
     ks: Iterable[int] = (5, 10),
 ) -> dict[str, Any]:
-    ks = sorted(set(int(k) for k in ks))
+    ks = sorted({int(k) for k in ks})
     if not ks or ks[0] <= 0:
         raise ValueError("All K values must be positive")
 
@@ -61,7 +61,7 @@ def run_benchmark(
     }
 
     return {
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(UTC).isoformat(),
         "dataset": dataset.id,
         "pipeline": retriever.name,
         "document_count": len(dataset.documents),
