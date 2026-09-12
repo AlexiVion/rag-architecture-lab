@@ -4,7 +4,7 @@ A from-first-principles lab for implementing, benchmarking, and comparing Retrie
 
 > **Current state**
 >
-> V0 retrieval benchmarking is complete. V1 cross-encoder reranking has now been reproduced on the designated local Windows machine and has a canonical quality/latency result. The next experiment is V1.1: a small candidate-depth efficiency ablation.
+> V0 retrieval benchmarking, V1 cross-encoder reranking, and V1.1 candidate-depth ablation are complete on the designated local Windows machine. The retrieval phase is now closed with Hybrid RRF as the default path and 10-candidate cross-encoder reranking retained as an optional quality mode. The next phase is V2: generation, context construction, and citations.
 
 ## Why this project exists
 
@@ -73,13 +73,40 @@ Dense + BM25 -> RRF -> top 50 candidates -> Cross-Encoder -> top K
 | Pipeline | MRR@10 | nDCG@10 | Recall@5 | Recall@10 | Mean latency | p95 latency |
 |---|---:|---:|---:|---:|---:|---:|
 | Hybrid RRF | 0.6484 | 0.6865 | **0.7571** | 0.8179 | **34.53 ms** | **53.09 ms** |
-| Hybrid + Cross-Encoder | **0.6615** | **0.6944** | 0.7449 | **0.8272** | 3706.43 ms | 4184.39 ms |
+| Hybrid + Cross-Encoder (50) | **0.6615** | **0.6944** | 0.7449 | **0.8272** | 3706.43 ms | 4184.39 ms |
 
 The reranker improved MRR@10 by about **2.0% relative**, nDCG@10 by about **1.2%**, and Recall@10 by about **1.1%**, while Recall@5 decreased about **1.6%**. Mean latency increased roughly **107.3x** on the canonical local CPU environment.
 
-**V1 decision:** 50-candidate cross-encoder reranking is a **NO-GO as the default architecture** on this machine. The quality gain is real but too small to justify several seconds of query latency. One focused candidate-depth ablation remains justified before moving to generation.
+**V1 decision:** 50-candidate cross-encoder reranking is a **NO-GO as the default architecture** on this machine. The quality gain is real but too small to justify several seconds of query latency.
 
 See [`benchmarks/V1_RESULTS.md`](benchmarks/V1_RESULTS.md) for the complete canonical result and interpretation.
+
+## V1.1 — Candidate-depth ablation
+
+V1.1 asks whether smaller reranking candidate sets retain most of the quality improvement while reducing latency.
+
+| Candidate depth | MRR@10 | nDCG@10 | Recall@5 | Recall@10 | Mean latency | p95 latency |
+|---:|---:|---:|---:|---:|---:|---:|
+| Hybrid baseline | 0.6484 | 0.6865 | 0.7571 | 0.8179 | ~31–38 ms | ~46–62 ms |
+| **10** | 0.6600 | 0.6914 | **0.7660** | 0.8179 | **744.11 ms** | **893.12 ms** |
+| **20** | **0.6618** | 0.6926 | 0.7389 | 0.8211 | 1634.30 ms | 1887.84 ms |
+| **50** | 0.6615 | **0.6944** | 0.7449 | **0.8272** | 3706.43 ms | 4184.39 ms |
+
+The 10-candidate configuration produced the best measured reranking trade-off: it preserved most of the MRR@10 improvement from the 50-candidate setup, improved Recall@5, and cut mean reranking latency from ~3.7 s to ~0.74 s.
+
+**Final retrieval decision:**
+
+```text
+Default / fast mode:
+Dense + BM25 -> RRF -> top K
+
+Optional / quality mode:
+Dense + BM25 -> RRF -> top 10 candidates -> Cross-Encoder -> top K
+```
+
+Universal cross-encoder reranking remains a **NO-GO as the default path**. The 10-candidate reranker is retained as an optional/adaptive stage for cases where additional ranking quality can justify sub-second CPU latency.
+
+See [`benchmarks/V1_1_RESULTS.md`](benchmarks/V1_1_RESULTS.md) for the full ablation and decision.
 
 ## Benchmark
 
@@ -159,8 +186,8 @@ Canonical experiment summaries also record the local hardware, operating system,
 
 - ✅ **V0:** Dense vs. BM25 vs. Hybrid retrieval
 - ✅ **V1:** Cross-encoder reranking — canonical local benchmark complete
-- 🧪 **V1.1:** Candidate-depth efficiency ablation: 10 vs. 20 vs. the V1 reference at 50 candidates
-- **V2:** Generation, context construction, and citations
+- ✅ **V1.1:** Candidate-depth efficiency ablation — final retrieval decision complete
+- 🧪 **V2:** Generation, context construction, and citations
 - **V3:** Trace/observability model and interactive inspection
 - **V4:** Web observatory and benchmark visualization
 - **Later experiments:** query rewriting, multi-query retrieval, parent-child retrieval, contextual retrieval, adaptive/agentic RAG, GraphRAG
@@ -180,4 +207,4 @@ The current experiments run at **$0 paid API cost**. They use public benchmark d
 
 ## Status
 
-V0 and V1 are complete. V1 establishes that cross-encoder reranking improves ranking quality on SciFact but that reranking 50 candidates is too expensive on the canonical CPU environment. V1.1 will test 10 and 20 candidates before the project makes its final reranking decision and moves to V2.
+The initial retrieval phase is complete. Hybrid RRF is the default retrieval architecture. A 10-candidate cross-encoder reranker remains available as an optional/adaptive quality mode. The next project phase is **V2: generation, context construction, and citations**.
