@@ -25,9 +25,9 @@ V0 compares:
 Metrics:
 
 - Recall@K
-- Mean Reciprocal Rank (MRR)
+- Mean Reciprocal Rank (MRR@K)
 - nDCG@K
-- Mean query latency
+- Mean and p95 query latency
 
 ## Benchmark
 
@@ -58,7 +58,7 @@ python -m venv .venv
 # macOS/Linux
 # source .venv/bin/activate
 
-pip install -e .
+pip install -e ".[benchmark]"
 ```
 
 Run a quick smoke benchmark:
@@ -74,6 +74,13 @@ raglab benchmark --dataset beir/scifact/test --pipelines bm25 dense hybrid --k 5
 ```
 
 The first dense run downloads the configured open-source embedding model locally. No paid API key is needed.
+
+For development:
+
+```bash
+pip install -e ".[dev]"
+pytest
+```
 
 ## Project structure
 
@@ -94,7 +101,7 @@ benchmarks/       Generated benchmark results (JSON)
 
 ## Reproducibility
 
-Each benchmark result records the dataset, pipeline configuration, K values, embedding model, aggregate metrics, and latency. Results are written to `benchmarks/results/` as JSON.
+Each benchmark result records the dataset, pipeline configuration, K values, embedding model, aggregate metrics, per-query rankings, latency, and runtime environment. Results are written to `benchmarks/results/` as JSON.
 
 ## Roadmap
 
@@ -113,6 +120,13 @@ See [`docs/SCOPE.md`](docs/SCOPE.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE
 
 V0 is designed to run at **$0 API/infrastructure cost** on a local machine. The only external downloads are open-source Python packages, the benchmark data, and a local embedding model.
 
+## References
+
+- Thakur et al. (2021), **BEIR: A Heterogeneous Benchmark for Zero-shot Evaluation of Information Retrieval Models**
+- Wadden et al. (2020), **Fact or Fiction: Verifying Scientific Claims (SciFact)**
+- Cormack, Clarke & Buettcher (2009), **Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank Learning Methods**
+- Robertson & Zaragoza (2009), **The Probabilistic Relevance Framework: BM25 and Beyond**
+
 ## Status
 
-The repository is currently implementing the V0 retrieval benchmark. Do not interpret planned roadmap items as completed features.
+The repository contains the V0 retrieval engine and benchmark harness. Real benchmark results have not yet been committed; roadmap items beyond V0 are planned, not completed.
