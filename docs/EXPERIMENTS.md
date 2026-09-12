@@ -71,7 +71,7 @@ These are starting conditions, not claims of optimality.
 
 ### V0 result
 
-V0 passed its go/no-go review. On the recorded BEIR SciFact run, Hybrid RRF produced the strongest quality metrics, while BM25 remained substantially faster. See [`../benchmarks/V0_RESULTS.md`](../benchmarks/V0_RESULTS.md).
+V0 passed its go/no-go review. On the recorded BEIR SciFact run, Hybrid RRF produced the strongest quality metrics. See [`../benchmarks/V0_RESULTS.md`](../benchmarks/V0_RESULTS.md).
 
 ---
 
@@ -118,31 +118,11 @@ Keep fixed:
 - K values: 5 and 10
 - Hybrid retrieval configuration from V0
 - embedding model: `sentence-transformers/all-MiniLM-L6-v2`
-- machine/environment for within-run latency comparison
+- canonical local machine for latency comparison
 
 Change:
 
 - add a reranking stage after Hybrid retrieval
-
-### Compared pipelines
-
-**Hybrid baseline**
-
-```text
-Dense + BM25 -> RRF -> top K
-```
-
-**Hybrid + reranking**
-
-```text
-Dense + BM25 -> RRF -> top 50 candidates
-                         |
-                         v
-            local cross-encoder
-                         |
-                         v
-                       top K
-```
 
 ### Default reranker
 
@@ -150,23 +130,23 @@ Dense + BM25 -> RRF -> top 50 candidates
 
 This is used as an external pretrained model dependency. The experiment does not claim to train the reranker from scratch. The architecture, candidate orchestration, evaluation, and comparison are implemented in this repository.
 
-### Default V1 parameters
+### Canonical local environment
 
-- Hybrid candidate depth per component: 100
-- RRF constant: 60
-- Rerank candidate depth: 50
-- Evaluation K: 5, 10
-- Paid API usage: none
+- CPU: AMD Ryzen 7 5700U with Radeon Graphics
+- 8 cores / 16 logical processors
+- RAM: ~15.3 GiB
+- Windows 11 64-bit
+- Python 3.11.9
 
-### V1 result
+### V1 canonical result
 
-The 50-candidate reranker improved most ranking metrics over Hybrid RRF, including MRR@10 (0.6484 -> 0.6615), nDCG@10 (0.6865 -> 0.6944), and Recall@10 (0.8179 -> 0.8272). However, mean query latency increased from 45.91 ms to 3896.99 ms on the recorded CPU runner, roughly 84.9x.
+The 50-candidate reranker improved most ranking metrics over Hybrid RRF, including MRR@10 (0.6484 -> 0.6615), nDCG@10 (0.6865 -> 0.6944), and Recall@10 (0.8179 -> 0.8272). Mean query latency increased from 34.53 ms to 3706.43 ms on the canonical local machine, roughly 107.3x.
 
 **Architecture decision:** NO-GO for this exact 50-candidate CPU configuration as the default retrieval path.
 
-**Research decision:** GO for one targeted efficiency ablation before deciding whether reranking stays in the architecture.
+**Research decision:** GO for one candidate-depth efficiency ablation.
 
-See [`../benchmarks/V1_RESULTS.md`](../benchmarks/V1_RESULTS.md) for the full table and interpretation.
+See [`../benchmarks/V1_RESULTS.md`](../benchmarks/V1_RESULTS.md) for the full canonical table and interpretation.
 
 ---
 
@@ -176,24 +156,9 @@ See [`../benchmarks/V1_RESULTS.md`](../benchmarks/V1_RESULTS.md) for the full ta
 
 > **Can a smaller reranking candidate set preserve most of V1's ranking improvement while materially reducing latency?**
 
-### Why candidate depth matters
-
-Cross-encoder cost scales approximately with the number of query-document pairs that must be scored. V1 reranked 50 candidates for each query and produced useful but modest quality gains at several seconds of CPU latency.
-
-Reducing the candidate pool changes two things at once:
-
-1. fewer query-document pairs are scored, so reranking should be faster;
-2. documents outside the candidate pool can no longer be promoted into the final top K.
-
-This creates a direct quality/latency frontier rather than a single yes/no reranking result.
-
 ### Candidate depths
 
-V1.1 tests:
-
-- **10 candidates** — cheapest configuration; can reorder the existing first-stage top 10 but cannot promote ranks 11+ into the final top 10.
-- **20 candidates** — intermediate configuration; can promote documents from ranks 11–20 while requiring substantially fewer pair scores than V1's 50-candidate setup.
-- **50 candidates** — V1 reference point; results are already recorded and do not need to be recomputed for the main conclusion.
+V1.1 tests 10 and 20 candidates against matched Hybrid baselines, with the V1 50-candidate configuration as the reference point.
 
 ### Controlled variables
 
@@ -205,46 +170,68 @@ Keep fixed:
 - Hybrid RRF configuration
 - dense model: `sentence-transformers/all-MiniLM-L6-v2`
 - reranker: `cross-encoder/ms-marco-MiniLM-L-6-v2`
+- canonical local machine
 - all other retrieval parameters
 
 Change:
 
 - rerank candidate depth only
 
-### Evaluation
+### Canonical V1.1 results
 
-For each candidate depth, compare:
+**10 candidates**
 
-- MRR@5 and MRR@10
-- nDCG@5 and nDCG@10
-- Recall@5 and Recall@10
-- mean query latency
-- p95 query latency
+- MRR@10: 0.6484 -> 0.6600
+- nDCG@10: 0.6865 -> 0.6914
+- Recall@5: 0.7571 -> 0.7660
+- Recall@10: 0.8179 -> 0.8179
+- mean latency: 30.71 ms -> 744.11 ms (~24.2x)
+- p95 latency: 45.65 ms -> 893.12 ms
 
-The main decision is not simply which candidate depth has the highest quality. We want the smallest candidate pool that captures a meaningful fraction of V1's ranking gain without inheriting its extreme latency penalty.
+**20 candidates**
 
-### Decision rule
+- MRR@10: 0.6484 -> 0.6618
+- nDCG@10: 0.6865 -> 0.6926
+- Recall@5: 0.7571 -> 0.7389
+- Recall@10: 0.8179 -> 0.8211
+- mean latency: 38.32 ms -> 1634.30 ms (~42.6x)
+- p95 latency: 61.89 ms -> 1887.84 ms
 
-After V1.1:
+**50-candidate reference from V1**
 
-- if 10 or 20 candidates retain most of the ranking gain with a large latency reduction, keep reranking as an optional or adaptive stage;
-- if latency remains disproportionate to quality gains, remove reranking from the default path and move to V2 generation/context construction;
-- do not increase model complexity again until the efficiency question is resolved.
+- MRR@10: 0.6615
+- nDCG@10: 0.6944
+- Recall@5: 0.7449
+- Recall@10: 0.8272
+- mean latency: 3706.43 ms
+- p95 latency: 4184.39 ms
 
-### Reproducibility
+### Interpretation
 
-Example commands:
+The 10-candidate configuration retained most of the MRR improvement observed at 50 candidates while reducing reranking latency by roughly 80%. It also improved Recall@5 instead of reducing it.
 
-```bash
-raglab benchmark \
-  --dataset beir/scifact/test \
-  --pipelines hybrid hybrid-rerank \
-  --k 5 10 \
-  --rerank-candidates 10
+The 20-candidate configuration slightly improved MRR@10 and Recall@10 relative to 10 candidates, but more than doubled mean latency and reduced Recall@5 below the Hybrid baseline. It therefore did not establish a clearly better trade-off.
 
-raglab benchmark \
-  --dataset beir/scifact/test \
-  --pipelines hybrid hybrid-rerank \
-  --k 5 10 \
-  --rerank-candidates 20
+The experiments demonstrate that candidate depth is a real architectural control knob: increasing it changes both quality and compute, and more candidates do not improve every metric monotonically.
+
+### Final retrieval decision
+
+**Default architecture:** Hybrid RRF without cross-encoder reranking.
+
+```text
+Dense + BM25 -> RRF -> top K
 ```
+
+**Optional quality mode:** Hybrid RRF followed by a 10-candidate cross-encoder reranker.
+
+```text
+Dense + BM25 -> RRF -> top 10 candidates -> Cross-Encoder -> top K
+```
+
+Universal cross-encoder reranking is a NO-GO as the default CPU path. The 10-candidate configuration is retained as an optional/adaptive stage where additional ranking quality can justify approximately 0.7 seconds of local CPU latency.
+
+See [`../benchmarks/V1_1_RESULTS.md`](../benchmarks/V1_1_RESULTS.md) for the full tables, deltas, and decision.
+
+### Next phase
+
+V1.1 closes the initial retrieval/reranking phase. The project moves next to **V2: generation, context construction, and citations**.
