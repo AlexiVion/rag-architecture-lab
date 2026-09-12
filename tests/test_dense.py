@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 import numpy as np
 
 from raglab.core import Document
@@ -7,7 +9,7 @@ from raglab.retrieval.dense import DenseRetriever
 class FakeEmbeddings:
     name = "fake"
 
-    vectors = {
+    vectors: ClassVar[dict[str, np.ndarray]] = {
         "cats": np.array([1.0, 0.0], dtype=np.float32),
         "dogs": np.array([0.0, 1.0], dtype=np.float32),
         "cat query": np.array([0.9, 0.1], dtype=np.float32),
