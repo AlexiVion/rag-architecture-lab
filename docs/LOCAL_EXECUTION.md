@@ -1,8 +1,8 @@
 # Local Benchmark Execution
 
-All benchmark computation for this project is intended to run on the local Windows machine/server, not on GitHub-hosted Actions runners.
+All computation for this project is intended to run on the local Windows machine/server, not on GitHub-hosted Actions runners.
 
-GitHub is used for source control and publishing code/results. Benchmark execution stays local so experiments use the same machine and latency measurements remain comparable.
+GitHub is used for source control and publishing code/results. Tests and benchmark execution stay local so experiments use the same machine and latency measurements remain comparable.
 
 ## 1. Clone or update the repository
 
@@ -26,7 +26,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\scripts\setup-local.ps1
 ```
 
-The setup script creates `.venv`, installs benchmark and development dependencies, and runs the unit tests.
+The setup script creates `.venv`, installs benchmark and development dependencies, and runs the unit tests locally.
 
 ## 3. Run V1 locally
 
@@ -78,8 +78,8 @@ After a benchmark finishes locally:
 3. write/update the corresponding `benchmarks/*_RESULTS.md` document;
 4. commit the result summary to GitHub.
 
-Do not use GitHub-hosted benchmark runs as the canonical latency source.
+Do not use GitHub-hosted runs as the canonical source for tests, benchmarks, or latency measurements.
 
 ## GitHub Actions policy
 
-Benchmark workflows are intentionally not stored in `.github/workflows/`. The remaining GitHub workflow, if present, is for lightweight code tests only and is not used to execute benchmark experiments.
+The repository intentionally contains no GitHub Actions workflows for execution. GitHub is the source-control and publication layer; computation happens on the local machine/server.
