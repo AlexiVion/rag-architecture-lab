@@ -17,6 +17,7 @@ jobs:
           python-version: "3.11"
           cache: pip
       - name: Install benchmark dependencies
+        # The benchmark extra includes pyarrow because NanoBEIR stores its corpus as Parquet.
         run: pip install -e ".[benchmark]"
       - name: Run NanoBEIR SciFact benchmark
         run: raglab benchmark --dataset nano-beir/scifact --pipelines bm25 dense hybrid --k 5 10
