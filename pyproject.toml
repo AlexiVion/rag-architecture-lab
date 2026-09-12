@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rag-architecture-lab"
 version = "0.1.0"
-description = "A from-first-principles lab for implementing, benchmarking and comparing RAG retrieval architectures."
+description = "A from-first-principles lab for implementing, benchmarking and comparing RAG architectures."
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Alexi Vion" }]
@@ -17,6 +17,10 @@ dependencies = [
 benchmark = [
   "ir-datasets[pyarrow]>=0.5.11,<1",
   "sentence-transformers>=3,<6",
+]
+generation = [
+  "transformers>=4.45,<6",
+  "torch>=2.2",
 ]
 dev = [
   "pytest>=8,<9",
