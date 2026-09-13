@@ -1,0 +1,30 @@
+schema_version: 1
+id: TECH-001
+name: RAG Architecture Lab
+slug: rag-architecture-lab
+type: technical-lab
+domain: artificial-intelligence
+areas:
+  - rag
+  - information-retrieval
+  - evaluation
+status: published
+visibility: public
+purpose:
+  - technical-portfolio
+  - capability-proof
+  - benchmarking
+stack:
+  - python
+featured: true
+repository: https://github.com/AlexiVion/rag-architecture-lab
+live_demo: null
+owner: AlexiVion
+created: 2026-09-12
+updated: 2026-09-13
+topics:
+  - rag
+  - retrieval
+  - benchmarking
+  - information-retrieval
+registry: https://github.com/VionWorks/portfolio-registry/blob/main/projects/TECH-001.yaml
