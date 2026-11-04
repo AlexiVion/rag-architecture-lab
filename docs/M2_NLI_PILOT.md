@@ -50,3 +50,24 @@ A stronger, **fully automatic** study uses the original SciFact **TRAIN** source
 No need to fill 18 JSON packets manually: run `scripts/run-m2-original-scifact-stances-local.ps1`. It checks code tests, downloads the official public archive once if absent, validates its **pinned SHA256**, loads only `claims_train.jsonl` and `corpus.jsonl`, reuses the CPU NLI weights and writes a private report under `runs/stance-eval`. No manual input, no Qwen and no change to the RAG runtime. The source archive's claims/annotations are CC BY 4.0, abstracts ODC-By 1.0 according to the source repository LICENSE. Do not redistribute raw corpus content without appropriate attribution.
 
 These numbers are **gold-labelled TRAIN rationale stance scores**, not end-to-end answer factuality, not official leaderboard results, and not a held-out claim of accuracy. We may later use original SciFact DEV (with separate labels) only after freezing choices and documenting evaluation protocol; never use TEST for tuning.
+
+
+## FINAL decision — M2-STANCE-TRAIN-01 (2026-11-04)
+
+**Status: NO-GO for `cross-encoder/nli-MiniLM2-L6-H768` as a scientific evidence/abstention gate in V2.**
+
+The maintainer executed `scripts/run-m2-original-scifact-stances-local.ps1` at GitHub commit `97caca7`. All local tests **PASSED**. The *original* SciFact TRAIN source archive was verified by SHA-256, and the original human-curated scientific stance rationale labels were loaded: 616 entailment and 341 contradiction rationale entries were available. A reproducible balanced seed-17 sample of 20 SUPPORT and 20 CONTRADICT cases was selected. The local CPU NLI yielded:
+
+| Human-labelled TRAIN rationale | Predicted contradiction | Predicted entailment | Predicted neutral |
+|---|---:|---:|---:|
+| SUPPORT / entailment (20) | 2 | 2 | 16 |
+| CONTRADICT / contradiction (20) | 9 | 1 | 10 |
+
+- Sample correct predictions: **11/40 = 27.5%**. Balanced recall = **27.5%**.
+- SUPPORT recall: **2/20 = 10%**. CONTRADICT recall: **9/20 = 45%**.
+- **26/40 = 65%** of examples were predicted neutral, although this two-class gold sample contains no neutral labels.
+- An always-one-class predictor would get **50%** on this particular balanced sample; this is a descriptive baseline, not a validated tuned competitor.
+
+Consequence: **do not deploy the NLI model for abstention, support adjudication, contradiction filtering, or quality gating**. This decision concerns this specific off-domain model/configuration on this original SciFact TRAIN sample. It does **not** establish that NLI generally fails or that the RAG pipeline has 27.5% answer accuracy.
+
+Exact local evidence: `runs/stance-eval/SCIFACT_ORIGINAL_TRAIN_STANCE_20261104T151846152707Z.json` and accompanying Markdown, stored only on the maintainer's machine. Concise public case report: `benchmarks/M2_SCIFACT_TRAIN_NLI_NO_GO_20261104.md`. No TEST labels were used, no live RAG changes made, and PR #2 remains draft. Future NLI research requires a new explicit hypothesis or a predeclared stronger model with an independent validation plan; do not repeat the same model without reason.
