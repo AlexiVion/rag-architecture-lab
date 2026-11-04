@@ -267,7 +267,7 @@ def main() -> int:
     print(f"M2_GENERATOR_CALLS={result['total_generator_calls']}")
     for case in result["cases"]:
         print(f"M2_CASE={case['case_id']} STATUS={case['output_status']} "
-              f"CITATIONS_VALID={case['local_answer_artifact']['citation_report']['citation_contract_passed']}")
+              f"CITATIONS_VALID={case['citation_contract_syntax_passed']}")
     print(f"M2_RAW_JSON_LOCAL={json_file}")
     print(f"M2_REPORT_LOCAL={md_file}")
     print("SEMANTIC_SUPPORT=NOT_EVALUATED; ANSWER_CORRECTNESS=NOT_EVALUATED")

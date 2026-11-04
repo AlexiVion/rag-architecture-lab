@@ -1,8 +1,6 @@
 """M2 smoke tests are deliberately synthetic and never load local Qwen weights."""
 from __future__ import annotations
 
-import copy
-
 import pytest
 
 from raglab.evaluation.m2_live_smoke import (
@@ -58,6 +56,8 @@ def test_four_predeclared_controls_use_real_pipeline_contract():
     assert report["cases"][3]["local_answer_artifact"]["timings_ms"]["generation"] == 0
     assert all(c["safe_publication_gate_passed"] for c in report["cases"])
     assert "Citation gate" in summary_markdown(report)
+    assert report["cases"][0]["citation_contract_syntax_passed"] is True
+    assert "citation_contract_passed" not in report["cases"][0]["local_answer_artifact"]["citation_report"]
 
 
 def test_cited_nonanswer_from_irrelevant_or_contradictory_evidence_is_not_certified():
@@ -98,7 +98,7 @@ def test_fixed_source_ids_are_verified_and_not_inferred_from_gold():
         FixedEvidenceRetriever(["not-a-real-source"]).index(DOCUMENTS)
 
 
-def test_fixture_fingerprint_changes_when_case_or_source_changes():
+def test_fixture_fingerprint_is_stable_and_source_ids_are_unique():
     report = run_control_cases(valid_generator())
     assert len(report["fixture_sha256"]) == 64
     assert all(c["evidence_condition_curated_not_model_inferred"] for c in report["cases"])
