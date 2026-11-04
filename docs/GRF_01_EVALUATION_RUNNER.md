@@ -65,4 +65,9 @@ Original locally saved outputs: `runs/graph-hybrid/GRF01_FROZEN_EVALUATION.json`
 
 ### Post-run evidence audit
 
-The newly added `scripts/audit-grf01-local.ps1` runs full pytest and independently checks the saved report's per-query source rankings, supporting-document recall, paired bootstrap CI, win/loss/tie counts, graph paths, frozen model/policy/cohort identities and timing summaries. It does **not** rerun the evaluator or load model weights. It prints actual CI bounds and writes a local audit report plus the ignored JSON file consumed by the web explorer. This code is **not yet verified on the operator's Windows machine**. The archived original run will not be overwritten.
+The newly added `scripts/audit-grf01-local.ps1` runs full pytest and independently checks the saved report's per-query source rankings, supporting-document recall, paired bootstrap CI, win/loss/tie counts, graph paths, frozen model/policy/cohort identities and timing summaries. It does **not** rerun the evaluator or load model weights. It prints actual CI bounds and writes a local audit report plus the ignored JSON file consumed by the web explorer. The audit has now **passed on the operator's Windows machine**, including the complete test suite and source-report verification. The archived original run will not be overwritten.
+
+
+## Final audited result (2026-11-04)
+
+Read the full [GRF-01 audited result](../benchmarks/GRF01_HOTPOTQA_DEV_FROZEN_20261104.md). **PASS**: all Python tests, `GRF01_SAVED_RUN_AUDIT_PASS`, source SHA256 `f2167bc7220554b1864648c5c5de0b67544bfbdba585a4aeed8f466927fcb2b4`. Paired ΔRecall@1=0.0000 CI [−0.0333,+0.0333]; @3=−0.0500 CI [−0.1000,−0.0083]; primary @5=−0.0083 CI [−0.0250,0]. Path-active cases 36 (0 wins/1 loss/35 ties at @5), no path 24 (24 ties). Final study remains **INCONCLUSIVE, NO AUTOMATIC PROMOTION**. No model or query rerun. Public aggregate contains only statistics, source hash and provenance, with local audit taking precedence in the web explorer.

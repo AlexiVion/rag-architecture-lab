@@ -81,3 +81,8 @@ After all local regression tests passed, the operator ran the **single** reserve
 - Decision: `INCONCLUSIVE_NO_AUTOMATIC_PROMOTION` with no production change.
 
 The confidence interval bounds and wins/losses per query are in the locally saved JSON but **not present in the console excerpt**; a new post-run auditor is committed to verify and report them. No second evaluation or parameter tuning is appropriate on this now-exposed cohort. The GRF-00 and GRF-01 cohorts/baselines differ, and raw numbers must not be interpreted as a causal controlled improvement between the two.
+
+
+## Final empirical outcome and closed cohort (2026-11-04)
+
+This is a **historical preregistration**; the frozen 60-query evaluation and subsequent saved-report audit have been completed. The original report hash was `f2167bc7220554b1864648c5c5de0b67544bfbdba585a4aeed8f466927fcb2b4`. Graph−Hybrid primary paired Recall@5 Δ=−0.0083 (95% bootstrap CI [−0.0250,0]); Recall@3 Δ=−0.0500 (CI [−0.1000,−0.0083]); Recall@1 Δ=0 (CI [−0.0333,+0.0333]). The primary decision was `INCONCLUSIVE_NO_AUTOMATIC_PROMOTION`. The cohort must **not** be reused to tune graph weights or claim new independent validation. See `benchmarks/GRF01_HOTPOTQA_DEV_FROZEN_20261104.md`.

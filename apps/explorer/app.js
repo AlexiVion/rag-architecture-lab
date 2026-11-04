@@ -177,16 +177,28 @@ async function load(){
 }
 load();
 
+const PUBLISHED_GRF00_SOURCE_SHA256 = '962dc3b12d0086857ad94198cf2b1fff7a49ca5f7df069e9575a6daaf778f016';
+const PUBLISHED_GRF01_SOURCE_SHA256 = 'f2167bc7220554b1864648c5c5de0b67544bfbdba585a4aeed8f466927fcb2b4';
+
+// Only a missing local file may trigger the published read-only fallback.
+// If a local audit artifact is present but corrupt, fail closed.
+async function loadBenchmarkArtifact(localPath, publishedPath) {
+  const local = await fetch(localPath, {cache:'no-store'});
+  if (local.ok) return {data: await local.json(), origin: 'local'};
+  if (local.status !== 404) throw new Error('Local result was not accessible');
+  const publicResponse = await fetch(publishedPath, {cache:'no-store'});
+  if (!publicResponse.ok) throw new Error('Published summary unavailable');
+  return {data: await publicResponse.json(), origin: 'published'};
+}
+
 async function loadLocalBenchmark() {
   const status = $('benchmark-badge');
   try {
-    const response = await fetch('./data/hotpotqa-summary.local.json', {cache:'no-store'});
-    if (!response.ok) throw new Error('Benchmark aggregate is not generated locally');
-    const data = await response.json();
+    const {data,origin} = await loadBenchmarkArtifact('./data/hotpotqa-summary.local.json','./data/grf00-summary.public.json');
     if (data.schema_version !== 1 || data.kind !== 'verified_retrieval_benchmark_aggregate'
       || data.experiment_id !== 'GRF00-HOTPOTQA-DEV-01' || data.sample_count !== 60
-      || data.publication_status !== 'verified_from_local_per_query_records'
-      || !/^[0-9a-f]{64}$/.test(data.source_report_sha256)
+      || data.publication_status !== (origin==='local' ? 'verified_from_local_per_query_records' : 'published_operator_audit_summary')
+      || data.source_report_sha256 !== PUBLISHED_GRF00_SOURCE_SHA256
       || !['NO_GO_GRAPH_FIRST_ON_THIS_DEV_SUBSET','INCONCLUSIVE_OR_MIXED_RESULTS'].includes(data.decision)) {
       throw new Error('Invalid or unaudited local benchmark summary');
     }
@@ -215,7 +227,7 @@ async function loadLocalBenchmark() {
       groups.append(el('span','bench-group',`${label}: ${group.cases} cases · ΔRecall@5: ${delta===null?'n/a':(delta*100).toFixed(2)+' pts'}`));
     }
     $('benchmark-provenance').textContent =
-      `Verified local run · HotpotQA DEV distractor · 60 questions · CC BY-SA 4.0 · Report SHA256 ${data.source_report_sha256.slice(0,16)}… · Dataset is NOT a held-out benchmark; no generated answer metrics.`;
+      `${origin==='local'?'Local saved-JSON audit':'Public aggregate reconstructed from successful operator audit log'} · HotpotQA DEV distractor · 60 questions · CC BY-SA 4.0 · Report SHA256 ${data.source_report_sha256.slice(0,16)}… · This is NOT an independent TEST benchmark; no generated answer metrics.`;
   } catch (error) {
     status.textContent = 'LOCAL RESULT PENDING';
     $('benchmark-metrics').textContent = 'No audited local results available. Run scripts/audit-grf00-hotpotqa-local.ps1 and refresh.';
@@ -226,14 +238,14 @@ async function loadLocalBenchmark() {
 async function loadGrf01Benchmark() {
   const badge = $('grf01-badge'), host = $('grf01-metrics');
   try {
-    const response = await fetch('./data/grf01-summary.local.json', {cache:'no-store'});
-    if (!response.ok) throw new Error('No audited GRF-01 local result');
-    const data = await response.json();
+    const {data,origin} = await loadBenchmarkArtifact('./data/grf01-summary.local.json','./data/grf01-summary.public.json');
     if (data.schema_version !== 1 || data.kind !== 'verified_grf01_retrieval_aggregate'
-      || data.publication_status !== 'audited_local_existing_run'
+      || data.publication_status !== (origin==='local'?'audited_local_existing_run':'published_operator_audit_summary')
       || data.experiment_id !== 'GRF01-HOTPOTQA-DEV-01'
       || data.sample_count !== 60
-      || !/^[0-9a-f]{64}$/.test(data.source_report_sha256)
+      || data.source_report_sha256 !== PUBLISHED_GRF01_SOURCE_SHA256
+      || data.cohort_sha256 !== 'a560b1cbabe1ce6b4413f0f6f59759cd08e69ce49c5391e05b7c8767f81bd13f'
+      || data.policy_sha256 !== 'fd28fe01f244fa27f731395bd522a331026eb1cfa6a6acb4bcf592db1fb942bb'
       || !['INCONCLUSIVE_NO_AUTOMATIC_PROMOTION','NO_GO_PRIMARY_RECALL_BELOW_BASELINE','PRIMARY_POSITIVE_PENDING_COST_AND_PROVENANCE_REVIEW'].includes(data.decision)) {
       throw new Error('Invalid or unverified GRF-01 study aggregate');
     }
@@ -276,7 +288,7 @@ async function loadGrf01Benchmark() {
       const delta=item.mean_delta_recall_at_5;
       groupHost.append(el('span','bench-group',title+': '+item.cases+' cases · ΔRecall@5 '+(delta===null?'n/a':(delta*100).toFixed(2)+' pts')+' · W/L/T '+item.wins+'/'+item.losses+'/'+item.ties));
     }
-    $('grf01-source').textContent='Audited original GRF-01 run · model revision '+data.model_revision.slice(0,12)+'… · report SHA256 '+data.source_report_sha256.slice(0,16)+'… · HotpotQA DEV CC BY-SA 4.0. These are source retrieval metrics, not answer accuracy.';
+    $('grf01-source').textContent=(origin==='local'?'Local saved-JSON audit':'Public aggregate from operator audit log')+' · model revision '+data.model_revision.slice(0,12)+'… · report SHA256 '+data.source_report_sha256.slice(0,16)+'… · HotpotQA DEV CC BY-SA 4.0. These are source retrieval metrics, not answer accuracy.';
   } catch (error) {
     badge.textContent='AUDITED RESULT PENDING';
     host.textContent='Audited GRF-01 result unavailable. Run scripts/audit-grf01-local.ps1 and refresh.';

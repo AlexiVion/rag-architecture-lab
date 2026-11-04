@@ -57,3 +57,12 @@ No hosted multi-user chatbot, billing, client CRM, platform integrations, GPU cl
 **GRF-01D/E evaluation runner:** source code, synthetic tests and `scripts/run-grf01-hybrid-study-local.ps1` committed. It validates the frozen cohort/model/policy before loading weights and computes a one-pass four-architecture same-candidate comparison with paired CIs and resource measurements. Windows verification and all **GRF-01 actual scores are still pending**; full GraphRAG and M2 quality gates remain open.
 
 **GRF-01 frozen evaluation executed (2026-11-04):** full local pytest PASS; 60 reserved queries evaluated exactly once; fixed MiniLM model and graph policy hashes verified. Primary Recall@5: Hybrid RRF **0.8583** vs Graph-Hybrid **0.8500** (delta **−0.0083**). Recall@3 delta −0.0500, Recall@1 equal. **INCONCLUSIVE_NO_AUTOMATIC_PROMOTION**, Hybrid RRF retained. New saved-report audit and local observatory panel staged; no unreported CI/win-loss values are asserted. M2/ten-model matrix/public release still incomplete.
+
+
+## Latest verified checkpoint — 2026-11-04 (supersedes earlier in-progress notes)
+
+**GRF-00:** 60 HotpotQA DEV bridge questions, graph-first source title links vs BM25, NO-GO. The independent saved-result audit passed. **GRF-01:** 60 disjoint DEV bridge questions, sealed Hybrid RRF vs Graph-Hybrid, full test suite and saved-result audit **PASS**. Primary paired ΔRecall@5 = **−0.0083**, 95% CI **[−0.025,0]**, decision **INCONCLUSIVE_NO_AUTOMATIC_PROMOTION**. Recall@3 delta −0.05 with wholly negative 95% CI; graph paths: 36 active (0 wins/1 loss/35 ties at @5), 24 inactive (all ties). Source report SHA256 `f2167bc7220554b1864648c5c5de0b67544bfbdba585a4aeed8f466927fcb2b4`.
+
+The graph policies are research-only. **Hybrid RRF remains the default.** These DEV subsets have been observed, so do not tune them to produce favorable results. M2 semantic response-quality measurement, 10 additional model comparisons, general graph extraction and public web hosting are not yet complete.
+
+The explorer now has published **summary-only statistical aggregates** as a read-only fallback when an operator-specific locally audited JSON is absent. Published summaries are grounded in successful operator audit logs, not the raw full report in GitHub. No source passages or copyright-restricted question texts were published.

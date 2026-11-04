@@ -21,7 +21,7 @@
 | Recall@3 | 0.7417 | 0.6917 | -0.0500 |
 | Recall@5 (primary) | 0.8583 | 0.8500 | **-0.0083** |
 
-The saved run reported `INCONCLUSIVE_NO_AUTOMATIC_PROMOTION`. Its exact paired bootstrap interval, per-query wins/losses/ties, graph activation breakdown and CPU/memory costs **are not shown in the terminal transcript**. We do not invent them. A separate no-model post-run audit (`scripts/audit-grf01-local.ps1`) checks the local JSON and exposes the measured values without running a second benchmark.
+The saved run reported `INCONCLUSIVE_NO_AUTOMATIC_PROMOTION`. Its exact paired bootstrap interval and graph activation breakdown were subsequently verified by the operator's saved-report audit; see the final audit section below. CPU/memory metrics are in the local saved report but are not transcribed here. A separate no-model post-run audit (`scripts/audit-grf01-local.ps1`) checks the local JSON and exposes the measured values without running a second benchmark.
 
 ## Research decision
 
@@ -32,3 +32,27 @@ Previous GRF-00 graph-first vs BM25 on a *different* 60-query DEV subset was a N
 Graph traversal in these studies relies on quoted article-title mentions rather than general semantic entity/relation extraction; source retrieval is not the same as grounded-answer correctness. DEV subsets are not an untouched, independent test set.
 
 Local raw reports remain gitignored; HotpotQA original text remains under its CC BY-SA 4.0 terms. **M2 and the broader GraphRAG release gate remain open.**
+
+## Saved-report audit — PASS (2026-11-04)
+
+The operator executed `scripts/audit-grf01-local.ps1` at commit `92ad46b` and received **full pytest PASS**, followed by **`GRF01_SAVED_RUN_AUDIT_PASS`**. The post-run auditor recomputed per-case document recall, seeded paired bootstrap intervals, source ranking integrity, frozen policy/cohort identities, graph activation groups and timing summaries **without re-running any model or query**.
+
+Archived original report SHA256: `f2167bc7220554b1864648c5c5de0b67544bfbdba585a4aeed8f466927fcb2b4`. The original 60-query JSON remains local and gitignored.
+
+| Recall | Hybrid RRF | Graph-Hybrid | Graph−Hybrid | 95% paired bootstrap CI |
+|---|---:|---:|---:|---|
+| @1 | 0.4417 | 0.4417 | +0.0000 | [−0.0333, +0.0333] |
+| @3 | 0.7417 | 0.6917 | **−0.0500** | [−0.1000, −0.0083] |
+| @5 **primary** | 0.8583 | 0.8500 | **−0.0083** | [−0.0250, 0.0000] |
+
+| Graph path state | Queries | Mean paired ΔRecall@5 | Wins | Losses | Ties |
+|---|---:|---:|---:|---:|---:|
+| Activated path | 36 | −0.013889 | 0 | 1 | 35 |
+| No activated path | 24 | 0.000000 | 0 | 0 | 24 |
+| **All queries** | **60** | **−0.008333** | **0** | **1** | **59** |
+
+**Primary decision unchanged: `INCONCLUSIVE_NO_AUTOMATIC_PROMOTION`.** For Recall@3 the paired interval is wholly negative; for primary Recall@5 it touches zero. This is evidence against promoting the current graph-boost approach, not proof of equivalence or failure of every GraphRAG architecture.
+
+A public **summary-only** copy is recorded in `apps/explorer/data/grf01-summary.public.json`, with the source report's SHA256 and explicit operator-audit provenance. This is reconstructed from the operator's successful audit log; the full row-level JSON was checked on the user's machine, **not independently uploaded into GitHub**. The local exported `grf01-summary.local.json` remains available for direct source-based browser verification. Neither summary republishes HotpotQA source passages.
+
+See [GRF-00 audited NO-GO](GRF00_HOTPOTQA_DEV_60_NO_GO_20261104.md). The prior GRF-00 cohort and BM25 baseline differ, so cross-experiment improvement claims would be invalid.

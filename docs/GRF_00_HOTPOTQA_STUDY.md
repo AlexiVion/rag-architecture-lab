@@ -71,3 +71,8 @@ The independent post-run auditor found **40/60 cases with a traversed graph path
 This reconciles to the full-sample difference: `(40×−0.175 + 20×0)/60 = −0.1167`.
 
 The evidence supports a **NO-GO on graph-first source prioritization**, but does not isolate whether particular extracted relations, entity seeding or ranking cause each loss. Do not tune using these now-inspected DEV examples. For next comparison see `docs/GRF_01_HYBRID_RRF_PROTOCOL.md`.
+
+
+## Public observatory summary
+
+The GRF-00 local audit has PASS status and original report SHA256 `962dc3b12d0086857ad94198cf2b1fff7a49ca5f7df069e9575a6daaf778f016`. The aggregate-only results and CIs from that successful operator audit log are recorded in `apps/explorer/data/grf00-summary.public.json`. The viewer loads the locally verified `hotpotqa-summary.local.json` when it exists; otherwise it displays the public report **with explicit operator-log provenance**. No per-query HotpotQA articles or QA texts are in this public file.

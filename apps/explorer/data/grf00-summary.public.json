@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "kind": "verified_retrieval_benchmark_aggregate",
+  "publication_status": "published_operator_audit_summary",
+  "experiment_id": "GRF00-HOTPOTQA-DEV-01",
+  "decision": "NO_GO_GRAPH_FIRST_ON_THIS_DEV_SUBSET",
+  "dataset": "hotpotqa/distractor/dev_v1",
+  "dataset_license": "CC BY-SA 4.0",
+  "sample_count": 60,
+  "source_report_sha256": "962dc3b12d0086857ad94198cf2b1fff7a49ca5f7df069e9575a6daaf778f016",
+  "metrics": {
+    "recall@1": {
+      "bm25": 0.43333333333333335,
+      "graph_plus_bm25": 0.35,
+      "paired_delta": -0.08333333333333333,
+      "paired_bootstrap_95ci": [
+        -0.15,
+        -0.016666666666666666
+      ]
+    },
+    "recall@3": {
+      "bm25": 0.6833333333333333,
+      "graph_plus_bm25": 0.5916666666666667,
+      "paired_delta": -0.09166666666666666,
+      "paired_bootstrap_95ci": [
+        -0.175,
+        -0.008333333333333333
+      ]
+    },
+    "recall@5": {
+      "bm25": 0.825,
+      "graph_plus_bm25": 0.7083333333333334,
+      "paired_delta": -0.11666666666666667,
+      "paired_bootstrap_95ci": [
+        -0.19166666666666668,
+        -0.058333333333333334
+      ]
+    }
+  },
+  "subgroups": {
+    "paths_present": {
+      "cases": 40,
+      "mean_delta_recall_at_5": -0.175,
+      "wins": 0,
+      "losses": 11,
+      "ties": 29
+    },
+    "paths_absent": {
+      "cases": 20,
+      "mean_delta_recall_at_5": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 20
+    }
+  },
+  "provenance_note": "Aggregate transcribed from GRF-00 console output and successful on-machine saved-JSON audit, not raw per-query data in public GitHub.",
+  "limitations": [
+    "DEV distractor contexts, not open-domain Wikipedia retrieval or an independent TEST split.",
+    "Graph used exact title mentions, not learned entity-relation semantics.",
+    "No answer correctness or semantic entailment measured.",
+    "Original per-query archived JSON remains local."
+  ]
+}

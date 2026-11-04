@@ -248,12 +248,13 @@ The current experiments run at **$0 paid API cost**. They use public benchmark d
 
 The initial retrieval phase is complete. Hybrid RRF is the default retrieval architecture. A 10-candidate cross-encoder reranker remains available as an optional/adaptive quality mode. The next project phase is **V2: generation, context construction, and citations**.
 
-**GRF-01 next experiment:** [predeclared independent Hybrid RRF comparison protocol](docs/GRF_01_HYBRID_RRF_PROTOCOL.md). The exposed 60-query DEV subset will not be reused to tune new retrieval parameters.
+## Latest verified graph research (2026-11-04)
 
-**Next no-prompt research preparation:** `scripts/freeze-grf01-cohort-local.ps1` reserves 60 non-overlapping HotpotQA DEV cases for the pre-registered Hybrid RRF comparison, without running models or reporting scores. Current implementation is awaiting local validation.
+- **GRF-00:** Graph-first vs BM25, 60 HotpotQA DEV questions; **NO-GO**. Primary Recall@5 delta −0.1167 (paired CI below zero). Original saved-result audit PASS.
+- **GRF-01:** Fixed graph bonus vs Hybrid RRF on 60 nonoverlapping, previously reserved DEV questions; original report SHA256 `f2167bc7220554b1864648c5c5de0b67544bfbdba585a4aeed8f466927fcb2b4`. Local full test suite and independent saved-result audit **PASS**. Recall@1 delta 0.0000; Recall@3 delta −0.0500 (CI [−0.1000, −0.0083]); Recall@5 delta −0.0083 (CI [−0.0250, 0]), **INCONCLUSIVE_NO_AUTOMATIC_PROMOTION**.
+- **Default stays Hybrid RRF.** These cohorts have been scored and must not be used for tuning and fresh validation. The studies compare document recovery, not factual answer generation.
+- **Explorer:** `apps/explorer` displays a curated source-backed graph plus GRF-00/01 retrieval statistics. It prefers local archived-report-verified data if available; otherwise it loads source-hashed, aggregate-only **public summaries reconstructed from operator audit logs**. It does not display original HotpotQA passages or invent missing measurements. The explorer is locally runnable; **public hosting has not been deployed**.
 
-**GRF-01 next local gate:** the new 60-query disjoint cohort reservation passed on Windows; use `scripts/prepare-grf01-hybrid-local.ps1` to run full tests and freeze the Graph-Hybrid policy **without scoring those cases**. See [locked policy](docs/GRF_01_LOCKED_HYBRID_POLICY.md). No new Graph-Hybrid improvement has been measured.
+See [Graph-first report](benchmarks/GRF00_HOTPOTQA_DEV_60_NO_GO_20261104.md), [Graph-Hybrid audited report](benchmarks/GRF01_HOTPOTQA_DEV_FROZEN_20261104.md) and [the research release blueprint](docs/RELEASE_WOW_BLUEPRINT.md).
 
-**Prepared single-pass GRF-01 study:** `scripts/run-grf01-hybrid-study-local.ps1` now combines full pytest, immutable policy lock and the one allowed 60-query **disjoint DEV** comparison of BM25, Dense, Hybrid RRF and Graph-Hybrid. The code is staged but not yet validated locally or executed. It uses CPU-only pinned MiniLM weights, may download them once, and will not overwrite the original result. Do not claim the graph improves retrieval before the measurements.
-
-**GRF-01 completed study:** In the frozen 60-query HotpotQA DEV cohort, Hybrid RRF Recall@5 was **0.8583** and Graph-Hybrid Recall@5 **0.8500** (inconclusive; no default promotion). Run `scripts/audit-grf01-local.ps1` once to verify the preserved JSON and expose its metrics in the local observatory. This does not rerun the encoder. [Study and limitations](docs/GRF_01_EVALUATION_RUNNER.md).
+**Next release priorities:** close M2 semantic answer verification and abstention, benchmark the ten additional role-separated model candidates, harden/host the observatory, then cut the public v1.0 release.

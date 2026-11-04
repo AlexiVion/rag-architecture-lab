@@ -206,3 +206,10 @@ After running the original 60-query DEV study, the operator executed the separat
 
 
 **GRF-01 real local study completed (2026-11-04):** the frozen 60-query HotpotQA DEV cohort was evaluated once against matched BM25, Dense, Hybrid RRF and Graph-Hybrid. All local pytest tests passed. Recall@1 Graph−Hybrid 0.0000, Recall@3 −0.0500 and primary Recall@5 −0.0083 (Hybrid 0.8583, Graph-Hybrid 0.8500). Study decision `INCONCLUSIVE_NO_AUTOMATIC_PROMOTION`. Original metrics remain local; CI/win-loss bounds pending independent saved-report audit and should not be invented. Retain Hybrid RRF default, do not retune on this exposed DEV sample. M2, ten-model registry measurements, general GraphRAG semantic extraction, and publicly deployed observatory remain unfinished.
+
+
+## Verified GRF-01 conclusion and public-summary status — 2026-11-04
+
+Frozen GRF-01 study plus independent post-run **local** audit are PASS; original report SHA256 `f2167bc7220554b1864648c5c5de0b67544bfbdba585a4aeed8f466927fcb2b4`. 60 queries; paired Graph-Hybrid−Hybrid ΔRecall@1 0.0000 (CI [−0.0333,+0.0333]), Δ@3 −0.0500 (CI [−0.1000,−0.0083]), Δ@5 −0.0083 (CI [−0.0250,0]). Path-active cases 36: 0 wins, 1 loss, 35 ties at @5; inactive cases 24: all ties. Decision **INCONCLUSIVE_NO_AUTOMATIC_PROMOTION**, so Hybrid RRF remains default. No second pass or weight tuning.
+
+The first browser app includes measured GRF-00 and GRF-01 aggregate views; read-only public JSON summaries built from operator-verified console logs can fill them on a fresh clone while locally audited source-based files take priority. The public summaries omit original HotpotQA source content and explicitly record their provenance. This is **not yet a public deployed website** or a semantic-answer benchmark, and M2 and MOD-10 remain release gates.
