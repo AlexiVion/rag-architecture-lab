@@ -49,6 +49,29 @@ def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _first_difference(actual: object, expected: object, where: str = "$") -> str | None:
+    """Find a small inspectable source-vs-published fixture mismatch."""
+    if type(actual) is not type(expected):
+        return f"{where}: types differ ({type(actual).__name__} vs {type(expected).__name__})"
+    if isinstance(actual, dict):
+        if actual.keys() != expected.keys():
+            return f"{where}: JSON field sets differ"
+        for key in sorted(actual):
+            found = _first_difference(actual[key], expected[key], where + "." + str(key))
+            if found:
+                return found
+    elif isinstance(actual, list):
+        if len(actual) != len(expected):
+            return f"{where}: lengths differ ({len(actual)} vs {len(expected)})"
+        for i, (a, b) in enumerate(zip(actual, expected)):
+            found = _first_difference(a, b, f"{where}[{i}]")
+            if found:
+                return found
+    elif actual != expected:
+        return f"{where}: {str(actual)[:90]!r} vs {str(expected)[:90]!r}"
+    return None
+
+
 def check_repository(root: Path = PROJECT_ROOT) -> dict:
     failures: list[str] = []
     observed: dict = {"repository": str(root), "checks": {}, "failures": failures}
@@ -81,7 +104,7 @@ def check_repository(root: Path = PROJECT_ROOT) -> dict:
         validate_observatory_artifact(fixture)
         expected = create_demo_artifact()
         if fixture != expected:
-            raise ValueError("Published fictional graph differs from the deterministic source")
+            raise ValueError("Published fictional graph differs from deterministic source: " + str(_first_difference(fixture, expected)))
         if any(x.get("answer") is not None for x in fixture["traces"]):
             raise ValueError("Illustrative fixture contains a purported generated answer")
         observed["checks"]["offline_graph_fixture"] = {
