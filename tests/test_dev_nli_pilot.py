@@ -47,7 +47,8 @@ def test_machine_predictions_are_not_human_labels(tmp_path):
     assert report["no_context_count"] == 3
     assert report["predicted_label_counts"]["entailment"] == 6
     assert report["human_semantic_labels"] == 0
-    assert report["validated_semantic_accuracy"] is None if "validated_semantic_accuracy" in report else report["semantic_truth_status"] == "not_evaluated"
+    assert report["validated_semantic_accuracy"] is None
+    assert report["semantic_truth_status"] == "not_evaluated"
     assert report["abstention_threshold"] is None
     assert all(row["semantic_truth_verified"] is False for row in report["cases"])
     assert sum(row["runtime_policy"] == "abstain_no_context" for row in report["cases"]) == 3
