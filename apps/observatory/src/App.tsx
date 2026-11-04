@@ -199,7 +199,7 @@ function Evidence({fixture,trace}:{fixture:GraphFixture;trace:QuestionTrace}){
   </>;
 }
 function Models({data}:{data:ObservatoryData}){
-  const groups=[["embedding","Embedding models"],["reranking","Rerankers"],["stance_nli","Evidence / NLI"],["generation","Generators"]];
+  const groups: [string, string][]=[["embedding","Embedding models"],["reranking","Rerankers"],["stance_nli","Evidence / NLI"],["generation","Generators"]];
   return <>
     <Intro tag="MODEL LAB / TEN ADDITIONAL CANDIDATES" title="Proposals are not measured results."
       body="Four model roles, ten additional candidates, and four separate historical baselines. Revision, licensing and measured-role checks are explicit release gates."/>
