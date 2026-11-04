@@ -151,6 +151,21 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Exit nonzero if a non-abstaining answer fails citation coverage",
     )
 
+    review_export = subparsers.add_parser(
+        "review-export",
+        help="Export an existing V2 answer to an unlabelled human-review packet",
+    )
+    review_export.add_argument("--path", required=True)
+    review_export.add_argument("--output", required=True)
+
+    review_score = subparsers.add_parser(
+        "review-score",
+        help="Summarize human-labelled evidence and claim annotations, without AI",
+    )
+    review_score.add_argument("--path", required=True)
+    review_score.add_argument("--output", default=None)
+
+
     experiment = subparsers.add_parser(
         "experiment",
         help="Compare a specified RAG architecture against a matched baseline",
@@ -622,6 +637,43 @@ def _experiment(args: argparse.Namespace) -> int:
     return 0
 
 
+def _review_export(args: argparse.Namespace) -> int:
+    from raglab.evaluation.semantic_review import prepare_review_packet
+
+    input_path = Path(args.path)
+    output_path = Path(args.output)
+    if output_path.exists():
+        raise FileExistsError(f"Will not overwrite existing reviews: {output_path}")
+    payload = json.loads(input_path.read_text(encoding="utf-8"))
+    packet = prepare_review_packet(payload)
+    packet["provenance"]["artifact_filename"] = input_path.name
+    packet["provenance"]["artifact_sha256"] = __import__("hashlib").sha256(
+        input_path.read_bytes()
+    ).hexdigest()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("x", encoding="utf-8") as stream:
+        json.dump(packet, stream, indent=2, ensure_ascii=False)
+    print(f"Semantic review packet: {output_path}")
+    print(f"Claims needing human review: {len(packet['claims'])}")
+    print(f"Sources needing relevance review: {len(packet['sources'])}")
+    print("No semantic support verdict was generated automatically.")
+    return 0
+
+
+def _review_score(args: argparse.Namespace) -> int:
+    from raglab.evaluation.semantic_review import summarize_review_packet
+
+    packet = json.loads(Path(args.path).read_text(encoding="utf-8"))
+    summary = summarize_review_packet(packet)
+    print(json.dumps(summary, indent=2, ensure_ascii=False))
+    if args.output:
+        out = Path(args.output)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+        print(f"Saved human review summary: {out}")
+    return 0
+
+
 def _inspect_answer(args: argparse.Namespace) -> int:
     from raglab.evaluation.answer_audit import audit_answer_artifact
 
@@ -663,6 +715,10 @@ def main() -> int:
         return _experiment(args)
     if args.command == "inspect-answer":
         return _inspect_answer(args)
+    if args.command == "review-export":
+        return _review_export(args)
+    if args.command == "review-score":
+        return _review_score(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 
