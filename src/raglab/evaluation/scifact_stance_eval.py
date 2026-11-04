@@ -14,6 +14,7 @@ import numpy as np
 from raglab.evaluation.dev_nli_pilot import DEFAULT_NLI_MODEL, NLI_LABELS, _logit_probabilities
 
 SCIFACT_ARCHIVE_URL = "https://scifact.s3-us-west-2.amazonaws.com/release/latest/data.tar.gz"
+SCIFACT_ARCHIVE_SHA256 = "11c621288d41ac144d29b13b0f8503b3820b7d6e8b1f6ff24dff335c196d76be"
 EXPECTED_FILES = ("corpus.jsonl", "claims_train.jsonl")
 LABEL_MAP = {"SUPPORT": "entailment", "CONTRADICT": "contradiction"}
 MAX_DOWNLOAD_BYTES = 80_000_000
@@ -90,6 +91,8 @@ def read_official_train_archive(path: Path) -> tuple[list[dict[str, Any]], list[
     if len(raw) > MAX_DOWNLOAD_BYTES:
         raise ValueError("SciFact archive is too large")
     fingerprint = hashlib.sha256(raw).hexdigest()
+    if fingerprint != SCIFACT_ARCHIVE_SHA256:
+        raise ValueError("SciFact archive checksum mismatch: refusing unpinned data revision")
     try:
         with tarfile.open(fileobj=io.BytesIO(raw), mode="r:gz") as archive:
             corpus = _decode_jsonl_member(archive, "corpus.jsonl")
@@ -182,11 +185,9 @@ def balanced_training_sample(
         )
         if len(groups[gold]) < per_class:
             raise ValueError(f"Not enough original TRAIN {gold} examples for balanced evaluation")
-    selected = groups["entailment"][:per_class] + groups["contradiction"][:per_class]
-    # Strictly deterministic but interleave the two classes for inference.
     return [
-        selected[i] if i % 2 == 0 else selected[per_class + i // 2]
-        for i in range(2 * per_class)
+        item for index in range(per_class)
+        for item in (groups["entailment"][index], groups["contradiction"][index])
     ]
 
 

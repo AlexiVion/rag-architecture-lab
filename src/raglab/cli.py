@@ -207,6 +207,15 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     diagnose_nli.add_argument("--suite", required=True)
 
+    stance = subparsers.add_parser(
+        "evaluate-original-scifact-stances",
+        help="Run model-only NLI evaluation against original expert-labelled SciFact TRAIN rationales",
+    )
+    stance.add_argument("--per-class", type=int, default=20)
+    stance.add_argument("--seed", type=int, default=17)
+    stance.add_argument("--archive", default=".cache/scifact-original/data.tar.gz")
+    stance.add_argument("--output-dir", default="runs/stance-eval")
+
     experiment = subparsers.add_parser(
         "experiment",
         help="Compare a specified RAG architecture against a matched baseline",
@@ -678,6 +687,73 @@ def _experiment(args: argparse.Namespace) -> int:
     return 0
 
 
+def _evaluate_scifact_original_stances(args: argparse.Namespace) -> int:
+    from raglab.evaluation.scifact_stance_eval import (
+        balanced_training_sample,
+        ensure_official_scifact_archive,
+        evaluate_gold_stance,
+        extract_labeled_rationales,
+        gold_report_markdown,
+        read_official_train_archive,
+    )
+
+    if not 1 <= args.per_class <= 100:
+        raise ValueError("Per-class sample budget must be between 1 and 100")
+    print("=== Original SciFact expert-labelled TRAIN rationale study ===")
+    print("Only TRAIN gold stance rationales. No TEST or qrel-derived truth.")
+    archive_path = ensure_official_scifact_archive(Path(args.archive))
+    corpus, train_claims, archive_sha = read_official_train_archive(archive_path)
+    examples = extract_labeled_rationales(corpus, train_claims)
+    selected = balanced_training_sample(
+        examples, per_class=args.per_class, seed=args.seed
+    )
+    from collections import Counter
+    totals = Counter(item["gold"] for item in examples)
+    print(f"Available original TRAIN rationales: {dict(totals)}")
+    print(f"Fixed balanced sample: {len(selected)}")
+    from sentence_transformers import CrossEncoder
+    from raglab.evaluation.dev_nli_pilot import DEFAULT_NLI_MODEL, NLI_LABELS
+    model = CrossEncoder(DEFAULT_NLI_MODEL, device="cpu", max_length=512)
+    label_map = getattr(model.model.config, "id2label", {})
+    resolved = tuple(
+        str(label_map.get(i, label_map.get(str(i), ""))).lower() for i in range(3)
+    )
+    if resolved != NLI_LABELS:
+        raise ValueError(f"Model class order not verified: {resolved}")
+    raw_logits = model.predict(
+        [(row["premise"], row["hypothesis"]) for row in selected],
+        batch_size=4,
+        show_progress_bar=False,
+        apply_softmax=False,
+    )
+    report = evaluate_gold_stance(
+        selected,
+        raw_logits,
+        archive_sha256=archive_sha,
+        model_revision=getattr(model.model.config, "_commit_hash", None),
+    )
+    report["selection_seed"] = args.seed
+    report["per_class_sample_budget"] = args.per_class
+    report["available_gold_counts"] = dict(totals)
+    folder = Path(args.output_dir)
+    folder.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
+    json_path = folder / f"SCIFACT_ORIGINAL_TRAIN_STANCE_{stamp}.json"
+    md_path = folder / f"SCIFACT_ORIGINAL_TRAIN_STANCE_{stamp}.md"
+    with json_path.open("x", encoding="utf-8") as output:
+        json.dump(report, output, indent=2, ensure_ascii=False)
+    with md_path.open("x", encoding="utf-8") as output:
+        output.write(gold_report_markdown(report))
+    print(f"TRAIN stance accuracy (sample only): {report['accuracy_on_this_expert_labeled_TRAIN_rationale_sample']:.4f}")
+    print(f"Balanced recall: {report['balanced_recall']:.4f}")
+    print(f"Confusion: {report['confusion']}")
+    print(f"JSON: {json_path}")
+    print(f"Markdown: {md_path}")
+    print("M2_ORIGINAL_SCIFACT_TRAIN_LABELLED_PILOT_COMPLETED")
+    print("No human questions, held-out TEST labels or runtime gate modifications.")
+    return 0
+
+
 def _diagnose_nli(args: argparse.Namespace) -> int:
     from raglab.evaluation.nli_diagnostics import (
         build_nli_diagnostic,
@@ -967,6 +1043,8 @@ def main() -> int:
         return _nli_dev_pilot(args)
     if args.command == "diagnose-nli":
         return _diagnose_nli(args)
+    if args.command == "evaluate-original-scifact-stances":
+        return _evaluate_scifact_original_stances(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 
