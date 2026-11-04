@@ -18,7 +18,7 @@
 | GEN-02 | Query decomposition | Can multi-hop questions be decomposed? | direct vs decomposed | answer support and task accuracy | Proposed |
 | GEN-03 | Self-reflective RAG | Can a critique loop improve response faithfulness? | one pass vs bounded critique | correctness, loops, latency | Proposed |
 | AGT-00 | Agentic RAG | When is iterative tool use justified? | bounded tool budget vs one shot | quality, steps, latency | Proposed |
-| GRF-00 | GraphRAG | When do entity relations help multi-hop retrieval? | graph vs equivalent text baseline | multi-hop accuracy, index cost | Proposed |
+| GRF-00 | Source-provenance graph retrieval (GraphRAG baseline) | When do entity relations help multi-hop retrieval? | graph vs equivalent text baseline | multi-hop accuracy, index cost | 1–2-hop graph prototype + curated fixture implemented; benchmark pending |
 | XTR-00 | Cross-domain / multilingual | Do findings generalize beyond English SciFact? | multiple domains and ES/FR/EN | slice-level metrics, failure modes | Proposed |
 
 ## Experiment deliverables (mandatory)
@@ -38,7 +38,7 @@ Each experiment requires:
 2. RET-03 and RET-04 introduce new retrieval architectures using existing hybrid baselines.
 3. RET-05, RET-06, RET-07, RET-08 compare evidence enrichment and recovery/routing.
 4. GEN-02, GEN-03 and AGT-00 examine reasoning and control loops after answer-level evaluation is reliable.
-5. GRF-00 only after documenting a dataset where graph structure could plausibly help.
+5. GRF-00 now has a deterministic curated graph prototype with exact source quotes. The next gate is an independently eligible multi-hop dataset and a matched text-only benchmark; the fixture alone does not pass the performance gate.
 6. XTR-00 should be revisited after every major architecture to avoid SciFact overfitting.
 
 ## Implementation vs empirical truth

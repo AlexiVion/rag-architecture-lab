@@ -34,12 +34,12 @@ Hard boundaries:
 | V2 retrieval+local Qwen | Code exists; historical generated answer was off-task and uncited | Post-gate real-model integration and answer quality still pending |
 | Citation syntax gate | Deterministic tests pass; fails closed on malformed draft | Test with real local generator; syntax != entailment |
 | M2 | Expert-labelled SciFact TRAIN stance sample exists; failed small NLI scored 27.5% (11/40) | Full answer/relevance/abstention evaluation incomplete |
-| GraphRAG / GRF-00 | Catalog entry only | Build real graph ingestion, traversal, source-grounded paths |
+| GraphRAG / GRF-00 | Implemented deterministic curated-source, 2-hop graph-first retriever and source-path trace | General-purpose extraction, real multi-hop benchmark and GO/NO-GO remain pending |
 | Model comparator | Partial fixed-model scripts | Uniform registry, revision/license tracking, per-role comparisons |
-| Web observatory | No application present in inspected PR file list | Build functional accessible explorer from validated manifests |
+| Web observatory | First static interactive evidence viewer committed, with 3 curated queries and exact-source inspector | General experiment dashboards, accessibility/browser QA and public deployment remain pending |
 | Public release | Public repository; LICENSE/CONTRIBUTING are on draft PR #2, not yet main | Clean release, merge, tag, external clone smoke, project page |
 
-The current integration PR changes **114 files** and remains in draft. Its size is itself a review risk; scope new work into focused commits/PRs and avoid merging blindly.
+The integration PR was already broad (114 changed files before GRF-00 and the viewer) and remains in draft. Its size is itself a review risk; scope new work into focused commits/PRs and avoid merging blindly.
 
 ## 3. Release architecture
 

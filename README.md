@@ -12,6 +12,21 @@ A from-first-principles lab for implementing, benchmarking, and comparing Retrie
 >
 > V0 retrieval benchmarking, V1 cross-encoder reranking, and V1.1 candidate-depth ablation are complete on the designated local Windows machine. The retrieval phase is now closed with Hybrid RRF as the default path and 10-candidate cross-encoder reranking retained as an optional quality mode. The next phase is V2: generation, context construction, and citations.
 
+## GRF-00 — Run the first interactive evidence observatory
+
+The experimental **GRF-00 provenance graph** is now implemented as a bounded (1–2 hop) graph-first retriever with original-document BM25 fallback, exact source-quote validation and inspectable path traces. A responsive static viewer is available at [apps/explorer](apps/explorer/index.html); its three sample questions are **fictional, curated demonstration fixtures**, not measured scientific quality.
+
+From an existing Windows clone with its Python environment ready, run:
+
+```powershell
+git pull --ff-only origin feat/research-lab-architecture-catalog-20261104
+.\scripts\run-observatory-local.ps1
+```
+
+The command runs the full test suite, re-exports the verified static JSON and opens the **local viewer at http://127.0.0.1:4188/**. Stop the server with Ctrl+C. It makes **no paid API calls**, uses no Qwen and does not download models for this demonstration. Linux/macOS users can run the Python export and standard local HTTP server as described in [the GRF-00 guide](docs/GRF_00_SEED_GRAPH.md).
+
+**Do not treat the demo as a GraphRAG benchmark or a finished v1.0.** Source-quoted two-hop traversal and the viewer are implemented; scalable entity extraction, real multi-hop quality results, M2 answer-quality validation, the ten new model experiments and a hosted explorer remain pending. The current feature branch PR is still draft.
+
 ## Why this project exists
 
 RAG is not one architecture. Retrieval choices create different trade-offs in relevance, robustness, latency, and complexity. This lab isolates those choices and measures them instead of treating a single RAG pipeline as universally best.
