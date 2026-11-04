@@ -63,3 +63,9 @@ To re-score the latest annotated JSON, without overwriting the human input or in
 ```
 
 The script creates a separate `summary_*.json` next to the annotated packet and will not overwrite an existing summary. This is still held-out test diagnostics only, **not** a train/dev calibration exercise.
+
+## TRAIN-only development controls
+
+Use `scripts/prepare-m2-dev-cases-local.ps1` to construct 18 independent, **unlabelled** evidence-review packets based solely on SciFact TRAIN qrels (six stable propositions × three candidate contexts). These are not Qwen outputs. They provide source-vs-task and no-context examples for a reviewer to annotate without using our inspected SciFact TEST failure to choose calibration thresholds.
+
+See `docs/M2_DEV_EVIDENCE_CASES.md` for the design, selection method, caveats and required human labels. The cross-query alternative is **not inherently irrelevant or contradictory**; no automatic model-quality score is generated. Contradiction cases remain a separate future dataset requirement.

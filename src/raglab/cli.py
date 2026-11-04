@@ -172,6 +172,15 @@ def _build_parser() -> argparse.ArgumentParser:
     review_interactive.add_argument("--path", required=True)
     review_interactive.add_argument("--output", required=True)
 
+    dev_design = subparsers.add_parser(
+        "design-dev-cases",
+        help="Build unlabelled, controlled SciFact TRAIN evidence review cases",
+    )
+    dev_design.add_argument("--dataset", default="beir/scifact/train")
+    dev_design.add_argument("--query-count", type=int, default=6)
+    dev_design.add_argument("--seed", type=int, default=17)
+    dev_design.add_argument("--output-dir", required=True)
+
     experiment = subparsers.add_parser(
         "experiment",
         help="Compare a specified RAG architecture against a matched baseline",
@@ -643,6 +652,30 @@ def _experiment(args: argparse.Namespace) -> int:
     return 0
 
 
+def _design_dev_cases(args: argparse.Namespace) -> int:
+    from raglab.evaluation.dev_case_design import (
+        design_dev_cases,
+        write_dev_cases,
+    )
+
+    if args.dataset != "beir/scifact/train":
+        raise ValueError("Development cases must use beir/scifact/train only")
+    dataset = load_ir_dataset(args.dataset)
+    manifest, packets = design_dev_cases(
+        dataset, query_count=args.query_count, seed=args.seed
+    )
+    directory = write_dev_cases(
+        manifest, packets, output_dir=Path(args.output_dir)
+    )
+    print(f"Unlabelled M2 dev suite: {directory}")
+    print(f"Training propositions: {manifest['query_count']}")
+    print(f"Review packets: {manifest['case_count']}")
+    print("No automatic truth, contradiction, relevance or answer-quality labels.")
+    print("Qrels inform candidate selection only and are absent from reviewer packets.")
+    print("No embeddings, cross-encoder, Qwen, or inference calls were made.")
+    return 0
+
+
 def _review_interactive(args: argparse.Namespace) -> int:
     from raglab.evaluation.interactive_review import annotate_packet
     from raglab.evaluation.semantic_review import summarize_review_packet
@@ -753,6 +786,8 @@ def main() -> int:
         return _review_score(args)
     if args.command == "review-interactive":
         return _review_interactive(args)
+    if args.command == "design-dev-cases":
+        return _design_dev_cases(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 
