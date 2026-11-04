@@ -57,6 +57,21 @@ def _build_parser() -> argparse.ArgumentParser:
     benchmark.add_argument("--rerank-candidates", type=int, default=50)
     benchmark.add_argument("--output-dir", default="benchmarks/results")
 
+    diagnose = subparsers.add_parser(
+        "diagnose-retrieval",
+        help="Locate qrel-relevant documents in BM25, Dense and Hybrid rankings",
+    )
+    diagnose.add_argument("--dataset", default="beir/scifact/test")
+    diagnose.add_argument("--query-id", default="1")
+    diagnose.add_argument(
+        "--strategies", nargs="+", choices=["bm25", "dense", "hybrid"],
+        default=["bm25", "dense", "hybrid"],
+    )
+    diagnose.add_argument("--candidate-k", type=int, default=100)
+    diagnose.add_argument("--context-k", type=int, default=5)
+    diagnose.add_argument("--embedding-model", default=DEFAULT_EMBEDDING_MODEL)
+    diagnose.add_argument("--output-dir", default="benchmarks/results")
+
     answer = subparsers.add_parser(
         "answer",
         help="Run the V2 local grounded-generation pipeline",
@@ -133,6 +148,60 @@ def _print_summary(results: list[dict]) -> None:
     print("  ".join("-" * width for width in widths))
     for row in rows:
         print("  ".join(value.ljust(widths[i]) for i, value in enumerate(row)))
+
+
+def _diagnose_retrieval(args: argparse.Namespace) -> int:
+    from raglab.diagnostics import diagnose_retrieval
+
+    dataset = load_ir_dataset(args.dataset)
+    names = list(dict.fromkeys(args.strategies))
+    bm25 = BM25Retriever()
+    needs_dense = "dense" in names or "hybrid" in names
+    dense = (
+        DenseRetriever(SentenceTransformerEmbeddings(args.embedding_model))
+        if needs_dense else None
+    )
+    retrievers = {}
+    if "bm25" in names:
+        retrievers["bm25"] = bm25
+    if "dense" in names:
+        assert dense is not None
+        retrievers["dense"] = dense
+    if "hybrid" in names:
+        assert dense is not None
+        retrievers["hybrid"] = HybridRetriever(
+            dense=dense, sparse=bm25, candidate_k=args.candidate_k,
+        )
+
+    report = diagnose_retrieval(
+        dataset,
+        query_id=args.query_id,
+        retrievers=retrievers,
+        candidate_k=args.candidate_k,
+        context_k=args.context_k,
+    )
+    print("\nRetrieval diagnosis — gold labels used only after ranking\n")
+    print(f"Query: {report['query']}")
+    for document in report["gold_documents"]:
+        print(f"Gold document: {document['doc_id']} | {document['title']}")
+    for name, outcome in report["strategies"].items():
+        print(
+            f"{name}: relevant top-{args.context_k}="
+            f"{outcome['relevant_in_context']}/{len(report['gold_documents'])}; "
+            f"gold ranks={outcome['gold_ranks']}; "
+            f"retrieval_ms={outcome['retrieval_ms']:.2f}"
+        )
+        if name == "hybrid":
+            print(f"Reranking candidate eligibility: {outcome['rerank_eligibility']}")
+
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    path = output_dir / f"DIAG_{_safe_name(args.query_id)}_{stamp}.json"
+    path.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"Saved diagnosis: {path}")
+    print("Ground-truth qrels may not exhaust all useful evidence.")
+    return 0
 
 
 def _benchmark(args: argparse.Namespace) -> int:
@@ -385,6 +454,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.command == "benchmark":
         return _benchmark(args)
+    if args.command == "diagnose-retrieval":
+        return _diagnose_retrieval(args)
     if args.command == "answer":
         return _answer(args)
     if args.command == "experiment":
