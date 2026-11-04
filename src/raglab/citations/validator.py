@@ -20,7 +20,17 @@ class CitationReport:
 
     @property
     def all_citations_valid(self) -> bool:
-        return not self.invalid_labels
+        # No citations is not a successful evidence-citation contract.
+        return self.citation_count > 0 and not self.invalid_labels
+
+    @property
+    def citation_contract_passed(self) -> bool:
+        # Syntactic coverage only; this does NOT establish semantic support.
+        return (
+            self.all_citations_valid
+            and self.sentence_count > 0
+            and self.cited_sentence_count == self.sentence_count
+        )
 
 
 def validate_citations(answer: str, available_labels: Iterable[str]) -> CitationReport:
