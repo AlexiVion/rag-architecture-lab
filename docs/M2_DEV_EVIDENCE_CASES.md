@@ -62,3 +62,11 @@ You can skip all interactive review and run the **entire 18-case objective audit
 This validates all tests and every original case against the local SciFact **TRAIN** corpus, including source document integrity, selected qrels, query mapping, all 3 balanced arms, and no-context controls. Writes `AUTO_AUDIT.json` and `AUTO_AUDIT.md` under the suite; rerunning replaces only these machine-generated reports, **never original packets or human reviews**.
 
 The safe deterministic policy is: **no context means abstain without generation**. For the 12 nonempty evidence scenarios, relevance/sufficiency/entailment remain `not_evaluated`. This is intentionally not a fabricated 18/18 semantic score, does not call Qwen or embeddings, and does not learn/calibrate an abstention threshold. `human-reviews` is optional and separate. A valid semantic benchmark will later need actual verified labels or a separately measured automated judge with audited error rates.
+
+## Local NLI model pilot — fully automatic, no manual review
+
+After the successful 18-case structural audit, a separate CPU pilot can evaluate the twelve nonempty TRAIN document/proposition pairs with a pretrained NLI model. It also records the six empty-context controls without invoking NLI for them.
+
+Use scripts/run-m2-nli-local.ps1. The script asks no questions; it may download public model weights on first use. Results are saved as uncalibrated **model predictions**, not ground-truth biomedical facts or human labels, in timestamped AUTO_NLI JSON and Markdown files. No original case or completed human review is modified.
+
+See docs/M2_NLI_PILOT.md for model provenance, methodological boundaries and interpretation.

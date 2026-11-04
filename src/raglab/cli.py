@@ -194,6 +194,13 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     auto_audit.add_argument("--suite", required=True)
 
+    nli_pilot = subparsers.add_parser(
+        "nli-dev-pilot",
+        help="Uncalibrated local NLI predictions on SciFact TRAIN evidence cases",
+    )
+    nli_pilot.add_argument("--suite", required=True)
+    nli_pilot.add_argument("--batch-size", type=int, default=2)
+
     experiment = subparsers.add_parser(
         "experiment",
         help="Compare a specified RAG architecture against a matched baseline",
@@ -665,6 +672,61 @@ def _experiment(args: argparse.Namespace) -> int:
     return 0
 
 
+def _nli_dev_pilot(args: argparse.Namespace) -> int:
+    from raglab.evaluation.dev_automatic_audit import audit_dev_suite
+    from raglab.evaluation.dev_nli_pilot import (
+        DEFAULT_NLI_MODEL,
+        NLI_LABELS,
+        format_nli_report,
+        run_nli_pilot,
+    )
+
+    if not 1 <= args.batch_size <= 8:
+        raise ValueError("NLI batch-size must be between 1 and 8")
+    suite = Path(args.suite)
+    dataset = load_ir_dataset("beir/scifact/train")
+    # Validate data integrity BEFORE loading/download of a local model.
+    audit_dev_suite(suite, dataset)
+    from sentence_transformers import CrossEncoder
+
+    print("=== M2 TRAIN: automatic CPU NLI pilot ===")
+    print(f"Model: {DEFAULT_NLI_MODEL} (first run may download public weights)")
+    model = CrossEncoder(DEFAULT_NLI_MODEL, device="cpu", max_length=512)
+    raw_labels = getattr(model.model.config, "id2label", {})
+    if len(raw_labels) != 3:
+        raise ValueError("Expected a 3-class NLI classifier")
+    labels = [
+        str(raw_labels.get(i, raw_labels.get(str(i), ""))).lower()
+        for i in range(3)
+    ]
+    if not all(x.startswith("label_") for x in labels) and tuple(labels) != NLI_LABELS:
+        raise ValueError(f"Unrecognized classifier class order: {labels}")
+    report = run_nli_pilot(
+        suite,
+        dataset,
+        predict=lambda pairs: model.predict(
+            pairs, batch_size=args.batch_size, show_progress_bar=False
+        ),
+        model_id=DEFAULT_NLI_MODEL,
+        model_revision=getattr(model.model.config, "_commit_hash", None),
+    )
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
+    json_path = suite / f"AUTO_NLI_{stamp}.json"
+    md_path = suite / f"AUTO_NLI_{stamp}.md"
+    with json_path.open("x", encoding="utf-8") as out:
+        json.dump(report, out, indent=2, ensure_ascii=False)
+    with md_path.open("x", encoding="utf-8") as out:
+        out.write(format_nli_report(report))
+    print(f"Pairs analyzed: {report['nli_scored_count']}")
+    print(f"Predicted classes: {report['predicted_label_counts']}")
+    print(f"Empty-context controls: {report['no_context_count']}")
+    print(f"JSON: {json_path}")
+    print(f"Markdown: {md_path}")
+    print("NLI_DEV_PILOT_UNCALIBRATED_COMPLETED")
+    print("Model outputs are not validated biomedical truth or human labels.")
+    return 0
+
+
 def _audit_dev_suite(args: argparse.Namespace) -> int:
     from raglab.evaluation.dev_automatic_audit import (
         audit_dev_suite,
@@ -846,6 +908,8 @@ def main() -> int:
         return _review_dev_batch(args)
     if args.command == "audit-dev-suite":
         return _audit_dev_suite(args)
+    if args.command == "nli-dev-pilot":
+        return _nli_dev_pilot(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 

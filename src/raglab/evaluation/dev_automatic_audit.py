@@ -192,7 +192,7 @@ def audit_report_markdown(report: dict[str, Any]) -> str:
         "# M2-DEV-EVIDENCE-01 — automatic structural audit",
         "",
         f"Status: **{report['status']}**.",
-        f"Dataset: \`{report['dataset']}\`.",
+        f"Dataset: `{report['dataset']}`.",
         f"Corpus fingerprint verified: {report['corpus_fingerprint_verified']}.",
         f"Contexts checked: {report['case_count']} in {report['query_count']} TRAIN propositions.",
         "",
