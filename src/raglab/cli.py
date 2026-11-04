@@ -18,6 +18,7 @@ from raglab.retrieval import (
     DenseRetriever,
     HybridRetriever,
     RerankingRetriever,
+    WeightedHybridRetriever,
 )
 
 DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
@@ -71,6 +72,22 @@ def _build_parser() -> argparse.ArgumentParser:
     diagnose.add_argument("--context-k", type=int, default=5)
     diagnose.add_argument("--embedding-model", default=DEFAULT_EMBEDDING_MODEL)
     diagnose.add_argument("--output-dir", default="benchmarks/results")
+
+    fusion_study = subparsers.add_parser(
+        "fusion-study",
+        help="Evaluate unweighted and dense-weighted RRF on SciFact training queries",
+    )
+    fusion_study.add_argument("--dataset", default="beir/scifact/train")
+    fusion_study.add_argument("--allow-test", action="store_true",
+                              help="Explicitly permit a held-out test evaluation")
+    fusion_study.add_argument("--weights", nargs="+", type=float,
+                              default=[1.5, 2.0, 3.0])
+    fusion_study.add_argument("--k", nargs="+", type=int, default=[5, 10])
+    fusion_study.add_argument("--candidate-k", type=int, default=100)
+    fusion_study.add_argument("--rrf-constant", type=int, default=60)
+    fusion_study.add_argument("--limit-queries", type=int, default=None)
+    fusion_study.add_argument("--embedding-model", default=DEFAULT_EMBEDDING_MODEL)
+    fusion_study.add_argument("--output-dir", default="benchmarks/results")
 
     answer = subparsers.add_parser(
         "answer",
@@ -148,6 +165,98 @@ def _print_summary(results: list[dict]) -> None:
     print("  ".join("-" * width for width in widths))
     for row in rows:
         print("  ".join(value.ljust(widths[i]) for i, value in enumerate(row)))
+
+
+def _fusion_study(args: argparse.Namespace) -> int:
+    import math
+
+    from raglab.core.fingerprint import fingerprint_documents
+
+    # Never silently tune weights against held-out SciFact test labels.
+    if args.dataset != "beir/scifact/train" and not args.allow_test:
+        raise ValueError(
+            "Fusion-weight selection is train-only by default. "
+            "For a separately justified held-out evaluation, pass --allow-test."
+        )
+    weights = list(dict.fromkeys(args.weights))
+    if any(not math.isfinite(value) or value <= 0 for value in weights):
+        raise ValueError("Fusion weights must be positive finite values")
+    if any(value == 1.0 for value in weights):
+        weights = [value for value in weights if value != 1.0]
+    if args.candidate_k <= 0 or args.rrf_constant < 0:
+        raise ValueError("Invalid RRF parameters")
+
+    dataset = load_ir_dataset(args.dataset, limit_queries=args.limit_queries)
+    bm25 = BM25Retriever()
+    embeddings = SentenceTransformerEmbeddings(args.embedding_model)
+    dense = DenseRetriever(embeddings)
+    base = HybridRetriever(
+        dense=dense, sparse=bm25, candidate_k=args.candidate_k,
+        rrf_constant=args.rrf_constant,
+    )
+    pipelines = [
+        ("bm25", bm25),
+        ("dense", dense),
+        ("hybrid-rrf", base),
+    ]
+    for dense_weight in weights:
+        pipelines.append((
+            f"hybrid-dense-{dense_weight:g}",
+            WeightedHybridRetriever(
+                dense=dense, sparse=bm25,
+                dense_weight=dense_weight,
+                candidate_k=args.candidate_k,
+                rrf_constant=args.rrf_constant,
+            ),
+        ))
+
+    # Shared retriever objects cache the same indexed corpus and embedding matrix.
+    # run_benchmark includes query-time search and fusion; indexing is excluded.
+    results = []
+    for name, retriever in pipelines:
+        print(f"Running {name}: {len(dataset.queries)} training/evaluation queries...")
+        results.append(run_benchmark(dataset, retriever, args.k))
+    print("\nFusion experiment (NOT a selected winner)\n")
+    _print_summary(results)
+
+    import platform
+    import subprocess
+
+    try:
+        sha = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], text=True, timeout=3,
+        ).strip()
+    except (OSError, subprocess.SubprocessError):
+        sha = None
+    payload = {
+        "experiment_id": "RET-FUSION-01",
+        "publication_status": "exploratory",
+        "created_at": datetime.now(UTC).isoformat(),
+        "dataset": args.dataset,
+        "query_count": len(dataset.queries),
+        "document_fingerprint": fingerprint_documents(dataset.documents),
+        "git_sha": sha,
+        "embedding_model": args.embedding_model,
+        "rrf_constant": args.rrf_constant,
+        "candidate_k": args.candidate_k,
+        "weights": weights,
+        "k": args.k,
+        "python": platform.python_version(),
+        "results": results,
+        "limitations": [
+            "Weights must be selected on train and frozen before test.",
+            "Repeated sequential queries may bias latency; warmups are not standardized.",
+            "Retrieval labels do not establish answer faithfulness.",
+            "No model revision lock; record exact model revision before canonical claims.",
+        ],
+    }
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    path = output_dir / f"RET_FUSION_{_safe_name(args.dataset)}_{stamp}.json"
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"Saved train-only exploratory fusion study: {path}")
+    return 0
 
 
 def _diagnose_retrieval(args: argparse.Namespace) -> int:
@@ -456,6 +565,8 @@ def main() -> int:
         return _benchmark(args)
     if args.command == "diagnose-retrieval":
         return _diagnose_retrieval(args)
+    if args.command == "fusion-study":
+        return _fusion_study(args)
     if args.command == "answer":
         return _answer(args)
     if args.command == "experiment":
