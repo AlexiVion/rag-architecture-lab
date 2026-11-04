@@ -40,3 +40,7 @@ The local output `runs/m2-parser-replay/M2_LIVE02_SYNTAX_REPLAY.json` is created
 ## Release gate
 
 Do not replace the existing pipeline parser automatically on this result. Before promotion, carry out independent parser security tests (misplaced citation attacks, code/markdown-like text, multi-sentence segmentation) and semantic support + answer-task alignment evaluation with predeclared independent labels. Continue to quarantine generated facts. M2 remains **OPEN**.
+
+## Actual local replay result — PASS (2026-11-04)
+
+The operator ran the full Windows pytest suite and archive replay successfully at commit `c929c32`. Report SHA256 `3c9fc0794ab2d2bd3ca10825585926083b0d40067c1696aa77fc90f230ea7816`. Citation syntax V1 accepted **0** generated candidates, experimental citation syntax V2 accepted **1**: the adequate-source draft ending `Fact. [S1]`. The irrelevant-source draft with `[Solis Probe]` and the uncited contradictory-date draft remain invalid. No-context still abstains without generation. This was an immutable, **zero-model-call / zero-publication** replay and does not alter the original recorded pipeline statuses. A versioned, **unlabelled** semantic review export is now documented in `docs/M2_REVIEW_02_HANDOFF.md`.
