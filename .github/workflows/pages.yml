@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - "apps/explorer/**"
+      - "apps/observatory/**"
+      - "experiments/model_matrix_10_proposed.json"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -39,12 +41,21 @@ jobs:
             echo "Possible credential detected in published data"
             exit 1
           fi
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Build verified React / TypeScript observatory
+        run: |
+          npm install --prefix apps/observatory --no-audit --no-fund
+          npm run --prefix apps/observatory check
+          npm run --prefix apps/observatory build
       - name: Set up GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload read-only static site
         uses: actions/upload-pages-artifact@v4
         with:
-          path: apps/explorer
+          path: apps/observatory/dist
       - name: Deploy site
         id: deployment
         uses: actions/deploy-pages@v4

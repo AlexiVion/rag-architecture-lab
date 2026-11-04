@@ -40,3 +40,17 @@ jobs:
         run: |
           raglab --help
           python -m build --no-isolation
+      - name: Node.js 22 for typed observatory
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate and build React TypeScript research observatory
+        run: |
+          npm install --prefix apps/observatory --no-audit --no-fund
+          npm run --prefix apps/observatory check
+          npm run --prefix apps/observatory build
+          test -f apps/observatory/dist/index.html
+          test -f apps/observatory/dist/data/demo.json
+          test -f apps/observatory/dist/data/grf00-summary.public.json
+          test -f apps/observatory/dist/data/grf01-summary.public.json
+          test -f apps/observatory/dist/data/model_matrix.json
