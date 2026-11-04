@@ -3,3 +3,6 @@ dist/
 public/data/
 coverage/
 *.tsbuildinfo
+artifacts/
+test-results/
+playwright-report/

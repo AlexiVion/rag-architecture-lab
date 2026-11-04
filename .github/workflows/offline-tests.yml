@@ -54,3 +54,14 @@ jobs:
           test -f apps/observatory/dist/data/grf00-summary.public.json
           test -f apps/observatory/dist/data/grf01-summary.public.json
           test -f apps/observatory/dist/data/model_matrix.json
+      - name: Install headless Chromium for WEB-01 browser QA
+        run: npx --prefix apps/observatory playwright install --with-deps chromium
+      - name: Test actual navigation, graph provenance, mobile layout and screenshots
+        run: npm run --prefix apps/observatory e2e
+      - name: Save verified browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web01-browser-screenshots
+          path: apps/observatory/artifacts/screens/*.png
+          if-no-files-found: ignore
