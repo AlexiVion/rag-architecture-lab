@@ -12,7 +12,7 @@ if (-not (Test-Path $Python)) {
 }
 
 Write-Host "=== GRF-00 DETERMINISTIC EVIDENCE GRAPH ==="
-& $Python -m pytest -q tests/test_graph_evidence.py
+& $Python -m pytest -q
 if ($LASTEXITCODE -ne 0) { throw "GRAPH_TESTS_FAILED" }
 
 Write-Host "=== VALIDATING + GENERATING PUBLIC OFFLINE FIXTURE ==="
