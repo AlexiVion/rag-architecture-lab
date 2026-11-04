@@ -89,6 +89,15 @@ def _build_parser() -> argparse.ArgumentParser:
     fusion_study.add_argument("--embedding-model", default=DEFAULT_EMBEDDING_MODEL)
     fusion_study.add_argument("--output-dir", default="benchmarks/results")
 
+    analyze_fusion = subparsers.add_parser(
+        "analyze-fusion",
+        help="Analyze paired-query differences from an existing fusion JSON (no models)",
+    )
+    analyze_fusion.add_argument("--path", required=True)
+    analyze_fusion.add_argument("--bootstrap-replicates", type=int, default=2000)
+    analyze_fusion.add_argument("--seed", type=int, default=42)
+
+
     answer = subparsers.add_parser(
         "answer",
         help="Run the V2 local grounded-generation pipeline",
@@ -165,6 +174,36 @@ def _print_summary(results: list[dict]) -> None:
     print("  ".join("-" * width for width in widths))
     for row in rows:
         print("  ".join(value.ljust(widths[i]) for i, value in enumerate(row)))
+
+
+def _analyze_fusion(args: argparse.Namespace) -> int:
+    from raglab.evaluation.paired_comparison import analyze_fusion_artifact, to_markdown
+
+    path = Path(args.path)
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    report = analyze_fusion_artifact(
+        payload, bootstrap_replicates=args.bootstrap_replicates, seed=args.seed
+    )
+
+    print("\nRET-FUSION-01 | offline paired-query audit\n")
+    print(f"Training queries checked: {report['query_count']}")
+    print(f"Decision: {report['decision']}")
+    for comparison in report["comparisons"]:
+        delta = comparison["metrics"]["recall@5"]
+        print(
+            f"{comparison['candidate']}: recall@5 delta={delta['delta']:+.5f}, "
+            f"95% bootstrap CI=[{delta['ci95'][0]:+.5f}, {delta['ci95'][1]:+.5f}], "
+            f"wins={delta['wins']}, losses={delta['losses']}, ties={delta['ties']}"
+        )
+    stem = path.with_suffix("")
+    json_path = stem.with_name(stem.name + "_PAIRED_ANALYSIS.json")
+    markdown_path = stem.with_name(stem.name + "_PAIRED_ANALYSIS.md")
+    json_path.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    markdown_path.write_text(to_markdown(report), encoding="utf-8")
+    print(f"JSON: {json_path}")
+    print(f"Report: {markdown_path}")
+    print("No model, embeddings, inference or new retrieval was run.")
+    return 0
 
 
 def _fusion_study(args: argparse.Namespace) -> int:
@@ -567,6 +606,8 @@ def main() -> int:
         return _diagnose_retrieval(args)
     if args.command == "fusion-study":
         return _fusion_study(args)
+    if args.command == "analyze-fusion":
+        return _analyze_fusion(args)
     if args.command == "answer":
         return _answer(args)
     if args.command == "experiment":
