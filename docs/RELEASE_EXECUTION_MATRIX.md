@@ -4,7 +4,7 @@
 
 | Gate | Required deliverable | Current evidence | Status |
 |---|---|---|---|
-| G0 / R0 | Clean install + tests + license, security, changelog, citation, CI, release-check | New source/CI/docs staged on feature branch; real external clone/CI pending | IN PROGRESS |
+| G0 / R0 | Clean install + tests + license, security, changelog, citation, CI, release-check | Full local Windows pytest/integrity/CLI/wheel PASS, GitHub Actions run #41932176318 PASS; external clean clone and integration pending | LOCAL+CI PASS |
 | G1 / M2 | Independently labelled source support, contradictions, abstentions and end-to-end real generator | Source-hashed Qwen diagnostic controls show 7/24 narrow proxy; 3/12 negative source examples syntax-accepted; NO-GO publication | BLOCKED SCIENCE |
 | G2 / GRF | Evidence-provenance graph, real multi-hop comparison, measured GO/NO-GO | Seed viewer + GRF-00 negative/GRF-01 inconclusive DEV studies audited | PARTIAL |
 | G3 / MOD-10 | Three embedders, two rerankers, two NLI and three generators, individually measured or skipped-with-reason with pinned revision/license | Registry lists all ten; no new model measurements | NOT STARTED |
@@ -26,3 +26,7 @@
 For M2, the demonstrated failure of semantic abstention prevents claiming that automatic factual publication is supported. The release may transparently present M2 as an experimental feature only if the blueprint's stated scientific acceptance criterion is updated by an explicit scoped decision; never simply relabel a syntax-valid response as source-supported.
 
 The current project remains an open-source **research** repository and not a hosted SaaS or an authenticated/paid API.
+
+## R0 local Windows validation — 2026-11-04
+
+The maintainer pulled `fd9e2952e43384da979d27c28e03d0c67ea397f2` and ran `scripts/verify-wow-r0-local.ps1`. **Full pytest suite PASS**, each offline integrity check PASS (required release files, pyproject metadata, deterministic graph fixture, GRF-00 and GRF-01 audited summary records, proposed 10-model registry), installed CLI `--help` PASS, and Python wheel successfully built: `rag_architecture_lab-0.1.0-py3-none-any.whl` (observed SHA256 `16acf2582bae7131c29676bec58d41ef2b497cf127415ab28667d4eac9a5f767`). `WOW_R0_LOCAL_ENGINEERING_CHECK_PASS`. The independent GitHub Actions [offline job](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/41932176318) completed **SUCCESS** on the same SHA. These are engineering prerequisites, **not** independent scientific M2 validation or v1 completion. Fresh public external clone/merged-main test still pending, PR #2 still draft. Next active engineering track: WEB-01 full React/TypeScript/Vite observatory, followed by model/labelled-research release gates.
