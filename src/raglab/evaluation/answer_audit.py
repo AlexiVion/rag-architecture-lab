@@ -28,11 +28,24 @@ def audit_answer_artifact(
 
     labels = [str(source.get("label", "")) for source in sources]
     ids = [str(source.get("doc_id", "")) for source in sources]
-    report = validate_citations(answer, labels)
     abstained = result.get("abstained", False) is True
-    if abstained:
+    output_status = result.get("output_status")
+    raw_generation = result.get("raw_generation")
+
+    if output_status == "rejected_citation_contract":
+        if not abstained or not isinstance(raw_generation, str):
+            raise ValueError("Rejected answer must retain the raw draft and abstain")
+        report = validate_citations(raw_generation, labels)
+        if report.citation_contract_passed:
+            raise ValueError("Draft does not fail the recorded citation contract")
+        # A rejected generation is an actual citation failure, not a successful
+        # abstention. This prevents sanitizing an output into a passing score.
+        citation_status = "failed"
+    elif abstained:
+        report = validate_citations(answer, labels)
         citation_status = "not_applicable_abstained"
     else:
+        report = validate_citations(answer, labels)
         citation_status = "passed" if report.citation_contract_passed else "failed"
 
     timings = result.get("timings_ms") or {}
@@ -48,6 +61,8 @@ def audit_answer_artifact(
         "source_document_ids": ids,
         "source_titles": [str(s.get("title", "")) for s in sources],
         "abstained": abstained,
+        "output_status": output_status or ("abstained_legacy" if abstained else "unknown_legacy"),
+        "raw_generation_preserved": isinstance(raw_generation, str),
         "citation_status": citation_status,
         "citation_count": report.citation_count,
         "invalid_citation_labels": list(report.invalid_labels),

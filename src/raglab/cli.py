@@ -561,6 +561,9 @@ def _answer(args: argparse.Namespace) -> int:
 
     print("\nAnswer\n")
     print(result.answer)
+    print(f"Output status: {result.output_status}")
+    if result.raw_generation is not None:
+        print("Rejected raw generation: saved in the local JSON only.")
     print("\nSources\n")
     for source in result.sources:
         title = source.title or "(untitled)"
@@ -596,6 +599,7 @@ def _answer(args: argparse.Namespace) -> int:
     output_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"\nSaved: {output_path}")
     print(f"Citation gate: {audit['citation_status']}")
+    print(f"Output status: {audit['output_status']}")
     print("Semantic faithfulness: not_evaluated (requires independently judged evidence)")
     if args.strict_citations and audit["citation_status"] == "failed":
         print("QUALITY_GATE_FAIL: generated answer lacks a valid citation contract")

@@ -29,6 +29,8 @@ class RAGAnswer:
     citation_report: CitationReport
     timings_ms: dict[str, float]
     abstained: bool = False
+    output_status: str = "accepted"
+    raw_generation: str | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -40,6 +42,9 @@ class RAGAnswer:
             "citation_report": asdict(self.citation_report),
             "timings_ms": dict(self.timings_ms),
             "abstained": self.abstained,
+            "output_status": self.output_status,
+            # Preserve only rejected drafts, in local research artifacts, for audits.
+            "raw_generation": self.raw_generation,
         }
 
 
@@ -106,6 +111,10 @@ class RAGPipeline:
                     "total": total_ms,
                 },
                 abstained=True,
+                output_status=(
+                    "abstained_no_context"
+                    if not context.sources else "abstained_evidence_gate"
+                ),
             )
 
         user_prompt = (
@@ -125,12 +134,23 @@ class RAGPipeline:
         citation_report = validate_citations(answer, context.labels)
         total_ms = (time.perf_counter() - started) * 1000.0
 
+        # A cited-looking sentence is NOT guaranteed to be entailed by its
+        # source. This is a syntactic fail-closed publication gate, not a
+        # semantic faithfulness verifier.
+        rejected = not citation_report.citation_contract_passed
+        public_answer = (
+            "The generated draft failed the citation requirements; "
+            "no factual answer is being provided."
+            if rejected else answer
+        )
         return RAGAnswer(
             question=question,
-            answer=answer,
+            answer=public_answer,
             retrieval_name=self.retriever.name,
             generator_name=self.generator.name,
             sources=context.sources,
+            # Crucially, these statistics describe the attempted generation,
+            # NOT the safe refusal string substituted for a rejected answer.
             citation_report=citation_report,
             timings_ms={
                 "retrieval": retrieval_ms,
@@ -138,4 +158,9 @@ class RAGPipeline:
                 "generation": generation_ms,
                 "total": total_ms,
             },
+            abstained=rejected,
+            output_status=(
+                "rejected_citation_contract" if rejected else "accepted"
+            ),
+            raw_generation=answer if rejected else None,
         )

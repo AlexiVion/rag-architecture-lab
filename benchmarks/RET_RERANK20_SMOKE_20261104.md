@@ -27,7 +27,7 @@ Top-five recall decreased **0.1083 absolute (10.83 percentage points)**. Mean qu
 
 **NO-GO for immediate adoption of this specific model/candidate depth.** Do not change the default Hybrid retriever, and do not launch a full 809-query rerank study or another Qwen generation run solely to rescue this smoke result.
 
-The 60 queries are a convenience subset, not a randomized held-out test. Statistical uncertainty and individual ranking failures will be inspected from the saved per-query JSON using `scripts/analyze-latest-rerank-local.ps1`. A negative result here does not invalidate reranking with other models or domain configurations.
+The 60 queries are a convenience subset, not a randomized held-out test. Offline paired analysis was subsequently completed with 69 tests passing. The **Recall@5 delta was −0.10833**, exploratory paired bootstrap **95% CI [−0.19167, −0.03333]**, with **1 improved, 10 worsened, 49 unchanged** queries. The interval excludes zero but is unadjusted and based on an ordered convenience subset. Other paired metrics were less conclusive (MRR@10 CI [−0.09866,+0.03275], nDCG@10 CI [−0.08363,+0.03708], Recall@10 CI [−0.08333,+0.08333]). This supports the NO-GO for this configuration without invalidating all rerankers. Local full artifact: `benchmarks/results/beir_scifact_train_20261104T140133Z_RERANK_ANALYSIS.json`.
 
 ## Next scientific work
 
