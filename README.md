@@ -23,7 +23,7 @@ git pull --ff-only origin feat/research-lab-architecture-catalog-20261104
 .\scripts\run-observatory-local.ps1
 ```
 
-The command runs the full test suite, re-exports the verified static JSON and opens the **local viewer at http://127.0.0.1:4188/**. Stop the server with Ctrl+C. It makes **no paid API calls**, uses no Qwen and does not download models for this demonstration. Linux/macOS users can run the Python export and standard local HTTP server as described in [the GRF-00 guide](docs/GRF_00_SEED_GRAPH.md).
+The command runs the full test suite, re-exports the verified static JSON and opens the **local viewer at http://127.0.0.1:4874/**. Stop the server with Ctrl+C. It makes **no paid API calls**, uses no Qwen and does not download models for this demonstration. Linux/macOS users can run the Python export and standard local HTTP server as described in [the GRF-00 guide](docs/GRF_00_SEED_GRAPH.md).
 
 **Do not treat the demo as a GraphRAG benchmark or a finished v1.0.** Source-quoted two-hop traversal and the viewer are implemented; scalable entity extraction, real multi-hop quality results, M2 answer-quality validation, the ten new model experiments and a hosted explorer remain pending. The current feature branch PR is still draft.
 

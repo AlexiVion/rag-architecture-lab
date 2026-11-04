@@ -1,6 +1,6 @@
 param(
     [switch]$NoServe,
-    [int]$Port = 4188
+    [int]$Port = 4874
 )
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot

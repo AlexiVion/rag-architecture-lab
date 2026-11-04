@@ -20,7 +20,7 @@ From the root of a working local clone with its existing Python environment:
 .\scripts\run-observatory-local.ps1
 \`\`\`
 
-This runs the graph regression tests, regenerates and verifies \`apps/explorer/data/demo.json\`, opens \`http://127.0.0.1:4188\` and serves the static viewer from localhost. Stop the server with Ctrl+C.
+This runs the graph regression tests, regenerates and verifies \`apps/explorer/data/demo.json\`, opens \`http://127.0.0.1:4874\` and serves the static viewer from localhost. Stop the server with Ctrl+C.
 
 For noninteractive headless test/fixture export only:
 
@@ -33,7 +33,7 @@ Cross-platform equivalent:
 \`\`\`bash
 python -m pytest -q tests/test_graph_evidence.py
 python -m raglab.observatory.fixture --output apps/explorer/data/demo.json
-python -m http.server 4188 --bind 127.0.0.1 --directory apps/explorer
+python -m http.server 4874 --bind 127.0.0.1 --directory apps/explorer
 \`\`\`
 
 The prebuilt public demo file is an **illustrative fixture**, never a performance/quality benchmark. Its numerical graph counts count curated nodes and paths, not evidence accuracy. Real benchmarks still need true multi-hop QA labels, controls, paired retrieval evaluation and measurement of index and query costs.
