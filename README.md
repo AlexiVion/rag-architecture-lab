@@ -249,3 +249,5 @@ The current experiments run at **$0 paid API cost**. They use public benchmark d
 The initial retrieval phase is complete. Hybrid RRF is the default retrieval architecture. A 10-candidate cross-encoder reranker remains available as an optional/adaptive quality mode. The next project phase is **V2: generation, context construction, and citations**.
 
 **GRF-01 next experiment:** [predeclared independent Hybrid RRF comparison protocol](docs/GRF_01_HYBRID_RRF_PROTOCOL.md). The exposed 60-query DEV subset will not be reused to tune new retrieval parameters.
+
+**Next no-prompt research preparation:** `scripts/freeze-grf01-cohort-local.ps1` reserves 60 non-overlapping HotpotQA DEV cases for the pre-registered Hybrid RRF comparison, without running models or reporting scores. Current implementation is awaiting local validation.

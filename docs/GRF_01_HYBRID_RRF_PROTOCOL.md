@@ -46,3 +46,17 @@ Data cannot prove generated answer correctness here. Multi-hop answer quality is
 - [ ] GRF-01F: only then connect reviewed, license-cleared aggregate to the observatory.
 
 **Current outcome:** no GRF-01 measurements, no policy promoted. Current GRF-00 NO-GO remains unchanged.
+
+## GRF-01A implementation: disjoint cohort reservation (staged, not locally validated)
+
+A fully automatic reservation utility has been added:
+
+```powershell
+.\scripts\freeze-grf01-cohort-local.ps1
+```
+
+It runs the full regression suite, verifies the **exact original locally audited GRF-00 source report SHA256** `962dc3b12d0086857ad94198cf2b1fff7a49ca5f7df069e9575a6daaf778f016`, verifies the pinned HotpotQA DEV source cache, and applies fixed seed **217** to 500 deterministic eligible bridge questions. It excludes **all 60 previously exposed query IDs**, reserves the first **60 disjoint** entries, and writes an immutable/idempotent local manifest to `runs/graph-hybrid/GRF01_RESERVED_DEV_COHORT.json`.
+
+The manifest stores selected IDs, a SHA256 fingerprint, previous run hash, the exact eligibility and seed, plus an explicit warning that **DEV disjointness is not the same as an independent new dataset**. Re-running the command checks identity rather than replacing the manifest.
+
+This stage **does not run any model or benchmark**, inspect the selected cohort's performance, choose graph weights or prove a new architecture. The command and tests are committed but await the operator's local pytest + dataset verification. The old GRF-00 NO-GO remains unchanged. The next implementation package must **freeze** the Hybrid RRF/Graph Hybrid computational policy, model revision, and resource budget before any evaluation on the reserved cohort.

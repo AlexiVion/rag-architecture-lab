@@ -47,3 +47,6 @@ No hosted multi-user chatbot, billing, client CRM, platform integrations, GPU cl
 | MOD-10 | 10 candidates defined in proposed registry, no matched full matrix | role-specific sequential CPU results and artifacts |
 | WEB-01 | functional local browser explorer, sample graph trace and locally verified benchmark aggregate | public deployed viewer, accessible browser QA and reproducible published manifests |
 | REL-01 | no v1.0 release | documented external clone, deployed public explorer, verified release |
+
+
+**GRF-01A cohort reservation implementation (not yet run on the operator's machine):** `scripts/freeze-grf01-cohort-local.ps1` checks the archived GRF-00 source report SHA256, pins the existing HotpotQA cache, selects 60 never-before-used DEV query IDs with a new seed (217) and no overlap, and writes a gitignored immutable cohort manifest. **It does not evaluate or tune anything.** DEV reuse is still a methodological limitation.
