@@ -70,3 +70,14 @@ Run `scripts/prepare-grf01-hybrid-local.ps1`: full pytest and an immutable `GRF0
 `src/raglab/graph/grf01_study.py` now accepts only the **already locked** policy+cohort hashes, loads the exact pinned CPU MiniLM encoder once, and performs a single pass on the 60 pre-reserved DEV questions. BM25 and Dense are independently ranked on the same source documents. Both Hybrid RRF and Graph-Hybrid use **the identical cached retrieval lists**; gold labels are consulted only in the evaluator after ranking. Outputs record Recall@1/3/5 per architecture, paired bootstrap confidence intervals and win/loss/tie counts, graph paths, full measured relation-construction time, model encoding/index/query timings, sampled RSS when `psutil` is available, and experimental limitations. `GRF01_FROZEN_EVALUATION.json/.md` are written under gitignored `runs/graph-hybrid/` and a second successful run refuses overwrite. Primary confidence intervals **cannot automatically trigger deployment**; positive results still require independent resource/provenance review.
 
 The one-command Windows script `scripts/run-grf01-hybrid-study-local.ps1` executes the full Python test suite, locks the model-free policy first, and only then downloads/loads the pinned open embedding model and evaluates the frozen cohort. First model download may be required. **New code and tests have not been run on the operator's machine; no GRF-01 results exist yet.** This is same HotpotQA DEV split (disjoint IDs), not an untouched independent new dataset; we will report this honestly.
+
+## Observed frozen GRF-01 result (2026-11-04)
+
+After all local regression tests passed, the operator ran the **single** reserved DEV cohort (60/60 queries) with the pinned CPU MiniLM revision and locked source-quoted graph bonus. The original saved experiment reported:
+
+- Recall@1 Hybrid=0.4417 vs Graph-Hybrid=0.4417 (delta 0.0000).
+- Recall@3 Hybrid=0.7417 vs Graph-Hybrid=0.6917 (delta -0.0500).
+- Recall@5 Hybrid=0.8583 vs Graph-Hybrid=0.8500 (delta -0.0083).
+- Decision: `INCONCLUSIVE_NO_AUTOMATIC_PROMOTION` with no production change.
+
+The confidence interval bounds and wins/losses per query are in the locally saved JSON but **not present in the console excerpt**; a new post-run auditor is committed to verify and report them. No second evaluation or parameter tuning is appropriate on this now-exposed cohort. The GRF-00 and GRF-01 cohorts/baselines differ, and raw numbers must not be interpreted as a causal controlled improvement between the two.

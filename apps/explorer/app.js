@@ -169,7 +169,7 @@ async function load(){
   try{
     const response=await fetch('./data/demo.json',{cache:'no-store'});
     if(!response.ok)throw new Error('Fixture file missing. Run the offline exporter first.');
-    const body=await response.json();assertArtifact(body);dataset=body;render();loadLocalBenchmark();
+    const body=await response.json();assertArtifact(body);dataset=body;render();loadLocalBenchmark();loadGrf01Benchmark();
   }catch(error){
     $('load-error').hidden=false;
     $('load-error').textContent='Unable to load verified fixture: '+error.message+'. Serve this directory through a local HTTP server, not file://.';
@@ -220,5 +220,66 @@ async function loadLocalBenchmark() {
     status.textContent = 'LOCAL RESULT PENDING';
     $('benchmark-metrics').textContent = 'No audited local results available. Run scripts/audit-grf00-hotpotqa-local.ps1 and refresh.';
     $('benchmark-groups').replaceChildren();
+  }
+}
+
+async function loadGrf01Benchmark() {
+  const badge = $('grf01-badge'), host = $('grf01-metrics');
+  try {
+    const response = await fetch('./data/grf01-summary.local.json', {cache:'no-store'});
+    if (!response.ok) throw new Error('No audited GRF-01 local result');
+    const data = await response.json();
+    if (data.schema_version !== 1 || data.kind !== 'verified_grf01_retrieval_aggregate'
+      || data.publication_status !== 'audited_local_existing_run'
+      || data.experiment_id !== 'GRF01-HOTPOTQA-DEV-01'
+      || data.sample_count !== 60
+      || !/^[0-9a-f]{64}$/.test(data.source_report_sha256)
+      || !['INCONCLUSIVE_NO_AUTOMATIC_PROMOTION','NO_GO_PRIMARY_RECALL_BELOW_BASELINE','PRIMARY_POSITIVE_PENDING_COST_AND_PROVENANCE_REVIEW'].includes(data.decision)) {
+      throw new Error('Invalid or unverified GRF-01 study aggregate');
+    }
+    const inspected = [];
+    for (const [key,label] of [['recall@1','Recall@1'],['recall@3','Recall@3'],['recall@5','Recall@5']]) {
+      const metric = data.metrics?.[key];
+      const lo = metric?.paired_bootstrap_95ci?.[0];
+      const hi = metric?.paired_bootstrap_95ci?.[1];
+      const values = [metric?.hybrid,metric?.graph_hybrid,metric?.graph_hybrid_minus_hybrid_delta,lo,hi];
+      if (!values.every(n=>typeof n==='number' && Number.isFinite(n) && Math.abs(n)<=1)) {
+        throw new Error('Missing or out-of-range measured retrieval metric');
+      }
+      inspected.push({label,metric,lo,hi});
+    }
+    const groups = [];
+    for (const [id,title] of [['path_activated','Graph path active'],['no_path','No graph path']]) {
+      const item = data.subgroups?.[id];
+      if (!item || !Number.isInteger(item.cases) || item.cases<0
+        || (item.mean_delta_recall_at_5!==null && !Number.isFinite(item.mean_delta_recall_at_5))) {
+        throw new Error('Invalid observed graph subgroup');
+      }
+      groups.push({title,item});
+    }
+    if (groups.reduce((sum,x)=>sum+x.item.cases,0)!==60) throw new Error('Subgroup counts differ');
+    badge.textContent = data.decision==='INCONCLUSIVE_NO_AUTOMATIC_PROMOTION'
+      ? 'INCONCLUSIVE · KEEP HYBRID'
+      : data.decision.startsWith('NO_GO') ? 'NO-GO · KEEP HYBRID' : 'POSITIVE · REVIEW REQUIRED';
+    host.replaceChildren();
+    for (const {label,metric,lo,hi} of inspected) {
+      const card=el('div','bench-metric');
+      card.append(el('span','bench-key',label));
+      card.append(el('div','bench-values','Hybrid RRF '+(metric.hybrid*100).toFixed(2)+'% · Graph-Hybrid '+(metric.graph_hybrid*100).toFixed(2)+'%'));
+      const delta=el('div','bench-delta',(metric.graph_hybrid_minus_hybrid_delta>=0?'+':'')+(metric.graph_hybrid_minus_hybrid_delta*100).toFixed(2)+' pts');
+      if (metric.graph_hybrid_minus_hybrid_delta<0) delta.classList.add('negative');
+      card.append(delta,el('small',null,'95% paired CI: ['+(lo*100).toFixed(2)+', '+(hi*100).toFixed(2)+'] pts'));
+      host.append(card);
+    }
+    const groupHost=$('grf01-groups');groupHost.replaceChildren();
+    for (const {title,item} of groups) {
+      const delta=item.mean_delta_recall_at_5;
+      groupHost.append(el('span','bench-group',title+': '+item.cases+' cases · ΔRecall@5 '+(delta===null?'n/a':(delta*100).toFixed(2)+' pts')+' · W/L/T '+item.wins+'/'+item.losses+'/'+item.ties));
+    }
+    $('grf01-source').textContent='Audited original GRF-01 run · model revision '+data.model_revision.slice(0,12)+'… · report SHA256 '+data.source_report_sha256.slice(0,16)+'… · HotpotQA DEV CC BY-SA 4.0. These are source retrieval metrics, not answer accuracy.';
+  } catch (error) {
+    badge.textContent='AUDITED RESULT PENDING';
+    host.textContent='Audited GRF-01 result unavailable. Run scripts/audit-grf01-local.ps1 and refresh.';
+    $('grf01-groups').replaceChildren();
   }
 }

@@ -203,3 +203,6 @@ After running the original 60-query DEV study, the operator executed the separat
 
 
 **GRF-01B/C implementation staged (2026-11-04):** The user completed the 60-query disjoint DEV reservation with SHA256 `a560b1cbabe1ce6b4413f0f6f59759cd08e69ce49c5391e05b7c8767f81bd13f` and no overlap. A fixed two-hop graph-augmented Hybrid RRF policy (model revision pinned, RRF=60, source-quote bonus weight 0.10, exact no-path identity) and synthetic tests have been added. Local operator has not yet verified those new changes, and the reserved cohort has not been scored; do not claim accuracy improvements. See `docs/GRF_01_LOCKED_HYBRID_POLICY.md`.
+
+
+**GRF-01 real local study completed (2026-11-04):** the frozen 60-query HotpotQA DEV cohort was evaluated once against matched BM25, Dense, Hybrid RRF and Graph-Hybrid. All local pytest tests passed. Recall@1 Graph−Hybrid 0.0000, Recall@3 −0.0500 and primary Recall@5 −0.0083 (Hybrid 0.8583, Graph-Hybrid 0.8500). Study decision `INCONCLUSIVE_NO_AUTOMATIC_PROMOTION`. Original metrics remain local; CI/win-loss bounds pending independent saved-report audit and should not be invented. Retain Hybrid RRF default, do not retune on this exposed DEV sample. M2, ten-model registry measurements, general GraphRAG semantic extraction, and publicly deployed observatory remain unfinished.

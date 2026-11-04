@@ -99,7 +99,7 @@ def test_cannot_change_cohort_or_model_contract():
 
 def test_cannot_forge_gold_recall_or_graph_source_ids():
     report, cohort, lock = fixtures()
-    report["cases"][0]["recall"]["hybrid"]["recall@1"] = 1.0 - report["cases"][0]["recall"]["hybrid"]["recall@1"]
+    report["cases"][0]["recall"]["hybrid"]["recall@1"] += 0.25
     with pytest.raises(ValueError, match="numeric"):
         audit(report, cohort, lock, "h", canonical=False)
     report, cohort, lock = fixtures()

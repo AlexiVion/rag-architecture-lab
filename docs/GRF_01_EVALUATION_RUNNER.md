@@ -1,6 +1,6 @@
 # GRF-01 — Frozen one-pass paired evaluation runner
 
-**State:** Implementation prepared, **not yet executed** against the 60 reserved HotpotQA DEV cases.
+**State:** The reserved 60-query one-pass experiment has **completed locally** with all Python tests passing, pinned MiniLM loaded successfully, and `GRF01_DECISION=INCONCLUSIVE_NO_AUTOMATIC_PROMOTION`. Independent saved-report audit implementation is staged for local verification.
 
 ## One command (Windows)
 
@@ -48,3 +48,21 @@ After a successful run the script refuses to rerun or overwrite the result. No p
 ### Decision rule
 
 A negative 95% CI for the paired primary delta is a **NO-GO** for this specific graph bonus policy. A CI including zero is inconclusive. A positive CI is marked **positive pending separate resource and provenance gate review**, never automatic deployment. The Hybrid RRF default remains unchanged regardless of this command.
+
+## Recorded GRF-01 run — 2026-11-04
+
+The operator executed the fixed one-pass study at commit `4d5e6d5`, with full pytest PASS, locked model revision `1110a243fdf4706b3f48f1d95db1a4f5529b4d41`, policy hash `fd28fe01f244fa27f731395bd522a331026eb1cfa6a6acb4bcf592db1fb942bb` and reserved cohort SHA256 `a560b1cbabe1ce6b4413f0f6f59759cd08e69ce49c5391e05b7c8767f81bd13f`.
+
+| Metric | Hybrid RRF | Graph-Hybrid | Graph-Hybrid − Hybrid |
+|---|---:|---:|---:|
+| Recall@1 | 0.4417 | 0.4417 | 0.0000 |
+| Recall@3 | 0.7417 | 0.6917 | -0.0500 |
+| Recall@5 (primary) | 0.8583 | 0.8500 | -0.0083 |
+
+Original locally saved outputs: `runs/graph-hybrid/GRF01_FROZEN_EVALUATION.json` and sibling Markdown. The terminal log does **not** display the paired CI bounds, individual wins/losses or resource measurements; do **not** infer or invent them.
+
+**Decision:** inconclusive, with no grounds to promote this graph-bonus policy. Hybrid RRF remains the reference. The two completed GRF experiments used **different cohorts and baselines**, so the smaller observed drop in GRF-01 cannot by itself be attributed causally to an architectural improvement.
+
+### Post-run evidence audit
+
+The newly added `scripts/audit-grf01-local.ps1` runs full pytest and independently checks the saved report's per-query source rankings, supporting-document recall, paired bootstrap CI, win/loss/tie counts, graph paths, frozen model/policy/cohort identities and timing summaries. It does **not** rerun the evaluator or load model weights. It prints actual CI bounds and writes a local audit report plus the ignored JSON file consumed by the web explorer. This code is **not yet verified on the operator's Windows machine**. The archived original run will not be overwritten.
