@@ -97,6 +97,15 @@ def _build_parser() -> argparse.ArgumentParser:
     analyze_fusion.add_argument("--bootstrap-replicates", type=int, default=2000)
     analyze_fusion.add_argument("--seed", type=int, default=42)
 
+    analyze_rerank = subparsers.add_parser(
+        "analyze-rerank",
+        help="Analyze saved paired retrieval benchmark without loading local models",
+    )
+    analyze_rerank.add_argument("--path", required=True)
+    analyze_rerank.add_argument("--bootstrap-replicates", type=int, default=2000)
+    analyze_rerank.add_argument("--seed", type=int, default=42)
+
+
 
     answer = subparsers.add_parser(
         "answer",
@@ -174,6 +183,40 @@ def _print_summary(results: list[dict]) -> None:
     print("  ".join("-" * width for width in widths))
     for row in rows:
         print("  ".join(value.ljust(widths[i]) for i, value in enumerate(row)))
+
+
+def _analyze_rerank(args: argparse.Namespace) -> int:
+    from raglab.evaluation.rerank_analysis import (
+        analyze_rerank_artifact,
+        rerank_report_markdown,
+    )
+
+    input_path = Path(args.path)
+    payload = json.loads(input_path.read_text(encoding="utf-8"))
+    report = analyze_rerank_artifact(
+        payload,
+        bootstrap_replicates=args.bootstrap_replicates,
+        seed=args.seed,
+    )
+    print("\nRET-RERANK-20 | offline paired-query audit\n")
+    print(f"Development queries: {report['query_count']}")
+    for metric, entry in report["metrics"].items():
+        print(
+            f"{metric}: delta={entry['delta']:+.5f}, "
+            f"95% bootstrap CI=[{entry['ci95'][0]:+.5f}, "
+            f"{entry['ci95'][1]:+.5f}], "
+            f"wins={entry['wins']}, losses={entry['losses']}, ties={entry['ties']}"
+        )
+    print(f"Decision: {report['decision']}")
+    name = input_path.with_suffix("")
+    json_path = name.with_name(name.name + "_RERANK_ANALYSIS.json")
+    md_path = name.with_name(name.name + "_RERANK_ANALYSIS.md")
+    json_path.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    md_path.write_text(rerank_report_markdown(report), encoding="utf-8")
+    print(f"JSON: {json_path}")
+    print(f"Report: {md_path}")
+    print("No indexing, embedding, cross-encoder or Qwen was invoked.")
+    return 0
 
 
 def _analyze_fusion(args: argparse.Namespace) -> int:
@@ -608,6 +651,8 @@ def main() -> int:
         return _fusion_study(args)
     if args.command == "analyze-fusion":
         return _analyze_fusion(args)
+    if args.command == "analyze-rerank":
+        return _analyze_rerank(args)
     if args.command == "answer":
         return _answer(args)
     if args.command == "experiment":

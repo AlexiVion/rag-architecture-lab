@@ -24,3 +24,9 @@ This does *not* run Qwen, generation or an answer-faithfulness metric. It can do
 This initial set is a **plumbing/feasibility smoke**, not a final ranking of techniques. Full SciFact train and candidate-depth 10/20/50 ablations with uncertainty, source inspection and performance budgets should precede any held-out claim. Reranking is CPU-intensive and must justify latency overhead.
 
 Do not run held-out SciFact test to choose the candidate depth, or claim that a retrieved qrel-relevant article guarantees an answer with valid citations. Use the baseline as the control, and keep original `HybridRetriever` unchanged during experiments.
+
+## Measured local smoke (2026-11-04)
+
+The first 60 SciFact TRAIN queries completed successfully (62 tests passed). Original Hybrid: Recall@5 0.7750, mean query latency 36.60 ms. Hybrid plus MS MARCO reranker at candidate depth 20: Recall@5 0.6667, mean query latency 1725.90 ms. This specific variant has a **provisional NO-GO** for immediate adoption; do not launch a full reranking study before inspecting per-query evidence.
+
+See `benchmarks/RET_RERANK20_SMOKE_20261104.md` and the offline analyzer `scripts/analyze-latest-rerank-local.ps1`. This does not preclude other rerankers or alternative candidate-depth policies. V2 semantic faithfulness remains untested.
