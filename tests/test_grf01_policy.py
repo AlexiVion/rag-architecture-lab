@@ -71,7 +71,7 @@ def test_forged_relations_fail_closed():
     with pytest.raises(ValueError, match="quote"):
         policy.paired_rankings(
             "Aster Rover", docs, dense, sparse,
-            nodes=nodes,
+            nodes=nodes, k=3,
             edges=[EvidenceEdge(
                 "fake", "doc-a", "mentions", "doc-b", "doc-a",
                 "Aster Rover invented a spaceship.",
@@ -82,11 +82,11 @@ def test_forged_relations_fail_closed():
 def test_reject_mismatched_candidates_and_bad_k():
     docs, dense, sparse = fixture()
     with pytest.raises(ValueError, match="ALL identical"):
-        policy.paired_rankings("Aster Rover", docs, dense[:2], sparse)
+        policy.paired_rankings("Aster Rover", docs, dense[:2], sparse, k=3)
     broken = sparse.copy()
     broken[2] = SearchResult("not-present", 0, 3)
     with pytest.raises(ValueError, match="missing, duplicated or foreign"):
-        policy.paired_rankings("Aster Rover", docs, dense, broken)
+        policy.paired_rankings("Aster Rover", docs, dense, broken, k=3)
     with pytest.raises(ValueError, match="top-k"):
         policy.paired_rankings("Aster Rover", docs, dense, sparse, k=0)
 
