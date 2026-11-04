@@ -50,3 +50,17 @@ The script runs full pytest first, then performs only an offline audit of the sa
 The defensible conclusion is that Qwen2.5-0.5B plus the current prompt **did not reliably abstain** when supplied topically related-but-insufficient evidence or contradictory sources in this six-group original fictional template family. The deterministic no-context skip is working; that is pipeline behavior, not model reasoning. The sample has only six items per category, no expert-annotated natural facts, no verified model weights revision and no independent natural-language entailment judge. As a consequence **the M2 answer-quality acceptance criterion remains OPEN**.
 
 Next, inspect exact preserved generated outputs and their attribution errors. Only then choose an explicit **development-only** semantic adequacy strategy (e.g. structured attribute consistency in this narrow domain, with fail-closed rules), validate it on a different independently labelled cohort, and keep automatic publication disabled until evidence support and abstention error rates are defensible. Do not repeat or tune against these frozen 24 cases and then claim an independent test result.
+
+## Final original-file forensic audit — PASS (2026-11-04)
+
+The maintainer ran the entire Windows regression suite PASS and independent `M2_SYNTH01_ARCHIVED_AUDIT_PASS`. Original report SHA256 `f33eade629967ff9c4c15bf3ce3e05ca4adc329ece837017bd0fd9ce6ef109e4`; manifest SHA256 `c5a528a2f7c77c66ba0b56b151fc9909cbcddac5fad491d8f59cf4af8e4efa74`. The audit reconciled the original 24 rows, exact source/evidence mappings, original candidate and citation fields and aggregate score. No Qwen inference and no publication occurred during the audit. The previous caveat that raw Qwen candidates were unavailable **is superseded by this section**.
+
+The default V1 pipeline `accepted` these **three negative-control drafts** (all held within the local research experiment):
+
+1. `M2S01-irrelevant`: `Crescent Labs developed the Helix Pressure Unit for the Kestrel Explorer [S1].` The source related that component to *Mantis Flyer*, not to Kestrel Explorer.
+2. `M2S02-conflicting`: `Vantage Mechanica developed the Prism Course Module installed on the Boreal Cartographer [S2].` The other original source attributed the same component to *Oakwave Systems*; no conflict was acknowledged.
+3. `M2S05-irrelevant`: `Falcon Workshop developed the Polar Thermal Sensor for the Ravenna Probe [S1].` The source related that component to *Saffron Orbiter*, not to Ravenna Probe.
+
+By contrast, some of the adequate-source original drafts name the right manufacturer but omit `[S1]` or invent labels like `[M2S02-a]`. Thus there are **distinct instruction-following, citation-format, entity-alignment and contradiction-resolution problems**; adjusting citation punctuation alone is insufficient.
+
+**Decision remains** `NO_GO_AUTOMATIC_ANSWER_PUBLICATION_UNTIL_SOURCE_SUPPORT_GATE_VALIDATED`. Synthetic control success is not general semantic quality, and this 24-question cohort is exposed. See `docs/M2_GUARD_DEV01_REPLAY.md` for a post-hoc *research-only* structured evidence-gate prototype; even if it suppresses the exposed false-acceptance patterns, that is not an unbiased new evaluation or production authorization.

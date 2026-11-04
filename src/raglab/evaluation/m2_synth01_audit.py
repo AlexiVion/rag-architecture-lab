@@ -184,8 +184,8 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines = [
         "# M2-SYNTH-01 — original 24-case saved-result audit",
         "",
-        f"Original report SHA256: \`{report['report_original_sha256']}\`",
-        f"Original manifest SHA256: \`{report['manifest_original_sha256']}\`",
+        f"Original report SHA256: \\`{report['report_original_sha256']}\\`",
+        f"Original manifest SHA256: \\`{report['manifest_original_sha256']}\\`",
         f"Outcome: **{report['research_decision']}**",
         "",
         "| Control | n | Success | Pipeline accepted | V2 citation syntax | Model exact abstention |",
