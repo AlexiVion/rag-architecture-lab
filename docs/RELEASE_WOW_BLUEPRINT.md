@@ -218,3 +218,8 @@ The first browser app includes measured GRF-00 and GRF-01 aggregate views; read-
 ## M2 controlled real-generator smoke staged (2026-11-04)
 
 After GRF-00/01 saved reports and public summary-only viewer assets passed on the user's machine, `M2-LIVE-01` was implemented to exercise the **existing V2 pipeline with Qwen** on four original fictional evidence controls. Unlike the SciFact held-out diagnostic, this does not read TEST data; unlike an answer-quality benchmark, it **does not pretend to automatically certify factuality**. Three Qwen outputs and one no-context generator skip are saved as gitignored local artifacts with citation syntax, output acceptance/refusal status and exact source mappings. The tests/real invocation have not yet run on the user's machine. The model revision is reported only if resolvable, not yet frozen for reproducible scientific comparison. See `docs/M2_LIVE_QWEN_CONTROLS.md`. Separate expert-labeled TRAIN/DEV quality and abstention tests remain mandatory.
+
+
+## M2 real Qwen smoke observed; semantic assessment still open (2026-11-04)
+
+The operator successfully completed the first Qwen2.5-0.5B-Instruct post-citation-gate runtime control. All Python tests PASS, three generated drafts all rejected for citation-contract failures, empty-context generator skipped. A citation-valid generated answer was **not** observed even for the answerable controlled case. This is an operational utility gap, not a scientific truth/factuality score. A model-free postrun audit now inspects exact raw drafts and syntax failure reasons, pending operator verification. Model commit was unresolved. Keep M2 independent semantic validity and calibrated abstention gates open.

@@ -71,3 +71,8 @@ The explorer now has published **summary-only statistical aggregates** as a read
 ## M2 next executable gate (prepared; local run pending)
 
 `M2-LIVE-01` adds `scripts/run-m2-live-controls-local.ps1` for one bounded local Qwen test across four explicitly fictional controlled evidence conditions (answerable, irrelevant but nonempty, contradictory and no-context). Full pytest runs before the generator. Exact source IDs, observable public output status, citation coverage, preserved rejected drafts, no-context generator-skip and timing are recorded. No SciFact TEST is re-used and no answer-level semantic support is attributed to citation syntax. A previously passed empty-context unit test is **not** a substitute for a live-generator smoke. This closes neither M2 independent quality evaluation nor the wider WOW v1.0 release.
+
+
+## Latest M2 live-generator checkpoint — 2026-11-04
+
+**M2-LIVE-01:** The first post-citation-gate real local Qwen run completed with pytest PASS: four fictional controls, three generator calls, all three generated drafts rejected by the citation contract (including curated adequate evidence). No-context abstained without generator invocation. Fixture SHA256 261e4545b00e19d100e4144ca2704f7bac11658db1f200ef2601e58621e7e46c. Qwen commit unresolved. An offline saved-result audit and synthetic tamper tests were added (scripts/audit-m2-live-local.ps1), awaiting operator verification to identify exact raw citation failures. Do not infer semantic answer correctness from citation syntax. M2 scientific-quality acceptance remains **OPEN**.

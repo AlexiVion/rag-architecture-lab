@@ -30,3 +30,12 @@ It first runs the **complete pytest suite**, then executes three real-generator 
 **DO NOT claim M2 is closed or semantically perfect from this smoke.** Model answers can be cited but irrelevant, unsupported, inconsistent or wrongly confident. Independent human or independently validated answer-quality labels, correct abstention rates, and a genuinely untouched evaluation set are required to close M2.
 
 Historical context: the previous SciFact TEST Q1 answer was off-task/uncited, and the tested off-domain NLI verifier was **NO-GO** on gold SciFact TRAIN rationales. Those results remain unchanged.
+
+
+## Observed local Qwen execution — 2026-11-04
+
+The operator completed the complete Python test suite, then three real Qwen generations: all three returned rejected_citation_contract, including the case with curated sufficient evidence. The fourth no-context control abstained without calling Qwen.
+
+Original saved JSON: runs/m2-live/M2_LIVE_20261104T182515461187Z.json. Original fixture SHA256: 261e4545b00e19d100e4144ca2704f7bac11658db1f200ef2601e58621e7e46c. Model revision was not resolved. No individual raw draft was present in the console output, so the cause of the citation failures is **not yet known**.
+
+The new scripts/audit-m2-live-local.ps1 audits this original saved JSON without loading any generator, verifying exact source texts, labels, output status, model calls and original citation stats; then it prints the raw original drafts and their syntax-failure categories. The original experiment will not be overwritten. New tests are awaiting local operator verification.

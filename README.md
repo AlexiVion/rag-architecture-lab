@@ -265,3 +265,10 @@ See [Graph-first report](benchmarks/GRF00_HOTPOTQA_DEV_60_NO_GO_20261104.md), [G
 The next scientific-quality milestone begins with a **real-generator, fictional-source operational regression**, rather than repeating the exposed SciFact TEST question. Run `scripts/run-m2-live-controls-local.ps1` to first run the complete test suite and then exercise the existing V2 pipeline on four predefined conditions: sufficient evidence, irrelevant nonempty evidence, conflicting evidence and no evidence. It makes **three bounded real Qwen calls**, with a guaranteed generator skip in the no-context control.
 
 This measures publication/citation syntax and safe empty-context behavior; it explicitly **does not** automatically score semantic truth or answer task correctness. All generated outputs stay local under gitignored `runs/m2-live/`. Newly added implementation/tests have **not yet been run on the operator's Windows environment**, and M2 remains open. [Design and limitations](docs/M2_LIVE_QWEN_CONTROLS.md).
+
+
+## M2-LIVE-01 real Qwen outcome (2026-11-04)
+
+The Windows full suite and bounded Qwen experiment both **PASS operationally**. Three real generated drafts were **all rejected by the citation syntax gate**, including one with sufficient source evidence; the empty-context control abstained with zero generator calls. The resolved model revision was unavailable. This is **not** a semantic accuracy or answer-quality measurement.
+
+The new offline script (scripts/audit-m2-live-local.ps1) verifies the saved original source IDs, citation statistics and refusal statuses, and prints the exact raw rejected drafts without rerunning Qwen. This new code and tests still require Windows validation. See the M2 original case report under benchmarks/M2_LIVE_QWEN_BOUNDARY_20261104.md.
