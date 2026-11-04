@@ -79,6 +79,13 @@ def _build_parser() -> argparse.ArgumentParser:
     answer.add_argument("--context-max-chars", type=int, default=10_000)
     answer.add_argument("--source-max-chars", type=int, default=2_200)
     answer.add_argument("--output-dir", default="runs/v2")
+
+    experiment = subparsers.add_parser(
+        "experiment",
+        help="Compare a specified RAG architecture against a matched baseline",
+    )
+    experiment.add_argument("--spec", required=True, help="Path to a JSON experiment spec")
+    experiment.add_argument("--output-dir", default="benchmarks/results")
     return parser
 
 
@@ -306,6 +313,21 @@ def _answer(args: argparse.Namespace) -> int:
     return 0
 
 
+def _experiment(args: argparse.Namespace) -> int:
+    from raglab.experiments import run_experiment
+
+    spec = json.loads(Path(args.spec).read_text(encoding="utf-8"))
+    payload = run_experiment(spec)
+    _print_summary(payload["results"])
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    output_path = output_dir / f"{_safe_name(payload['experiment_id'])}_{timestamp}.json"
+    output_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"Saved exploratory comparison: {output_path}")
+    return 0
+
+
 def main() -> int:
     parser = _build_parser()
     args = parser.parse_args()
@@ -313,6 +335,8 @@ def main() -> int:
         return _benchmark(args)
     if args.command == "answer":
         return _answer(args)
+    if args.command == "experiment":
+        return _experiment(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 
