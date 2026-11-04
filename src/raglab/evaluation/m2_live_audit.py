@@ -123,8 +123,20 @@ def audit_saved_m2(
             raise ValueError("Recorded original candidate text missing")
         recalculated = validate_citations(original, labels)
         saved = result.get("citation_report")
-        if saved != json.loads(json.dumps(asdict(recalculated))):
+        # In-process RAGAnswer.to_dict() retains tuples from asdict(), while
+        # the immutable archived JSON represents the exact same tuple fields
+        # as arrays. Both shapes must match every value and expected field;
+        # this is structural compatibility, NOT a weaker citation check.
+        expected_report = asdict(recalculated)
+        if not isinstance(saved, dict) or set(saved) != set(expected_report):
             raise ValueError("Recorded citation statistics disagree with original draft")
+        for key, expected_value in expected_report.items():
+            actual = saved[key]
+            if isinstance(expected_value, tuple):
+                if type(actual) not in (tuple, list) or tuple(actual) != expected_value:
+                    raise ValueError("Recorded citation statistics disagree with original draft")
+            elif type(actual) is not type(expected_value) or actual != expected_value:
+                raise ValueError("Recorded citation statistics disagree with original draft")
         if row.get("citation_contract_syntax_passed") is not recalculated.citation_contract_passed:
             raise ValueError("Recorded citation-validity flag disagrees")
         if sources and ((status == "accepted") is not recalculated.citation_contract_passed):

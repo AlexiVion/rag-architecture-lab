@@ -1,6 +1,8 @@
 """Synthetic tests of original saved M2 Qwen audit (no model downloads)."""
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from raglab.evaluation.m2_live_audit import audit_saved_m2, citation_failure_reason
@@ -38,6 +40,37 @@ def test_audit_recomputes_original_syntax_and_preserves_semantic_unknown():
         "not_applicable_no_context",
     ]
     assert all(r["semantic_support"] == "NOT_EVALUATED" for r in result["cases"])
+
+
+def test_json_roundtrip_normalizes_tuple_fields_without_losing_integrity():
+    original = archive()
+    # The in-memory RAGAnswer.to_dict() retains tuples for citation labels.
+    raw_report = original["cases"][1]["local_answer_artifact"]["citation_report"]
+    assert type(raw_report["cited_labels"]) is tuple
+    serialized = json.loads(json.dumps(original))
+    archived_report = serialized["cases"][1]["local_answer_artifact"]["citation_report"]
+    assert type(archived_report["cited_labels"]) is list
+    summary = audit_saved_m2(serialized, "f" * 64, require_real_model=False)
+    assert summary["audit_status"] == "PASS_NO_NEW_MODEL_RUN"
+    assert summary["cases"][1]["citation_count"] == 1
+
+
+def test_wrong_saved_citation_stats_still_rejected_in_both_shapes():
+    for use_json in (False, True):
+        data = archive()
+        if use_json:
+            data = json.loads(json.dumps(data))
+        report = data["cases"][1]["local_answer_artifact"]["citation_report"]
+        report["citation_count"] = 999
+        with pytest.raises(ValueError, match="citation statistics"):
+            audit_saved_m2(data, "f" * 64, require_real_model=False)
+
+
+def test_citation_label_modification_not_silently_normalized():
+    data = json.loads(json.dumps(archive()))
+    data["cases"][1]["local_answer_artifact"]["citation_report"]["cited_labels"] = ["S9"]
+    with pytest.raises(ValueError, match="citation statistics"):
+        audit_saved_m2(data, "f" * 64, require_real_model=False)
 
 
 def test_model_identity_required_for_real_local_archive():
