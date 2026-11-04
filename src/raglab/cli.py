@@ -79,6 +79,27 @@ def _build_parser() -> argparse.ArgumentParser:
     answer.add_argument("--context-max-chars", type=int, default=10_000)
     answer.add_argument("--source-max-chars", type=int, default=2_200)
     answer.add_argument("--output-dir", default="runs/v2")
+    answer.add_argument(
+        "--strict-citations",
+        action="store_true",
+        help="Exit nonzero for a generated answer failing syntactic citation coverage",
+    )
+
+    audit = subparsers.add_parser(
+        "inspect-answer",
+        help="Audit a saved V2 answer without regenerating or downloading an LLM",
+    )
+    audit.add_argument("--path", required=True)
+    audit.add_argument(
+        "--with-qrels",
+        action="store_true",
+        help="Compare retrieved document IDs to test qrels (evaluation only)",
+    )
+    audit.add_argument(
+        "--strict",
+        action="store_true",
+        help="Exit nonzero if a non-abstaining answer fails citation coverage",
+    )
 
     experiment = subparsers.add_parser(
         "experiment",
@@ -308,8 +329,17 @@ def _answer(args: argparse.Namespace) -> int:
         "model": args.model,
         "result": result.to_dict(),
     }
+    from raglab.evaluation.answer_audit import audit_answer_artifact
+
+    audit = audit_answer_artifact(payload)
+    payload["audit"] = audit
     output_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"\nSaved: {output_path}")
+    print(f"Citation gate: {audit['citation_status']}")
+    print("Semantic faithfulness: not_evaluated (requires independently judged evidence)")
+    if args.strict_citations and audit["citation_status"] == "failed":
+        print("QUALITY_GATE_FAIL: generated answer lacks a valid citation contract")
+        return 1
     return 0
 
 
@@ -328,6 +358,28 @@ def _experiment(args: argparse.Namespace) -> int:
     return 0
 
 
+def _inspect_answer(args: argparse.Namespace) -> int:
+    from raglab.evaluation.answer_audit import audit_answer_artifact
+
+    artifact_path = Path(args.path)
+    payload = json.loads(artifact_path.read_text(encoding="utf-8"))
+    relevant_doc_ids = None
+    if args.with_qrels:
+        query_id = payload.get("query_id")
+        if query_id is None:
+            raise ValueError("Saved answer has no benchmark query ID; cannot use qrels")
+        dataset = load_ir_dataset(payload["dataset"])
+        if str(query_id) not in dataset.qrels:
+            raise ValueError(f"No relevance judgments found for query ID {query_id}")
+        relevant_doc_ids = list(dataset.qrels[str(query_id)])
+
+    report = audit_answer_artifact(payload, relevant_doc_ids=relevant_doc_ids)
+    print(json.dumps(report, indent=2, ensure_ascii=False))
+    if args.strict and report["citation_status"] == "failed":
+        return 1
+    return 0
+
+
 def main() -> int:
     parser = _build_parser()
     args = parser.parse_args()
@@ -337,6 +389,8 @@ def main() -> int:
         return _answer(args)
     if args.command == "experiment":
         return _experiment(args)
+    if args.command == "inspect-answer":
+        return _inspect_answer(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 

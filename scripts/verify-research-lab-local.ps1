@@ -31,7 +31,7 @@ if ($LASTEXITCODE -ne 0) {
 
 if ($WithGeneration) {
     Write-Host "=== LOCAL V2 GENERATION SMOKE ==="
-    & (Join-Path $RepoRoot "scripts\run-v2-local.ps1")
+    & (Join-Path $RepoRoot "scripts\run-v2-local.ps1") -StrictCitations
     if ($LASTEXITCODE -ne 0) {
         throw "V2 generation smoke failed"
     }
@@ -40,3 +40,4 @@ if ($WithGeneration) {
 Write-Host "LOCAL_VERIFICATION_PASS"
 Write-Host "Raw experiment outputs: benchmarks/results/ and runs/v2/"
 Write-Host "Note: unit/smoke success does NOT certify semantic faithfulness."
+Write-Host "Use scripts/inspect-latest-v2-local.ps1 to audit saved generations without running Qwen again."

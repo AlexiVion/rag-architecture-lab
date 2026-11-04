@@ -1,6 +1,7 @@
 param(
     [string]$Query = "",
-    [switch]$Quality
+    [switch]$Quality,
+    [switch]$StrictCitations
 )
 
 $ErrorActionPreference = "Stop"
@@ -28,6 +29,12 @@ $Arguments = @(
 if ($Query) {
     $Arguments += @("--query", $Query)
 }
+if ($StrictCitations) {
+    $Arguments += "--strict-citations"
+}
 
 Write-Host "Running V2 locally with pipeline: $Pipeline"
 & $Raglab @Arguments
+if ($LASTEXITCODE -ne 0) {
+    throw "V2 answer/citation check failed. Inspect the saved JSON under runs/v2."
+}
