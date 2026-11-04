@@ -1,5 +1,21 @@
 # RAG Architecture Lab
 
+**WOW v1.0 in development** — an open-source research platform for inspectable retrieval architectures, source-provenance graphs, grounded generation experiments and honest model comparisons. The repository is public; **the full v1.0 release has not been tagged or scientifically certified**.
+
+**Start here:** [WOW delivery matrix](docs/RELEASE_EXECUTION_MATRIX.md) · [R0 clean installation](docs/RELEASE_INSTALLATION.md) · [Offline observatory](apps/explorer/index.html) · [Measured results and limitations](docs/ROADMAP.md) · [Full v1.0 blueprint](docs/RELEASE_WOW_BLUEPRINT.md).
+
+The static graph explorer is already in the branch. It displays curated evidence and audited retrieval summaries; **it does not serve a Qwen model or fabricate semantic-support scores**. Current best documented SciFact retrieval default is Hybrid RRF. The M2 automatic factual-publication decision is **NO-GO** pending independently verified source support and calibrated abstention. Graph-first DEV is negative and graph-hybrid DEV is inconclusive. Ten additional model candidates are proposed, not yet measured.
+
+To verify the release engineering baseline locally, after creating the Python virtual environment described above:
+
+```powershell
+.\scripts\verify-wow-r0-local.ps1
+```
+
+The checker will explicitly report **engineering prerequisites** only. It will not declare full WOW v1.0 complete while M2/MOD-10/WEB-01 acceptance work is open.
+
+---
+
 **Complete WOW v1.0 program:** [Release blueprint](docs/RELEASE_WOW_BLUEPRINT.md) · [Ten-model proposed registry](experiments/model_matrix_10_proposed.json) · [Master tracking issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9). **This is a plan, not completed functionality.**
 
 **Open-source architecture research laboratory**, not a hosted RAG product. The goal is to implement and benchmark composable RAG strategies, publish reproducible evidence, and document engineering trade-offs. Existing V0/V1/V1.1 results are preserved; the V2 code requires an independently recorded local smoke test and answer-quality evaluation.

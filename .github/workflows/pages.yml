@@ -1,0 +1,50 @@
+name: Publish static RAG evidence observatory
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/explorer/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Check static site has no inference endpoint
+        shell: bash
+        run: |
+          test -f apps/explorer/index.html
+          test -f apps/explorer/app.js
+          test -f apps/explorer/data/demo.json
+          test -f apps/explorer/data/grf00-summary.public.json
+          test -f apps/explorer/data/grf01-summary.public.json
+          if grep -E -r -i 'api[_-]?key|bearer [a-z0-9]|sk-[a-z0-9]+' apps/explorer/data/; then
+            echo "Possible credential detected in published data"
+            exit 1
+          fi
+      - name: Set up GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload read-only static site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: apps/explorer
+      - name: Deploy site
+        id: deployment
+        uses: actions/deploy-pages@v4
