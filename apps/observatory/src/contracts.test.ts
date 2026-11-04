@@ -1,3 +1,7 @@
+import liveFixture from "../../explorer/data/demo.json";
+import liveGRF00 from "../../explorer/data/grf00-summary.public.json";
+import liveGRF01 from "../../explorer/data/grf01-summary.public.json";
+import liveModels from "../../../experiments/model_matrix_10_proposed.json";
 import { describe, expect, it } from "vitest";
 import {
   validateFixture, validateGRF00, validateGRF01, validateModels
@@ -58,5 +62,14 @@ describe("source-verified research contracts", () => {
     expect(() => validateModels({...registry,models: models.slice(1)})).toThrow();
     expect(() => validateModels({...registry,models: models.map((m,i) => i===0 ?
       {...m,execution_status:"measured", measured_metrics:null} : m)})).toThrow();
+  });
+});
+
+describe("actual published, source-verified observatory artifacts", () => {
+  it("validates the exact committed fixture and benchmark summaries", () => {
+    expect(validateFixture(liveFixture).traces).toHaveLength(3);
+    expect(validateGRF00(liveGRF00).sample_count).toBe(60);
+    expect(validateGRF01(liveGRF01).sample_count).toBe(60);
+    expect(validateModels(liveModels).models).toHaveLength(10);
   });
 });
