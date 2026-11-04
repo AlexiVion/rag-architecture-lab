@@ -1,0 +1,257 @@
+# RAG Architecture Lab — WOW Release v1.0 blueprint
+
+**Date:** 2026-11-04  
+**Status:** Approved **scope / implementation plan**, NOT completed implementation.  
+**Tracking:** [WOW Release #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9).  
+**Draft integration:** [PR #2](https://github.com/AlexiVion/rag-architecture-lab/pull/2).
+
+## 1. Product statement and design constraints
+
+**Vision:** An open-source, inspectable **RAG Architecture Observatory** for building retrieval approaches, measuring their trade-offs and diagnosing grounded-answer failures, including document provenance and knowledge-graph paths.
+
+The deliverable is a research platform rather than a SaaS chatbot. It is intended to be understandable by developers and hiring teams from a public GitHub repository + real live visual explorer, and usable locally with public data and **no paid API requirement**.
+
+The standout moment is *not* a pretty mock dashboard. It is selecting an experiment, watching where each candidate document came from, tracing its citations and graph relationships, and seeing a **real measured** quality/latency trade-off and documented failure case.
+
+Hard boundaries:
+- Distinguish **implemented**, **tested**, **benchmarked**, **scientifically validated**, **experimental** and **proposed** everywhere.
+- Preserve V0 / V1 / V1.1 historical results, no reclassification of negative experiments as wins.
+- **No claim of perfect semantic generation.** Perfect certainty is not measurable or guaranteeable on arbitrary real-world inputs. Replace with explicit coverage, measured error, honest abstention, refusal when evidence cannot be supported, and known limits.
+- Avoid using SciFact TEST for tuning; historical diagnostic exposure to TEST Q1 must be disclosed. Freeze protocol before a new genuinely independent evaluation.
+- CPU-friendly, sequential model execution, bounded RAM/storage and resumable local runs. Hosting an interactive *viewer* should not require hosting local model inference.
+- Research machine is documented as a Ryzen 7 5700U, approximately 16 GiB RAM. Do not assume a GPU.
+- Public artifacts must be source-verified and properly attributed. Never publish raw private drafts, model caches, unlicensed text corpora, or secret tokens.
+- Code MIT license is distinct from model and dataset licenses. Validate each external distribution before download/redistribution.
+
+## 2. Audited starting point (2026-11-04)
+
+| Component | Reality | Gate |
+|---|---|---|
+| V0 BM25 / Dense / Hybrid RRF | Implemented, SciFact retrieval benchmarks published | Retain Hybrid default and full provenance |
+| V1 reranking | Implemented, canonical measurements published | 50-candidate NO-GO default; 10-candidate optional |
+| V1.1 candidate-depth | Measured, documented | Retain conditions; do not generalize |
+| RET-03..08 adapters | Code exists; not all benchmarked | Evaluate per matching baseline |
+| V2 retrieval+local Qwen | Code exists; historical generated answer was off-task and uncited | Post-gate real-model integration and answer quality still pending |
+| Citation syntax gate | Deterministic tests pass; fails closed on malformed draft | Test with real local generator; syntax != entailment |
+| M2 | Expert-labelled SciFact TRAIN stance sample exists; failed small NLI scored 27.5% (11/40) | Full answer/relevance/abstention evaluation incomplete |
+| GraphRAG / GRF-00 | Implemented deterministic curated-source, 2-hop graph-first retriever and source-path trace | General-purpose extraction, real multi-hop benchmark and GO/NO-GO remain pending |
+| Model comparator | Partial fixed-model scripts | Uniform registry, revision/license tracking, per-role comparisons |
+| Web observatory | First static interactive evidence viewer committed, with 3 curated queries and exact-source inspector | General experiment dashboards, accessibility/browser QA and public deployment remain pending |
+| Public release | Public repository; LICENSE/CONTRIBUTING are on draft PR #2, not yet main | Clean release, merge, tag, external clone smoke, project page |
+
+The integration PR was already broad (114 changed files before GRF-00 and the viewer) and remains in draft. Its size is itself a review risk; scope new work into focused commits/PRs and avoid merging blindly.
+
+## 3. Release architecture
+
+```text
+                  Public read-only Explorer (React + TypeScript)
+                              |
+       Validated, schema-versioned JSON / graph artifacts
+                              |
+  Experiment manifest + dataset fingerprint + git SHA + model revisions
+                              |
+         Composable Experiment Runner and Observability Traces
+            /              |                 \
+  Retrieval baseline    GraphRAG GRF-00    Grounded Generation
+  BM25 / Dense / RRF    entities / edges   evidence context
+  rerank / RET-03..08  paths / provenance  citations / abstention
+            \             |                 /
+               Independent evaluation harness
+       retrieval  | stance | support | abstain | time | RAM
+                              |
+            Local CPU-first models + public datasets
+```
+
+Static viewer must not execute code/models from untrusted JSON. Use schema validation, DOM-safe rendering and explicitly labelled evidence.
+
+## 4. Workstreams and acceptance contracts
+
+### R0 — A clean installable research spine (must finish first)
+
+Deliver:
+- External-clone install validated with Python 3.11 and minimal dependencies; optional large model extras clearly separated.
+- Cross-platform CLI quickstart (Windows and Linux); one minimal dataset/fixture that downloads no model and demonstrates a real trace.
+- Focused issue/PR review of the existing 114-file draft, locally verified tests and experiment smoke.
+- License, model/dataset attribution and redistribution, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY.md, CHANGELOG.md, CITATION.cff, architecture diagram and version tag policy.
+- A single `release-check` script that does not claim scientific validity from unit tests.
+
+Acceptance: clean checkout -> install -> tests -> fixture experiment -> validated JSON trace, with exact commands and no paid key. Nothing is called complete based solely on documentation.
+
+### M2 — Grounded generation, semantic evidence and abstention
+
+Deliver:
+- End-to-end real local V2 smoke **after** the citation gate change: accepted-with-valid-citations, rejected-with-uncited-draft, and genuinely no-context abstention conditions.
+- Experiment schema with per-query retrieval evidence, model output, cited spans, source IDs, verified labels, failure taxonomy and calibrated-versus-uncalibrated status.
+- **TRAIN/DEV** answerable, contradicted, irrelevant and insufficient-evidence samples. Use original expert-labelled SciFact rationale stance data where applicable; qrels are retrieval labels only. Add independent answer-quality ground truth and a second domain.
+- Separate metric families: retrieval Recall/MRR/nDCG; citation validity; claim support by independently validated evidence; answer task correctness; correct/false abstention rates; coverage vs error (risk-coverage); latency and peak RAM.
+- Evidence-only and generated-answer splits; no oracle-evidence score misleadingly counted as end-to-end RAG success.
+- Predeclared acceptance thresholds based on use-case risk and measured confidence intervals, not a retroactive threshold on held-out TEST.
+- Optional stronger scientific verifier only as a separate candidate (do not revive the failed `nli-MiniLM2-L6-H768` by changing the label name).
+
+Acceptance: replicate good and bad answers with verifiable provenance, publish measured independent quality including false refusals, and show that the runtime fails safely for unsupported/uncited output **under the evaluated conditions**. **No '100% perfect' claim**.
+
+### GRF-00 — Real graph retrieval (not a visual mock graph)
+
+Minimum interoperable schema:
+- `Document{id, hash, license}`; `TextUnit{id, doc_id, offsets}`;
+- `Entity{id, aliases, type, confidence}`;
+- `Edge{source, relation, target, text_unit_ids, extractor, confidence}`;
+- `EvidencePath{query, node_ids, edge_ids, original_doc_ids}`.
+- Explicit provenance and stable graph IDs across repeated indexing.
+
+Stages:
+1. Deterministic seed graph and entity alias resolution from a small distributable fixture (no LLM).
+2. Local extraction adapter with schema-constrained JSON validation, duplicate/contradictory relation handling and provenance.
+3. Search via entity match -> 1- or 2-hop relation traversal -> parent document mapping -> query-aware reranking and text fallback. Budget candidate count, traversal depth, indexing time and memory.
+4. Optional Leiden/community summaries and global search after basic graph path retrieval works. Microsoft GraphRAG offers entity/relation extraction, community reports and local/global/DRIFT search; our implementation should compare those modes without claiming parity by name alone (reference: https://microsoft.github.io/graphrag/index/overview/ and https://microsoft.github.io/graphrag/query/overview/).
+5. Compare graph+text against Hybrid RRF on a benchmark where **multi-hop labels** genuinely exist (e.g. a license-cleared HotpotQA/MuSiQue subset), track path provenance, answer quality, failures and index/CPU cost.
+
+Acceptance: graph indexing/reindexing tests, real two-hop trace rendered in the web explorer, no source-less edges shown as proof, measured baseline comparison and a GO/NO-GO.
+
+### MOD-10 — Exactly ten candidate models across distinct roles
+
+**Ten additional model candidates** beyond the four model baselines already studied in this repository; do not call them ten language generators or collapse different tasks into one misleading rank. The proposed registry is `experiments/model_matrix_10_proposed.json`, with a separate historical-baseline section. Exact revisions, model-specific prompts, license terms and CPU budgets remain release gates; the Qwen2.5-3B-Instruct card currently lists a `qwen-research` license, so it cannot be silently redistributed as MIT.
+
+- 3 **embeddings**: recall, MRR, nDCG, index size/speed, memory.
+- 2 **rerankers**: paired delta vs Hybrid on the same candidates, query latency/CPU.
+- 2 **NLI / evidence classifiers**: original SUPPORT/CONTRADICT gold-rationale confusion matrix and out-of-domain error; prior failed model remains a negative control.
+- 3 **generators**: answer correctness, citations/claim support, abstention error, tokens/sec, total latency and memory.
+
+Ensure each model has an independently reviewed hub identifier, exact revision, actual license, input formatting, class order/score meaning, CPU feasibility and a published configuration. Large weights are optional and **loaded one at a time**. No ranking across incomparable model roles. Results must include at least one credible failure and cannot promote a new default based only on TRAIN scores.
+
+Acceptance: 10/10 **additional** candidate entries either **measured** or clearly marked `skipped_with_reason`; no fabricated scores, an independently repeatable sample, per-role results and reproducibility manifests. Missing model/corpus license blocks public redistribution, not necessarily local research.
+
+### WEB-01 — The interactive RAG observatory
+
+Build `apps/explorer/` as a static-first React + TypeScript application with a controlled typed data layer and Vite build; use a canvas/SVG graph library only for display. Keep research Python backend independent.
+
+Public information architecture:
+1. **Overview:** identity, architecture choices, verified metric highlights, transparency on limitations.
+2. **Experiment comparison:** select baseline/candidate, paired metric changes, mean/p95 latency and confidence intervals; only compare compatible runs. Hover reveals source artifact and exact conditions.
+3. **Pipeline inspector:** draw query -> retrieval -> fusion -> optional rerank/graph -> context -> generation -> citation gate. Click a stage for trace and timing.
+4. **Graph exploration:** evidence-backed nodes/edges and 1/2-hop path highlighting with document drill-down; provenance is mandatory.
+5. **Evidence review:** question, retrieved source snippets, raw attempted draft (where safe and public), visible citation status, accepted/abstained state and known errors.
+6. **Model lab:** ten model registry entries, per-role comparable measured scores and negative results.
+7. **Methodology:** source links, datasets, license notices, experiment protocol and reproducible local commands.
+
+Visualization quality: clean engineering/editorial aesthetic, dark/light themes, excellent spacing and typography, transitions that clarify provenance, responsive mobile, keyboard access, screen-reader summaries. Do not ship decorative fake gauges, invented traces or unsupported 'live score'.
+
+Backend/security: public viewer reads signed/hashed versioned static manifests; any local inference API is **opt-in and localhost-only**, never directly exposed publicly. Avoid uploading arbitrary private documents. Generated traces must be sanitized before publication. Target an accessible, static hosting workflow with no model-server cost.
+
+Acceptance: run `npm run build`, typecheck, browser/e2e checks, accessibility and performance smoke; deploy a publicly reachable viewer and verify it renders exact published artifacts. User workflow: click an experiment -> inspect evidence/graph and metric -> open original source.
+
+### REL-01 — Public technical launch
+
+Deliver:
+- English README with an immediate visual result, one-command no-download quickstart, exact dependency/memory expectations, three screenshots, a short architecture diagram and realistic experiment results.
+- Reproduction guide + model cards, open source attribution, security/reporting policy, executable and web deployment docs.
+- Release notes framing one compelling measured **positive** result (Hybrid), one **negative** result (NLI), and one genuine multi-hop graph trace (if benchmarked).
+- 60–120 second walkthrough video and a concise LinkedIn project write-up; direct links to public code, live explorer and reproducibility docs.
+- Tested release tag and a concise changelog. Build a portfolio-ready v1.0 only when acceptance gates genuinely pass.
+
+Acceptance: someone unfamiliar with the project can inspect the public repo, run a small real experiment, verify the source of every displayed score and use the hosted read-only explorer. Launch copy never says 'semantic accuracy 100%'.
+
+## 5. Execution order (strict; no fabricated completion)
+
+| Gate | Dependency | Result needed |
+|---|---|---|
+| G0: release spine | existing PR #2 + clean tests | reproducible install, agreed versioning, public license |
+| G1: evidence and M2 | G0 | independent scoring, error boundaries, verified citations/abstentions |
+| G2: graph | G0 + measurable retrieval baseline | true provenance graph + multi-hop study |
+| G3: ten-model comparison | G1 and adequate CPU resource budget | ten entries with distinct roles and honest status |
+| G4: explorer | versioned artifact schemas from G1/G2/G3 | real interactive trace/graph and public build |
+| G5: release | G0–G4 | verified external onboarding, changelog, GitHub tag and demo page |
+
+Work may be implemented in parallel by independent components **only when the contracts are frozen**. Begin the explorer shell early with explicitly marked sample fixtures; do not call its illustrative fixtures real benchmark results.
+
+## 6. Non-goals for the WOW v1.0
+
+No SaaS billing/auth, no cloud model inference requirement, no 50-model sweep, no promise of absolute scientific truth, no large deployment cluster, no blind adoption of an external GraphRAG framework as if it were an original implementation. These may be future optional integrations.
+
+## 7. Immediate first implementation package
+
+1. Keep PR #2 in draft until review/tests complete; do not merge by guessing.
+2. Implement the typed experiment/trace manifest and a tiny distributable **offline fixture** that can be validated without Hugging Face downloads.
+3. Implement GraphRAG evidence schema and deterministic seed-graph path with source linking; tests before optional LLM extraction.
+4. Build explorer shell reading the validated fixture (clearly labelled **fixture**).
+5. Close the M2 real-generation/output-gate issue before exposing demo generations as grounded.
+6. Run the model matrix in small CPU-budget cohorts, not a single heavy command.
+7. Publish measured artifacts only after verifying hashes and data licenses.
+
+**Definition of done:** real runnable code, all specified acceptance checks passing, empirical claims linked to verified evidence, a deployed explorer, and a release a newcomer can reproduce. A long checklist or pretty mock alone is not completion.
+
+
+**First real-source benchmark implementation status (2026-11-04):** `GRF00-HOTPOTQA-DEV-01` now has a frozen protocol and code (HotpotQA original CC BY-SA 4.0 DEV distractor, 60 deterministic eligible bridge queries, 2-hop quoted title-mention graph + BM25 vs BM25, same per-query candidates, recall@1/3/5 with paired bootstrap confidence intervals). The source download is SHA256 pinned, ~46 MB; query labels are not passed to the graph builder. Results have **not** been executed or verified locally yet. This is **not** a Hybrid RRF comparison or answer-quality study; both remain future gates.
+
+## GRF-00 empirical decision — 2026-11-04
+
+The user's Windows run of `GRF00-HOTPOTQA-DEV-01` completed successfully with all local tests passing, 60 DEV bridge questions, and the following BM25 vs graph-first+BM25 retrieval metrics:
+
+| Metric | BM25 | Graph+BM25 | Paired delta | 95% CI |
+|---|---:|---:|---:|---|
+| Recall@1 | 0.4333 | 0.3500 | -0.0833 | [-0.1500, -0.0167] |
+| Recall@3 | 0.6833 | 0.5917 | -0.0917 | [-0.1750, -0.0083] |
+| Recall@5 | 0.8250 | 0.7083 | -0.1167 | [-0.1917, -0.0583] |
+
+**Decision: NO-GO for the current graph-first title-mention prioritization policy on this DEV sample.** The graph is still a functioning learning/demo component and not evidence that GraphRAG generally fails. Its construction was unsupervised by the relevance labels. Do not tune on the same 60 DEV cases. Local diagnostics and a web-safe aggregate exporter have been added but still await local validation. Full graph extraction, correct production indexing time, Hybrid RRF comparison and answer quality remain unmet gates. No default retrieval changes.
+
+## Updated graph-first research decision — audited 2026-11-04
+
+After running the original 60-query DEV study, the operator executed the separate post-run audit. **Full test suite PASS**; archived report SHA256 `962dc3b12d0086857ad94198cf2b1fff7a49ca5f7df069e9575a6daaf778f016`. Mean delta Recall@5 was **−0.1750 for 40 path-active cases** (11 losses, 0 wins, 29 ties) and **0.0000 for 20 path-inactive fallback cases** (20 ties), reconciling to **−0.1167 across all 60**.
+
+**Conclusion:** current graph-first prioritization is NO-GO in this DEV subset. The audit does not establish that GraphRAG in general fails, nor does it explain each loss causally. Retain default Hybrid RRF unchanged. Any new design must freeze its retrieval strategy and evaluation cohort before observing performance; see `docs/GRF_01_HYBRID_RRF_PROTOCOL.md`. No GraphRAG release gate should be marked complete merely because the seed fixture works.
+
+
+**GRF-01B/C implementation staged (2026-11-04):** The user completed the 60-query disjoint DEV reservation with SHA256 `a560b1cbabe1ce6b4413f0f6f59759cd08e69ce49c5391e05b7c8767f81bd13f` and no overlap. A fixed two-hop graph-augmented Hybrid RRF policy (model revision pinned, RRF=60, source-quote bonus weight 0.10, exact no-path identity) and synthetic tests have been added. Local operator has not yet verified those new changes, and the reserved cohort has not been scored; do not claim accuracy improvements. See `docs/GRF_01_LOCKED_HYBRID_POLICY.md`.
+
+
+**GRF-01 real local study completed (2026-11-04):** the frozen 60-query HotpotQA DEV cohort was evaluated once against matched BM25, Dense, Hybrid RRF and Graph-Hybrid. All local pytest tests passed. Recall@1 Graph−Hybrid 0.0000, Recall@3 −0.0500 and primary Recall@5 −0.0083 (Hybrid 0.8583, Graph-Hybrid 0.8500). Study decision `INCONCLUSIVE_NO_AUTOMATIC_PROMOTION`. Original metrics remain local; CI/win-loss bounds pending independent saved-report audit and should not be invented. Retain Hybrid RRF default, do not retune on this exposed DEV sample. M2, ten-model registry measurements, general GraphRAG semantic extraction, and publicly deployed observatory remain unfinished.
+
+
+## Verified GRF-01 conclusion and public-summary status — 2026-11-04
+
+Frozen GRF-01 study plus independent post-run **local** audit are PASS; original report SHA256 `f2167bc7220554b1864648c5c5de0b67544bfbdba585a4aeed8f466927fcb2b4`. 60 queries; paired Graph-Hybrid−Hybrid ΔRecall@1 0.0000 (CI [−0.0333,+0.0333]), Δ@3 −0.0500 (CI [−0.1000,−0.0083]), Δ@5 −0.0083 (CI [−0.0250,0]). Path-active cases 36: 0 wins, 1 loss, 35 ties at @5; inactive cases 24: all ties. Decision **INCONCLUSIVE_NO_AUTOMATIC_PROMOTION**, so Hybrid RRF remains default. No second pass or weight tuning.
+
+The first browser app includes measured GRF-00 and GRF-01 aggregate views; read-only public JSON summaries built from operator-verified console logs can fill them on a fresh clone while locally audited source-based files take priority. The public summaries omit original HotpotQA source content and explicitly record their provenance. This is **not yet a public deployed website** or a semantic-answer benchmark, and M2 and MOD-10 remain release gates.
+
+
+## M2 controlled real-generator smoke staged (2026-11-04)
+
+After GRF-00/01 saved reports and public summary-only viewer assets passed on the user's machine, `M2-LIVE-01` was implemented to exercise the **existing V2 pipeline with Qwen** on four original fictional evidence controls. Unlike the SciFact held-out diagnostic, this does not read TEST data; unlike an answer-quality benchmark, it **does not pretend to automatically certify factuality**. Three Qwen outputs and one no-context generator skip are saved as gitignored local artifacts with citation syntax, output acceptance/refusal status and exact source mappings. The tests/real invocation have not yet run on the user's machine. The model revision is reported only if resolvable, not yet frozen for reproducible scientific comparison. See `docs/M2_LIVE_QWEN_CONTROLS.md`. Separate expert-labeled TRAIN/DEV quality and abstention tests remain mandatory.
+
+
+## M2 real Qwen smoke observed; semantic assessment still open (2026-11-04)
+
+The operator successfully completed the first Qwen2.5-0.5B-Instruct post-citation-gate runtime control. All Python tests PASS, three generated drafts all rejected for citation-contract failures, empty-context generator skipped. A citation-valid generated answer was **not** observed even for the answerable controlled case. This is an operational utility gap, not a scientific truth/factuality score. A model-free postrun audit now inspects exact raw drafts and syntax failure reasons, pending operator verification. Model commit was unresolved. Keep M2 independent semantic validity and calibrated abstention gates open.
+
+## M2-LIVE-02 response-faithfulness development stage (2026-11-04)
+
+The original four-case Qwen JSON has been audited on Windows: zero cited answers, one correct information-only draft lacking a source label, one unsupported named-entity transfer from unrelated evidence, one silent choice between contradictory facts, and one no-context generator skip. The new M2-LIVE-02 implementation changes only the *versioned prompt* and keeps all Qwen responses in a local research quarantine—even those that pass syntactic citations. Its old-report SHA guard, prompt fingerprint, synthetic tests and one-command Windows runner have been committed but **not yet verified by a local real-model run**. This is development over exposed fictional cases, not a held-out model-quality study or an M2 release pass.
+
+## M2-LIVE-02 empirical finding and citation V2 development gate (2026-11-04)
+
+Full Windows pytest PASS and one bounded M2-LIVE-02 prompt experiment complete: adequate candidate output used `Fact. [S1]` but the existing sentence splitter rejects it; irrelevant-source candidate used invented `[Solis Probe]` and an unsupported device-company connection; contradictory-source candidate silently chose a date, with no valid citation. All remain blocked by the original pipeline, no-context abstention remains correct. An **opt-in strict parser** plus **offline replay of the already saved 3 generations** are now committed for verification; no changes to the default pipeline. M2 answer-level entailment, task relevance, calibrated abstentions and independent evaluation remain open.
+
+## M2 syntax replay verified; quality review intake (2026-11-04)
+
+Offline Windows pytest PASS and M2-LIVE-02 V1/V2 syntax replay PASS. Source JSON hash `3c9fc0794ab2d2bd3ca10825585926083b0d40067c1696aa77fc90f230ea7816`; one formerly rejected but conventionally cited response is accepted **as syntax only**, while two failure cases remain invalid. No inference or publication. The proposed parser remains **opt-in**, production RAGPipeline unchanged. An unlabelled reviewer-packet exporter (sources, exact attempted claims, source relevance, claim support and expected abstention) is prepared for local full-test validation. Existing reviewer labels must not be fabricated or presented as automatic entailment, and these known fictional dev cases are not held-out research evidence. M2 acceptance remains open.
+
+## M2 new robustness evidence gate: M2-SYNTH-01 (2026-11-04)
+
+Successful operator run of M2-REVIEW-02 confirms all full Python regression tests and four unlabelled Qwen semantic review packet exports PASS; no truth/relevance labels were auto-assigned. M2-SYNTH-01 now supplies a **pre-registered 24-case invented-device source-control study** independent of the four exposed development fixtures but within the same narrow task family. Cohort hash `05e778d4b541d397c27a000d4042549d84b90d047a28f1bbf16b289bda6a3826`; prompt unchanged from M2-LIVE-02. It reports correct literal+citation proxy on answerable cases, exact abstention on irrelevant/contradictory cases, and deterministic skip on empty-context cases, plus both citation-parser verdicts. Per-case checkpoints and original transcripts remain local. **The real run and Windows full suite are not yet executed.** Even a positive result would not independently demonstrate open-domain faithfulness, claim-level entailment, natural-language answer relevance or correctly calibrated abstention. M2 quality and ten-model benchmark remain release gates.
+
+## M2 empirical release blocker: failure of evidence-aware abstention (2026-11-04)
+
+Frozen 24-case M2-SYNTH-01 run completed on Windows (full pytest PASS, 18 Qwen calls). Only **7/24** authored-template controls passed: 1/6 answerable, 0/6 irrelevant, 0/6 conflicting, 6/6 no-context; not a validated natural-language truth score. The existing RAGPipeline syntax gate accepted **3/12 cases that required abstention** under the fictional study, and Qwen emitted **zero exact abstention markers** over all twelve. The study did not externally publish any answer. Preserve **NO-GO** automatic factual publication, keep original parser behavior unchanged, do not retune this frozen cohort, and require independently labelled semantic support, relevance and contradiction screening. `M2-SYNTH-01` forensic saved-result audit is prepared but **not yet locally verified**; exact 18 original drafts are in the user's gitignored records.
+
+## M2-SYNTH-01 immutable forensic audit PASS and counterfactual-only guard (2026-11-04)
+
+The maintainer's saved-result audit of all 24 Qwen synthetic controls **PASS**, original report SHA256 `f33eade629967ff9c4c15bf3ce3e05ca4adc329ece837017bd0fd9ce6ef109e4`, manifest SHA256 `c5a528a2f7c77c66ba0b56b151fc9909cbcddac5fad491d8f59cf4af8e4efa74`. The narrow rubric outcome remains **7/24**; **3/12 nonempty negative-evidence answers accepted** by the default citation-only pipeline and zero exact semantic-abstention marker occurrences on these 12. No public answers were emitted. Three original accepted negative drafts have now been recorded verbatim in the benchmark report. Research decision is **NO-GO automatic publication**.
+
+A new exact-relationship `M2-GUARD-DEV-01` prototype and offline counterfactual replay were staged without model inference or default pipeline changes. The gate is *not* general semantic entailment and must not be deployed on the basis of this already-exposed cohort; independent multi-phrasing and expert-reviewed testing remains essential. New Windows pytest/replay still pending.
+
+## M2-GUARD development replay verified; coverage limitation quantified next (2026-11-04)
+
+The 24-case post-hoc structured guard replay and full regression suite **PASS** on the user's Windows machine. If the optional exact-English equipment relation gate had existed earlier, its source-only check would have allowed six original adequate-source contexts and denied 18 other contexts, including **three historically syntax-accepted negative evidence cases**. This is hypothetical prevention, with no model calls and no external publications; only one archived Qwen draft matched the strict post-generation structure. The precondition checker does not generalize to varied sentence phrasings.
+
+The new offline `M2-GUARD-STRESS-01` suite tests 40 independently named (but **author-labelled, not independently adjudicated**) source cases including paraphrased sufficient sources. It explicitly reports false rejects and false accepts in this narrow template family. This is developer stress testing, NOT a semantic truth validator or new evidence to publish automatically. Local Windows test/stress run pending. Independent natural language QA gate and default release decision remain OPEN/NO-GO.

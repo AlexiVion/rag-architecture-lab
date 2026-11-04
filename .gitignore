@@ -17,9 +17,16 @@ htmlcov/
 .cache/
 benchmarks/results/*.json
 !benchmarks/results/.gitkeep
+runs/
 
 # OS / editors
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+
+# Local-only, validated HotpotQA aggregate for the observatory
+apps/explorer/data/hotpotqa-summary.local.json
+
+# Local-only GRF-01 audited retrieval summary
+apps/explorer/data/grf01-summary.local.json

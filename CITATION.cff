@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use the code or published benchmark summaries, cite this repository and the original datasets separately."
+type: software
+title: "RAG Architecture Lab"
+authors:
+  - family-names: Vion
+    given-names: Alexi
+repository-code: "https://github.com/AlexiVion/rag-architecture-lab"
+url: "https://github.com/AlexiVion/rag-architecture-lab"
+license: MIT
+version: "0.1.0"
+abstract: "Reproducible experiments with retrieval architectures, evidence provenance, and local grounded generation."
+keywords:
+  - retrieval-augmented generation
+  - information retrieval
+  - graph retrieval
+  - reproducibility

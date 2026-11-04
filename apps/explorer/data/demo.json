@@ -1,0 +1,352 @@
+{
+  "corpus_sha256": "a1b8f69477e46e6f26eb555d1d36691b7143125bac0c88d90f9cddd7ccce6fd5",
+  "dataset": "offline-curated-aster-demo-v1",
+  "extraction_method": "manually_curated_exact_quotes",
+  "graph": {
+    "documents": [
+      {
+        "id": "doc-navigation",
+        "text": "The Orion Navigation System was developed by Meridian Robotics.",
+        "title": "Engineering notes"
+      },
+      {
+        "id": "doc-rover",
+        "text": "The Aster Rover uses the Orion Navigation System.",
+        "title": "Mission log"
+      },
+      {
+        "id": "doc-solar",
+        "text": "The Solis Probe has a thermal sensor made by Helios Instruments.",
+        "title": "Independent mission"
+      }
+    ],
+    "edges": [
+      {
+        "document_id": "doc-rover",
+        "id": "edge-uses",
+        "quote": "The Aster Rover uses the Orion Navigation System.",
+        "relation": "uses",
+        "source": "rover",
+        "target": "navigation"
+      },
+      {
+        "document_id": "doc-navigation",
+        "id": "edge-developed",
+        "quote": "The Orion Navigation System was developed by Meridian Robotics.",
+        "relation": "developed_by",
+        "source": "navigation",
+        "target": "manufacturer"
+      },
+      {
+        "document_id": "doc-solar",
+        "id": "edge-sensor",
+        "quote": "The Solis Probe has a thermal sensor made by Helios Instruments.",
+        "relation": "carries",
+        "source": "probe",
+        "target": "sensor"
+      },
+      {
+        "document_id": "doc-solar",
+        "id": "edge-sensor-maker",
+        "quote": "The Solis Probe has a thermal sensor made by Helios Instruments.",
+        "relation": "made_by",
+        "source": "sensor",
+        "target": "instrument"
+      }
+    ],
+    "nodes": [
+      {
+        "aliases": [
+          "Aster"
+        ],
+        "id": "rover",
+        "label": "Aster Rover"
+      },
+      {
+        "aliases": [
+          "Orion"
+        ],
+        "id": "navigation",
+        "label": "Orion Navigation System"
+      },
+      {
+        "aliases": [],
+        "id": "manufacturer",
+        "label": "Meridian Robotics"
+      },
+      {
+        "aliases": [],
+        "id": "probe",
+        "label": "Solis Probe"
+      },
+      {
+        "aliases": [],
+        "id": "sensor",
+        "label": "thermal sensor"
+      },
+      {
+        "aliases": [],
+        "id": "instrument",
+        "label": "Helios Instruments"
+      }
+    ]
+  },
+  "kind": "graph_evidence_fixture",
+  "license": "MIT demo fiction - generated for this repository",
+  "model_name": null,
+  "publication_status": "illustrative_fixture_not_benchmark",
+  "quantitative_benchmark_metrics": null,
+  "schema_version": 1,
+  "traces": [
+    {
+      "answer": null,
+      "answer_truth_status": "not_evaluated",
+      "generation_status": "not_run",
+      "id": "fixture-query-1",
+      "question": "Which organization developed the navigation system used by the Aster Rover?",
+      "ranked_sources": [
+        {
+          "doc_id": "doc-rover",
+          "rank": 1,
+          "score": 1.0
+        },
+        {
+          "doc_id": "doc-navigation",
+          "rank": 2,
+          "score": 0.5
+        },
+        {
+          "doc_id": "doc-solar",
+          "rank": 3,
+          "score": -3.0
+        }
+      ],
+      "trace": {
+        "graph_hit_document_ids": [
+          "doc-navigation",
+          "doc-rover"
+        ],
+        "limitations": "Curated source-quoted edges; no learned extraction or verified answer.",
+        "max_hops": 2,
+        "method": "bounded_provenance_graph_then_lexical_fallback",
+        "paths": [
+          {
+            "edge_ids": [
+              "edge-uses"
+            ],
+            "hop_count": 1,
+            "node_ids": [
+              "rover",
+              "navigation"
+            ],
+            "source_document_ids": [
+              "doc-rover"
+            ]
+          },
+          {
+            "edge_ids": [
+              "edge-uses",
+              "edge-developed"
+            ],
+            "hop_count": 2,
+            "node_ids": [
+              "rover",
+              "navigation",
+              "manufacturer"
+            ],
+            "source_document_ids": [
+              "doc-rover",
+              "doc-navigation"
+            ]
+          }
+        ],
+        "question": "Which organization developed the navigation system used by the Aster Rover?",
+        "ranked_document_ids": [
+          "doc-rover",
+          "doc-navigation",
+          "doc-solar"
+        ],
+        "schema_version": 1,
+        "seed_entity_ids": [
+          "rover"
+        ],
+        "semantic_support_verified": false
+      }
+    },
+    {
+      "answer": null,
+      "answer_truth_status": "not_evaluated",
+      "generation_status": "not_run",
+      "id": "fixture-query-2",
+      "question": "Which navigation system does the Aster Rover use?",
+      "ranked_sources": [
+        {
+          "doc_id": "doc-rover",
+          "rank": 1,
+          "score": 1.0
+        },
+        {
+          "doc_id": "doc-navigation",
+          "rank": 2,
+          "score": 0.5
+        },
+        {
+          "doc_id": "doc-solar",
+          "rank": 3,
+          "score": -3.0
+        }
+      ],
+      "trace": {
+        "graph_hit_document_ids": [
+          "doc-navigation",
+          "doc-rover"
+        ],
+        "limitations": "Curated source-quoted edges; no learned extraction or verified answer.",
+        "max_hops": 2,
+        "method": "bounded_provenance_graph_then_lexical_fallback",
+        "paths": [
+          {
+            "edge_ids": [
+              "edge-uses"
+            ],
+            "hop_count": 1,
+            "node_ids": [
+              "rover",
+              "navigation"
+            ],
+            "source_document_ids": [
+              "doc-rover"
+            ]
+          },
+          {
+            "edge_ids": [
+              "edge-uses",
+              "edge-developed"
+            ],
+            "hop_count": 2,
+            "node_ids": [
+              "rover",
+              "navigation",
+              "manufacturer"
+            ],
+            "source_document_ids": [
+              "doc-rover",
+              "doc-navigation"
+            ]
+          }
+        ],
+        "question": "Which navigation system does the Aster Rover use?",
+        "ranked_document_ids": [
+          "doc-rover",
+          "doc-navigation",
+          "doc-solar"
+        ],
+        "schema_version": 1,
+        "seed_entity_ids": [
+          "rover"
+        ],
+        "semantic_support_verified": false
+      }
+    },
+    {
+      "answer": null,
+      "answer_truth_status": "not_evaluated",
+      "generation_status": "not_run",
+      "id": "fixture-query-3",
+      "question": "Who made the thermal sensor on the Solis Probe?",
+      "ranked_sources": [
+        {
+          "doc_id": "doc-solar",
+          "rank": 1,
+          "score": 1.0
+        },
+        {
+          "doc_id": "doc-rover",
+          "rank": 2,
+          "score": -2.0
+        },
+        {
+          "doc_id": "doc-navigation",
+          "rank": 3,
+          "score": -3.0
+        }
+      ],
+      "trace": {
+        "graph_hit_document_ids": [
+          "doc-solar"
+        ],
+        "limitations": "Curated source-quoted edges; no learned extraction or verified answer.",
+        "max_hops": 2,
+        "method": "bounded_provenance_graph_then_lexical_fallback",
+        "paths": [
+          {
+            "edge_ids": [
+              "edge-sensor"
+            ],
+            "hop_count": 1,
+            "node_ids": [
+              "probe",
+              "sensor"
+            ],
+            "source_document_ids": [
+              "doc-solar"
+            ]
+          },
+          {
+            "edge_ids": [
+              "edge-sensor"
+            ],
+            "hop_count": 1,
+            "node_ids": [
+              "sensor",
+              "probe"
+            ],
+            "source_document_ids": [
+              "doc-solar"
+            ]
+          },
+          {
+            "edge_ids": [
+              "edge-sensor-maker"
+            ],
+            "hop_count": 1,
+            "node_ids": [
+              "sensor",
+              "instrument"
+            ],
+            "source_document_ids": [
+              "doc-solar"
+            ]
+          },
+          {
+            "edge_ids": [
+              "edge-sensor",
+              "edge-sensor-maker"
+            ],
+            "hop_count": 2,
+            "node_ids": [
+              "probe",
+              "sensor",
+              "instrument"
+            ],
+            "source_document_ids": [
+              "doc-solar"
+            ]
+          }
+        ],
+        "question": "Who made the thermal sensor on the Solis Probe?",
+        "ranked_document_ids": [
+          "doc-solar",
+          "doc-rover",
+          "doc-navigation"
+        ],
+        "schema_version": 1,
+        "seed_entity_ids": [
+          "probe",
+          "sensor"
+        ],
+        "semantic_support_verified": false
+      }
+    }
+  ]
+}

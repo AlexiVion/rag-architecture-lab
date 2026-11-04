@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from raglab.core import Document, SearchResult
+from raglab.core.fingerprint import fingerprint_documents
 from raglab.embeddings import EmbeddingProvider
 
 
@@ -26,11 +27,13 @@ class DenseRetriever:
         self.embeddings = embeddings
         self._doc_ids: list[str] = []
         self._matrix: NDArray[np.float32] | None = None
+        self._index_fingerprint: str | None = None
 
     def index(self, documents: Sequence[Document]) -> None:
-        doc_ids = [doc.id for doc in documents]
-        if self._matrix is not None and doc_ids == self._doc_ids:
+        fingerprint = fingerprint_documents(documents)
+        if self._matrix is not None and fingerprint == self._index_fingerprint:
             return
+        doc_ids = [doc.id for doc in documents]
         if not documents:
             raise ValueError("Cannot index an empty document collection")
 
@@ -40,6 +43,7 @@ class DenseRetriever:
 
         self._doc_ids = doc_ids
         self._matrix = _l2_normalize(matrix)
+        self._index_fingerprint = fingerprint
 
     def retrieve(self, query: str, k: int) -> list[SearchResult]:
         if self._matrix is None:

@@ -1,0 +1,29 @@
+{
+  "name": "@raglab/observatory",
+  "private": true,
+  "version": "1.0.0-dev",
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/prepare-data.mjs",
+    "dev": "vite --host 127.0.0.1",
+    "prebuild": "node scripts/prepare-data.mjs",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run src",
+    "check": "npm run typecheck && npm run test",
+    "e2e": "playwright test",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.0",
+    "vitest": "^3.2.4",
+    "@playwright/test": "^1.56.1"
+  }
+}

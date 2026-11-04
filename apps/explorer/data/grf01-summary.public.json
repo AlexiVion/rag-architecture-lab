@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "kind": "verified_grf01_retrieval_aggregate",
+  "publication_status": "published_operator_audit_summary",
+  "experiment_id": "GRF01-HOTPOTQA-DEV-01",
+  "decision": "INCONCLUSIVE_NO_AUTOMATIC_PROMOTION",
+  "dataset": "hotpotqa/distractor/dev_v1",
+  "dataset_license": "CC BY-SA 4.0",
+  "sample_count": 60,
+  "source_report_sha256": "f2167bc7220554b1864648c5c5de0b67544bfbdba585a4aeed8f466927fcb2b4",
+  "cohort_sha256": "a560b1cbabe1ce6b4413f0f6f59759cd08e69ce49c5391e05b7c8767f81bd13f",
+  "policy_sha256": "fd28fe01f244fa27f731395bd522a331026eb1cfa6a6acb4bcf592db1fb942bb",
+  "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+  "model_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+  "metrics": {
+    "recall@1": {
+      "hybrid": 0.44166666666666665,
+      "graph_hybrid": 0.44166666666666665,
+      "graph_hybrid_minus_hybrid_delta": 0,
+      "paired_bootstrap_95ci": [
+        -0.03333333333333333,
+        0.03333333333333333
+      ]
+    },
+    "recall@3": {
+      "hybrid": 0.7416666666666667,
+      "graph_hybrid": 0.6916666666666667,
+      "graph_hybrid_minus_hybrid_delta": -0.05,
+      "paired_bootstrap_95ci": [
+        -0.1,
+        -0.008333333333333333
+      ]
+    },
+    "recall@5": {
+      "hybrid": 0.8583333333333333,
+      "graph_hybrid": 0.85,
+      "graph_hybrid_minus_hybrid_delta": -0.008333333333333333,
+      "paired_bootstrap_95ci": [
+        -0.025,
+        0
+      ]
+    }
+  },
+  "subgroups": {
+    "path_activated": {
+      "cases": 36,
+      "mean_delta_recall_at_5": -0.013888888888888888,
+      "wins": 0,
+      "losses": 1,
+      "ties": 35
+    },
+    "no_path": {
+      "cases": 24,
+      "mean_delta_recall_at_5": 0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 24
+    }
+  },
+  "provenance_note": "Aggregate transcribed from GRF-01 console output and successful on-machine saved-JSON audit, not raw per-query data in public GitHub.",
+  "limitations": [
+    "DEV distractor contexts, not open-domain Wikipedia retrieval or an independent TEST split.",
+    "Disjoint from GRF-00 questions but still within a previously explored DEV split.",
+    "Graph title-mention links are not general semantic GraphRAG.",
+    "No answer correctness or semantic entailment measured.",
+    "Original per-query archived JSON remains local."
+  ]
+}
