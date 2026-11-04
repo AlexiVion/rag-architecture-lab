@@ -28,6 +28,8 @@ py -3.11 -m venv .venv
 .\.venv\Scripts\raglab.exe --help
 ```
 
+Package wheel builds use pip build isolation and may fetch small packaging tools, but not model weights or benchmark corpora.
+
 The offline validator checks the curated graph fixture against its deterministic source, public aggregate summaries and MOD-10 registry structure. It **does not** certify scientific answer correctness, safety or the completion of WOW v1.0.
 
 For a local browser demo:

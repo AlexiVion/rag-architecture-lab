@@ -13,7 +13,7 @@ Write-Host "=== WOW R0: INSTALLED CLI ==="
 & $Python -m raglab.cli --help
 if ($LASTEXITCODE -ne 0) { throw "R0_CLI_FAILED" }
 Write-Host "=== WOW R0: NO-DEPENDENCY PYTHON WHEEL BUILD ==="
-& $Python -m pip wheel --no-deps --no-build-isolation --wheel-dir "runs/release-r0/wheels" .
+& $Python -m pip wheel --no-deps --wheel-dir "runs/release-r0/wheels" .
 if ($LASTEXITCODE -ne 0) { throw "R0_WHEEL_BUILD_FAILED" }
 Write-Host "WOW_R0_LOCAL_ENGINEERING_CHECK_PASS"
 Write-Host "Not a scientific M2 or full WOW v1.0 release certificate."
