@@ -27,7 +27,7 @@ These numbers prove the implementation behavior on an *exposed* fictional cohort
 | Conflicting manufacturers | Deny | Two same-component source statements disagreeing on manufacturer |
 | Injected extra text | Deny | A correct first source sentence followed by additional instructions to claim a wrong manufacturer |
 
-**Frozen SHA256 (canonical JSON):** `a376e924fea5775a2c26322c31d38d6cbcaf51c5ad179282cb74840f2bc12e97`.
+**Frozen SHA256 (canonical JSON):** `81e702cdb4be3638ef3b6b0e27be96df34523ee6a684f068f6d570600ea7bc16`.
 
 The guard receives only the question and the original source passages. The author-specified positive/negative label is used for scoring **after** the guard has returned. No gold manufacturers, class identifiers or expected labels enter the assessed function. The post-generation checks use authored strings (NOT Qwen) to test whether the candidate's quoted company, component and vehicle can be reconciled with source text.
 

@@ -17,7 +17,7 @@ from raglab.evaluation.m2_guard_dev01 import assess_candidate, assess_evidence
 from raglab.evaluation.m2_synth_runner import write_or_check
 
 STUDY_ID = "M2-GUARD-STRESS-01-AUTHORED-GRAMMAR"
-FROZEN_SHA256 = "a376e924fea5775a2c26322c31d38d6cbcaf51c5ad179282cb74840f2bc12e97"
+FROZEN_SHA256 = "81e702cdb4be3638ef3b6b0e27be96df34523ee6a684f068f6d570600ea7bc16"
 CONDITIONS = (
     "canonical_supported",
     "paraphrase_supported",
