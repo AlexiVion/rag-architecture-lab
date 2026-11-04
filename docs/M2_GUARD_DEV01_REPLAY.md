@@ -56,3 +56,9 @@ There is an **optional callback** through the pre-existing `RAGPipeline(evidence
 The script is ASCII-only for Windows PowerShell 5.1, runs the **entire pytest suite** first, and only if tests pass audits the already-saved 24-case JSONs without Qwen. It writes `runs/m2-guard-dev01/counterfactual.json` exclusively and refuses to overwrite altered output. The original case files and research report do not change.
 
 **Status policy:** NO-GO automatic factual publication; DO NOT promote the new guard or experimental citation parser to default; train/DEV future safety gate first, independently evaluate relevance/support/abstention on a disjoint, representative cohort. The model revision still needs pinning for stronger scientific comparisons.
+
+## Actual operator result — PASS (2026-11-04)
+
+The operator ran full Windows pytest PASS and original-file-verified `M2_GUARD_DEV01_OFFLINE_REPLAY_PASS`. Report SHA256 `f33eade629967ff9c4c15bf3ce3e05ca4adc329ece837017bd0fd9ce6ef109e4`; manifest `c5a528a2f7c77c66ba0b56b151fc9909cbcddac5fad491d8f59cf4af8e4efa74`. Counterfactual decision: pre-generation **allow 6**, **deny 18**; all three previously syntax-accepted negative-source drafts would have been denied, if the guard had been applied before generation. `DENY_NO_CONTEXT=6`, `DENY_SOURCE_CONTRADICTION=6`, `DENY_UNPARSEABLE_SOURCE=6`. Strict postgeneration match was **1/24** on already generated Qwen drafts. No Qwen calls, no publications and no statistical held-out result.
+
+An additional no-model **authored paraphrase and adversarial coverage stress suite** has been frozen in `docs/M2_GUARD_STRESS01_PROTOCOL.md`. It does not affect this result, the original RAGPipeline or any production publication policy.
