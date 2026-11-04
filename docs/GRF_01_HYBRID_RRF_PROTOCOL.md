@@ -1,6 +1,6 @@
 # GRF-01 — Pre-registered matched Hybrid RRF vs graph-assisted retrieval
 
-**Status:** frozen *design specification only*, not implemented or run.  
+**Status:** Pre-registered design; GRF-01A cohort reservation verified locally (60 distinct queries, 0 overlap; SHA256 a560b1cbabe1…81bd13f). GRF-01B/C graph-augmented shared-ranking implementation is committed but awaits local validation. No GRF-01 evaluation has run.  
 **Pre-registration date:** 2026-11-04.  
 **Motivation:** GRF00-HOTPOTQA-DEV-01 yielded a graph-first Recall@5 delta of −0.1167 vs BM25 on 60 already inspected DEV bridge queries (source report SHA256 `962dc3b12d0086857ad94198cf2b1fff7a49ca5f7df069e9575a6daaf778f016`). We must not tune graph weights on those 60 queries and then claim an independent evaluation on them.
 
@@ -38,9 +38,9 @@ Data cannot prove generated answer correctness here. Multi-hop answer quality is
 
 ## Engineering work packages
 
-- [ ] GRF-01A: normalize dataset loaders and split manifest, validate source licenses and archive checksums, enforce no-overlap with original run's stored query IDs.
-- [ ] GRF-01B: implement dense+BM25 Hybrid RRF under the same candidate boundary; pin model ID, revision, CPU threads and preprocessing.
-- [ ] GRF-01C: implement source-grounded graph feature with stable trace schema and a deterministic no-path identity fallback to Hybrid.
+- [x] GRF-01A: manifest and source integrity, 60 disjoint DEV query IDs; tests and local reservation PASS.
+- [ ] GRF-01B: implement and locally verify matched Dense+BM25 Hybrid RRF. Code added with pinned CPU MiniLM embedding revision, shared complete candidate lists, and predeclared RRF constant; local verification pending.
+- [ ] GRF-01C: locally verify source-quoted graph bonus, stable path trace and strict no-path identity fallback; implementation and synthetic tests added.
 - [ ] GRF-01D: pairwise metrics, bootstrap and runtime/resource tracing, fail-closed tests against test split use, source-ID corruption and tuning.
 - [ ] GRF-01E: run exactly once on sealed cohort, analyze failure modes, publish positive **or negative** result with full provenance.
 - [ ] GRF-01F: only then connect reviewed, license-cleared aggregate to the observatory.
@@ -60,3 +60,7 @@ It runs the full regression suite, verifies the **exact original locally audited
 The manifest stores selected IDs, a SHA256 fingerprint, previous run hash, the exact eligibility and seed, plus an explicit warning that **DEV disjointness is not the same as an independent new dataset**. Re-running the command checks identity rather than replacing the manifest.
 
 This stage **does not run any model or benchmark**, inspect the selected cohort's performance, choose graph weights or prove a new architecture. The command and tests are committed but await the operator's local pytest + dataset verification. The old GRF-00 NO-GO remains unchanged. The next implementation package must **freeze** the Hybrid RRF/Graph Hybrid computational policy, model revision, and resource budget before any evaluation on the reserved cohort.
+
+## GRF-01B/C next unscored local gate
+
+Run `scripts/prepare-grf01-hybrid-local.ps1`: full pytest and an immutable `GRF01_POLICY_LOCK.json`. It does not fetch any model, score reserved DEV cases, change any production defaults or tune retrieval parameters. See [the locked policy specification](GRF_01_LOCKED_HYBRID_POLICY.md). The reference embedding is `sentence-transformers/all-MiniLM-L6-v2` at full immutable SHA `1110a243fdf4706b3f48f1d95db1a4f5529b4d41`, Apache 2.0; the graph signal is a predeclared bonus 0.10 / (60 + shortest quote-backed path hops).

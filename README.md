@@ -251,3 +251,5 @@ The initial retrieval phase is complete. Hybrid RRF is the default retrieval arc
 **GRF-01 next experiment:** [predeclared independent Hybrid RRF comparison protocol](docs/GRF_01_HYBRID_RRF_PROTOCOL.md). The exposed 60-query DEV subset will not be reused to tune new retrieval parameters.
 
 **Next no-prompt research preparation:** `scripts/freeze-grf01-cohort-local.ps1` reserves 60 non-overlapping HotpotQA DEV cases for the pre-registered Hybrid RRF comparison, without running models or reporting scores. Current implementation is awaiting local validation.
+
+**GRF-01 next local gate:** the new 60-query disjoint cohort reservation passed on Windows; use `scripts/prepare-grf01-hybrid-local.ps1` to run full tests and freeze the Graph-Hybrid policy **without scoring those cases**. See [locked policy](docs/GRF_01_LOCKED_HYBRID_POLICY.md). No new Graph-Hybrid improvement has been measured.

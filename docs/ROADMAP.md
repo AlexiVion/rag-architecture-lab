@@ -50,3 +50,6 @@ No hosted multi-user chatbot, billing, client CRM, platform integrations, GPU cl
 
 
 **GRF-01A cohort reservation implementation (not yet run on the operator's machine):** `scripts/freeze-grf01-cohort-local.ps1` checks the archived GRF-00 source report SHA256, pins the existing HotpotQA cache, selects 60 never-before-used DEV query IDs with a new seed (217) and no overlap, and writes a gitignored immutable cohort manifest. **It does not evaluate or tune anything.** DEV reuse is still a methodological limitation.
+
+
+**GRF-01 post-cohort status:** the reserved 60 DEV query IDs are verified locally with 0 overlap and SHA256 `a560b1cbabe1ce6b4413f0f6f59759cd08e69ce49c5391e05b7c8767f81bd13f`. The next implemented gate is an *unscored* policy lock (`scripts/prepare-grf01-hybrid-local.ps1`): same BM25 and Dense lists, immutable model revision, fixed RRF=60, graph boost=0.10, strict no-path identity. Its code/tests are staged for Windows validation; no new recall results or Graph-Hybrid GO claims exist.
