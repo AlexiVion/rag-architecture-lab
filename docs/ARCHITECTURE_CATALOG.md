@@ -11,8 +11,8 @@
 | GEN-01 | Faithfulness evaluation | Are answer claims actually supported? | common question set, references | support, abstention, factuality | Proposed V2.1 |
 | RET-03 | Multi-query | Does query diversification recover missed docs? | hybrid vs deterministic reformulations | Recall@K, latency, per-query wins | Implemented adapter; benchmark pending |
 | RET-04 | Parent-child | Do smaller matching units improve answer evidence? | same parent corpus, fixed chunk parameters | parent Recall, evidence coverage | Implemented adapter; benchmark pending |
-| RET-05 | Contextual retrieval | Does document-aware chunk augmentation help? | chunk-only vs enriched indexing | Recall@K, noise, latency | Proposed |
-| RET-06 | HyDE | Does a hypothetical answer embedding improve recall? | identical dense model + queries | Recall@K, runtime | Proposed |
+| RET-05 | Contextual retrieval | Does document-aware chunk augmentation help? | chunk-only vs enriched indexing | Recall@K, noise, latency | Implemented adapter; benchmark pending |
+| RET-06 | HyDE | Does a hypothetical answer embedding improve recall? | identical dense model + queries | Recall@K, runtime | Implemented adapter; benchmark pending |
 | RET-07 | Corrective RAG | Can evidence checks trigger useful recovery? | fixed judge + fallback policy | recovery, false correction, cost | Implemented adapter; benchmark pending |
 | RET-08 | Adaptive routing | Can routing retain quality at lower median cost? | same retrievers, fixed routing policy | weighted metrics, p95, routing errors | Implemented adapter; benchmark pending |
 | GEN-02 | Query decomposition | Can multi-hop questions be decomposed? | direct vs decomposed | answer support and task accuracy | Proposed |
@@ -43,4 +43,4 @@ Each experiment requires:
 
 ## Implementation vs empirical truth
 
-Adapters for RET-03/04/07/08 are intentionally *infrastructure*. They require explicitly supplied reformulators, chunk configuration, evidence judges or routers; no default language model is quietly substituted. Their presence does not mean these hypotheses were tested or that they outperform Hybrid RRF.
+Adapters for RET-03/04/05/06/07/08 are intentionally *infrastructure*. They require explicitly supplied reformulators, chunk configuration, evidence judges or routers; no default language model is quietly substituted. Their presence does not mean these hypotheses were tested or that they outperform Hybrid RRF.

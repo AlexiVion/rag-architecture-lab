@@ -73,7 +73,11 @@ class ContextBuilder:
 
             # Keep the recorded ContextSource.text exactly equal to the evidence
             # actually sent to the generator, even at the last budget boundary.
-            body = document.text.strip()[:body_budget]
+            full_body = document.text.strip()
+            if len(full_body) > body_budget and body_budget >= 4:
+                body = full_body[: body_budget - 3].rstrip() + "..."
+            else:
+                body = full_body[:body_budget]
             if not body:
                 continue
 
