@@ -142,6 +142,14 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\scripts\setup-local.ps1
 ```
 
+Run the new **spec-driven architecture comparison** (exploratory, BM25-only smoke):
+
+```powershell
+.\\scripts\\run-research-local.ps1
+```
+
+This runs an independent baseline and a Parent-Child retriever with shared evaluation metrics. See [experiment runner](docs/EXPERIMENT_RUNNER.md) for JSON specs, supported adapters, and clear limitations. No output should be described as a validated architecture winner without applying the [experiment protocol](docs/EXPERIMENT_PROTOCOL.md).
+
 Run V1 locally:
 
 ```powershell

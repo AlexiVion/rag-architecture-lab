@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import platform
 import subprocess
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from typing import Any
 
@@ -88,10 +88,18 @@ def run_experiment(
     embedding_model = str(
         spec.get("embedding_model", "sentence-transformers/all-MiniLM-L6-v2")
     )
-    needs_embeddings = base_name != "bm25" or (
-        architecture == "adaptive" and any(
-            value in {"dense", "hybrid"}
-            for value in _dict(params.get("routes", {}), "routes").values()
+    needs_embeddings = (
+        base_name != "bm25"
+        or (
+            architecture == "adaptive"
+            and any(
+                value in {"dense", "hybrid"}
+                for value in _dict(params.get("routes", {}), "routes").values()
+            )
+        )
+        or (
+            architecture == "corrective"
+            and params.get("fallback_base", "bm25") in {"dense", "hybrid"}
         )
     )
     if needs_embeddings and embeddings is None:
