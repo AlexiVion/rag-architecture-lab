@@ -66,3 +66,8 @@ No hosted multi-user chatbot, billing, client CRM, platform integrations, GPU cl
 The graph policies are research-only. **Hybrid RRF remains the default.** These DEV subsets have been observed, so do not tune them to produce favorable results. M2 semantic response-quality measurement, 10 additional model comparisons, general graph extraction and public web hosting are not yet complete.
 
 The explorer now has published **summary-only statistical aggregates** as a read-only fallback when an operator-specific locally audited JSON is absent. Published summaries are grounded in successful operator audit logs, not the raw full report in GitHub. No source passages or copyright-restricted question texts were published.
+
+
+## M2 next executable gate (prepared; local run pending)
+
+`M2-LIVE-01` adds `scripts/run-m2-live-controls-local.ps1` for one bounded local Qwen test across four explicitly fictional controlled evidence conditions (answerable, irrelevant but nonempty, contradictory and no-context). Full pytest runs before the generator. Exact source IDs, observable public output status, citation coverage, preserved rejected drafts, no-context generator-skip and timing are recorded. No SciFact TEST is re-used and no answer-level semantic support is attributed to citation syntax. A previously passed empty-context unit test is **not** a substitute for a live-generator smoke. This closes neither M2 independent quality evaluation nor the wider WOW v1.0 release.

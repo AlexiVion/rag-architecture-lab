@@ -258,3 +258,10 @@ The initial retrieval phase is complete. Hybrid RRF is the default retrieval arc
 See [Graph-first report](benchmarks/GRF00_HOTPOTQA_DEV_60_NO_GO_20261104.md), [Graph-Hybrid audited report](benchmarks/GRF01_HOTPOTQA_DEV_FROZEN_20261104.md) and [the research release blueprint](docs/RELEASE_WOW_BLUEPRINT.md).
 
 **Next release priorities:** close M2 semantic answer verification and abstention, benchmark the ten additional role-separated model candidates, harden/host the observatory, then cut the public v1.0 release.
+
+
+## M2-LIVE-01 — Real local Qwen boundary smoke (prepared)
+
+The next scientific-quality milestone begins with a **real-generator, fictional-source operational regression**, rather than repeating the exposed SciFact TEST question. Run `scripts/run-m2-live-controls-local.ps1` to first run the complete test suite and then exercise the existing V2 pipeline on four predefined conditions: sufficient evidence, irrelevant nonempty evidence, conflicting evidence and no evidence. It makes **three bounded real Qwen calls**, with a guaranteed generator skip in the no-context control.
+
+This measures publication/citation syntax and safe empty-context behavior; it explicitly **does not** automatically score semantic truth or answer task correctness. All generated outputs stay local under gitignored `runs/m2-live/`. Newly added implementation/tests have **not yet been run on the operator's Windows environment**, and M2 remains open. [Design and limitations](docs/M2_LIVE_QWEN_CONTROLS.md).
