@@ -40,6 +40,6 @@ The preflight **does not download a model, run the 60 reserved questions, calcul
 
 ## Next acceptance gate
 
-Only after the lock and full suite pass on the operator's machine should a **sealed evaluation runner** be written. It must share dense and BM25 result lists between the baseline and Graph-Hybrid, measure full graph construction/indexing and dense encoding costs, record the pinned revision and source corpus hash, produce paired Recall@1/3/5 and error cases, and never retune from the resulting 60 query scores.
+A separate sealed evaluation runner has now been implemented (`src/raglab/graph/grf01_study.py`) and will only run after the lock and full suite pass on the operator's machine. It shares dense and BM25 result lists between baseline and Graph-Hybrid; records graph construction/indexing and embedding/index/query costs, pinned revision/source hash, Recall@1/3/5, paired confidence intervals and failure cases. It refuses to overwrite a completed result. This code still requires local validation. See `scripts/run-grf01-hybrid-study-local.ps1`. No DEV results have been observed yet.
 
 A disjoint cohort from the already explored DEV split is still not a new independent dataset. This limitation must appear on the final result.

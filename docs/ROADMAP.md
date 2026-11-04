@@ -53,3 +53,5 @@ No hosted multi-user chatbot, billing, client CRM, platform integrations, GPU cl
 
 
 **GRF-01 post-cohort status:** the reserved 60 DEV query IDs are verified locally with 0 overlap and SHA256 `a560b1cbabe1ce6b4413f0f6f59759cd08e69ce49c5391e05b7c8767f81bd13f`. The next implemented gate is an *unscored* policy lock (`scripts/prepare-grf01-hybrid-local.ps1`): same BM25 and Dense lists, immutable model revision, fixed RRF=60, graph boost=0.10, strict no-path identity. Its code/tests are staged for Windows validation; no new recall results or Graph-Hybrid GO claims exist.
+
+**GRF-01D/E evaluation runner:** source code, synthetic tests and `scripts/run-grf01-hybrid-study-local.ps1` committed. It validates the frozen cohort/model/policy before loading weights and computes a one-pass four-architecture same-candidate comparison with paired CIs and resource measurements. Windows verification and all **GRF-01 actual scores are still pending**; full GraphRAG and M2 quality gates remain open.

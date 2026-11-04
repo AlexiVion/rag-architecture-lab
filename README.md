@@ -253,3 +253,5 @@ The initial retrieval phase is complete. Hybrid RRF is the default retrieval arc
 **Next no-prompt research preparation:** `scripts/freeze-grf01-cohort-local.ps1` reserves 60 non-overlapping HotpotQA DEV cases for the pre-registered Hybrid RRF comparison, without running models or reporting scores. Current implementation is awaiting local validation.
 
 **GRF-01 next local gate:** the new 60-query disjoint cohort reservation passed on Windows; use `scripts/prepare-grf01-hybrid-local.ps1` to run full tests and freeze the Graph-Hybrid policy **without scoring those cases**. See [locked policy](docs/GRF_01_LOCKED_HYBRID_POLICY.md). No new Graph-Hybrid improvement has been measured.
+
+**Prepared single-pass GRF-01 study:** `scripts/run-grf01-hybrid-study-local.ps1` now combines full pytest, immutable policy lock and the one allowed 60-query **disjoint DEV** comparison of BM25, Dense, Hybrid RRF and Graph-Hybrid. The code is staged but not yet validated locally or executed. It uses CPU-only pinned MiniLM weights, may download them once, and will not overwrite the original result. Do not claim the graph improves retrieval before the measurements.
