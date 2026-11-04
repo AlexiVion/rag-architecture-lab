@@ -46,3 +46,7 @@ After export, a reviewer may use the already existing `raglab review-interactive
 ## Proper M2 acceptance remains open
 
 The real M2 science gate requires independently reviewed relevance and entailment labels (preferably two reviewers plus adjudication), an untouched evaluation set, source evidence sufficiency/calibrated refusal metrics and a frozen model revision. Prior off-domain SciFact NLI is NO-GO; do not elevate it to a correctness oracle. No policy promotion results from a citation parser syntax replay or from these four diagnostic packets.
+
+## Actual operator run — PASS (2026-11-04)
+
+Full Windows pytest PASS; `M2_REVIEW02_UNLABELLED_BUNDLE_VERIFIED` / `M2_BUNDLE_STATE=CREATED`; original report SHA256 `3c9fc0794ab2d2bd3ca10825585926083b0d40067c1696aa77fc90f230ea7816`. Exactly 4 unlabelled packets R01-R04 with sources [1,1,2,0] and claims [1,1,1,0]. Experimental citation syntax accepts R01 only; **all semantic support decisions still read UNREVIEWED**. No model calls, no external publishing, no held-out quality score. A new, explicitly narrow synthetic robustness test protocol for unseen fictional names is recorded in `docs/M2_SYNTH01_FROZEN_PROTOCOL.md`; it will not infer human truth labels for these four original development cases.
