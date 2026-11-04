@@ -85,7 +85,7 @@ def test_retrieval_metrics_are_paired_and_truthfully_described():
     assert report["graph_built_without_gold_labels"]
     assert report["dataset"] == "hotpotqa/distractor/dev_v1"
     assert report["retrieval_scope"].startswith("per-question")
-    assert "answer generation" not in report["relevance_target"]
+    assert "not answer generation" in report["relevance_target"]
     for metric in ("recall@1", "recall@3", "recall@5"):
         scores = report["metrics"][metric]
         assert 0 <= scores["bm25"] <= 1
@@ -100,7 +100,7 @@ def test_no_answer_quality_is_measured():
     report = benchmark_bridge_dev([sample_record()], seed=17)
     text = " ".join(report["limitations"])
     assert "do not measure answer correctness" in text.lower()
-    assert "not full Wikipedia" in report["retrieval_scope"]
+    assert "not full wikipedia" in report["retrieval_scope"].lower()
 
 
 def test_recall_math_excludes_missing_document():

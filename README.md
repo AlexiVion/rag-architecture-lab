@@ -27,6 +27,16 @@ The command runs the full test suite, re-exports the verified static JSON and op
 
 **Do not treat the demo as a GraphRAG benchmark or a finished v1.0.** Source-quoted two-hop traversal and the viewer are implemented; scalable entity extraction, real multi-hop quality results, M2 answer-quality validation, the ten new model experiments and a hosted explorer remain pending. The current feature branch PR is still draft.
 
+## GRF-00 — First real-document paired benchmark (awaiting local results)
+
+The next optional no-prompt experiment measures **BM25 vs source-quoted graph + BM25** over the same candidate article contexts for 60 deterministic HotpotQA DEV bridge questions. The graph builder never reads the gold supporting facts; those are reserved for ranking evaluation. First run downloads approximately 46 MB of checksum-verified **CC BY-SA 4.0** data; no models are loaded:
+
+```powershell
+.\scripts\run-hotpotqa-graph-benchmark-local.ps1
+```
+
+This study measures *supporting-document Recall@1/3/5* and paired uncertainty, not answer faithfulness or an open-domain graph benchmark. [Design and limitations](docs/GRF_00_HOTPOTQA_STUDY.md). The script and tests are committed but **have not been run on the user's machine yet**.
+
 ## Why this project exists
 
 RAG is not one architecture. Retrieval choices create different trade-offs in relevance, robustness, latency, and complexity. This lab isolates those choices and measures them instead of treating a single RAG pipeline as universally best.

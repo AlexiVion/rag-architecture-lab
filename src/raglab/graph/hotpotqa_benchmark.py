@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 import random
 import re
 import statistics
@@ -92,7 +91,7 @@ def load_bridge_dev_rows(path: Path, *, seed: int = 17, count: int = 60) -> list
             part[0] for part in ctx
             if isinstance(part, list) and len(part) == 2 and isinstance(part[0], str)
         ]
-        if len(titles) != len(ctx) or len(set(titles)) != len(ctx):
+        if len(titles) != len(ctx) or len({title.casefold() for title in titles}) != len(ctx):
             continue  # Explicitly exclude malformed or duplicate-title contexts.
         gold = {
             fact[0] for fact in sf if isinstance(fact, list)

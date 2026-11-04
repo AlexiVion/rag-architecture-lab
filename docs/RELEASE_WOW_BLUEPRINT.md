@@ -179,3 +179,6 @@ No SaaS billing/auth, no cloud model inference requirement, no 50-model sweep, n
 7. Publish measured artifacts only after verifying hashes and data licenses.
 
 **Definition of done:** real runnable code, all specified acceptance checks passing, empirical claims linked to verified evidence, a deployed explorer, and a release a newcomer can reproduce. A long checklist or pretty mock alone is not completion.
+
+
+**First real-source benchmark implementation status (2026-11-04):** `GRF00-HOTPOTQA-DEV-01` now has a frozen protocol and code (HotpotQA original CC BY-SA 4.0 DEV distractor, 60 deterministic eligible bridge queries, 2-hop quoted title-mention graph + BM25 vs BM25, same per-query candidates, recall@1/3/5 with paired bootstrap confidence intervals). The source download is SHA256 pinned, ~46 MB; query labels are not passed to the graph builder. Results have **not** been executed or verified locally yet. This is **not** a Hybrid RRF comparison or answer-quality study; both remain future gates.
