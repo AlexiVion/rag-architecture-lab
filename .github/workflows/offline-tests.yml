@@ -62,6 +62,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web01-browser-screenshots
-          path: apps/observatory/artifacts/screens/*.png
+          name: web01-browser-evidence
+          path: |
+            apps/observatory/artifacts/screens/*.png
+            apps/observatory/package-lock.json
           if-no-files-found: ignore
