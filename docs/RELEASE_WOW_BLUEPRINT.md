@@ -110,7 +110,7 @@ Acceptance: graph indexing/reindexing tests, real two-hop trace rendered in the 
 
 ### MOD-10 — Exactly ten candidate models across distinct roles
 
-**Do not call these ten language generators or collapse different tasks into one misleading rank.** An initial explicit candidate registry is `experiments/model_matrix_10_proposed.json`.
+**Ten additional model candidates** beyond the four model baselines already studied in this repository; do not call them ten language generators or collapse different tasks into one misleading rank. The proposed registry is `experiments/model_matrix_10_proposed.json`, with a separate historical-baseline section. Exact revisions, model-specific prompts, license terms and CPU budgets remain release gates; the Qwen2.5-3B-Instruct card currently lists a `qwen-research` license, so it cannot be silently redistributed as MIT.
 
 - 3 **embeddings**: recall, MRR, nDCG, index size/speed, memory.
 - 2 **rerankers**: paired delta vs Hybrid on the same candidates, query latency/CPU.
@@ -119,7 +119,7 @@ Acceptance: graph indexing/reindexing tests, real two-hop trace rendered in the 
 
 Ensure each model has an independently reviewed hub identifier, exact revision, actual license, input formatting, class order/score meaning, CPU feasibility and a published configuration. Large weights are optional and **loaded one at a time**. No ranking across incomparable model roles. Results must include at least one credible failure and cannot promote a new default based only on TRAIN scores.
 
-Acceptance: 10/10 candidate entries either **measured** or clearly marked `skipped_with_reason`; no fabricated scores, an independently repeatable sample, per-role results and reproducibility manifests. Missing model/corpus license blocks public redistribution, not necessarily local research.
+Acceptance: 10/10 **additional** candidate entries either **measured** or clearly marked `skipped_with_reason`; no fabricated scores, an independently repeatable sample, per-role results and reproducibility manifests. Missing model/corpus license blocks public redistribution, not necessarily local research.
 
 ### WEB-01 — The interactive RAG observatory
 
