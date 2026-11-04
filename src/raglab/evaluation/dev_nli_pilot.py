@@ -111,7 +111,6 @@ def run_nli_pilot(
         "validated_semantic_accuracy": None,
         "abstention_threshold": None,
         "semantic_truth_status": "not_evaluated",
-        "validated_semantic_accuracy": None,
         "answer_appropriateness_accuracy": None,
         "limitations": [
             "Softmax outputs are uncalibrated model scores, not biomedical truth probabilities.",

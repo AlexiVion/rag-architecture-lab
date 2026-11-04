@@ -201,6 +201,12 @@ def _build_parser() -> argparse.ArgumentParser:
     nli_pilot.add_argument("--suite", required=True)
     nli_pilot.add_argument("--batch-size", type=int, default=2)
 
+    diagnose_nli = subparsers.add_parser(
+        "diagnose-nli",
+        help="Verify archived TRAIN NLI scores and three basic model sanity controls",
+    )
+    diagnose_nli.add_argument("--suite", required=True)
+
     experiment = subparsers.add_parser(
         "experiment",
         help="Compare a specified RAG architecture against a matched baseline",
@@ -672,6 +678,55 @@ def _experiment(args: argparse.Namespace) -> int:
     return 0
 
 
+def _diagnose_nli(args: argparse.Namespace) -> int:
+    from raglab.evaluation.nli_diagnostics import (
+        build_nli_diagnostic,
+        diagnostic_markdown,
+    )
+    from raglab.evaluation.dev_automatic_audit import audit_dev_suite
+    from raglab.evaluation.dev_nli_pilot import DEFAULT_NLI_MODEL
+    from sentence_transformers import CrossEncoder
+
+    suite = Path(args.suite)
+    reports = sorted(
+        p for p in suite.glob("AUTO_NLI_*.json")
+        if not p.name.startswith("AUTO_NLI_DIAGNOSTIC_")
+    )
+    if not reports:
+        raise FileNotFoundError("No prior AUTO_NLI pilot report in selected suite")
+    original = reports[-1]
+    saved = json.loads(original.read_text(encoding="utf-8"))
+    dataset = load_ir_dataset("beir/scifact/train")
+    audit_dev_suite(suite, dataset)
+    print("=== M2 NLI SANITY DIAGNOSTIC: NO PROMPTS ===")
+    print("Previous experiment: " + original.name)
+    print("Loading the cached public NLI model on CPU for three simple controls.")
+    model = CrossEncoder(DEFAULT_NLI_MODEL, device="cpu", max_length=512)
+    diagnostics = build_nli_diagnostic(
+        suite,
+        saved,
+        probe_predict=lambda pairs: model.predict(
+            pairs, batch_size=3, show_progress_bar=False,
+            apply_softmax=False
+        ),
+    )
+    diagnostics["archived_input_file"] = original.name
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
+    json_path = suite / f"AUTO_NLI_DIAGNOSTIC_{stamp}.json"
+    markdown_path = suite / f"AUTO_NLI_DIAGNOSTIC_{stamp}.md"
+    with json_path.open("x", encoding="utf-8") as stream:
+        json.dump(diagnostics, stream, ensure_ascii=False, indent=2)
+    with markdown_path.open("x", encoding="utf-8") as stream:
+        stream.write(diagnostic_markdown(diagnostics))
+    print(f"Model controls passed: {diagnostics['control_probe_passed']}")
+    print(f"By source arm: {diagnostics['per_source_arm']}")
+    print(f"Decision: {diagnostics['decision']}")
+    print(f"JSON: {json_path}")
+    print(f"Markdown: {markdown_path}")
+    print("No change to runtime abstention or human annotations.")
+    return 0
+
+
 def _nli_dev_pilot(args: argparse.Namespace) -> int:
     from raglab.evaluation.dev_automatic_audit import audit_dev_suite
     from raglab.evaluation.dev_nli_pilot import (
@@ -910,6 +965,8 @@ def main() -> int:
         return _audit_dev_suite(args)
     if args.command == "nli-dev-pilot":
         return _nli_dev_pilot(args)
+    if args.command == "diagnose-nli":
+        return _diagnose_nli(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 

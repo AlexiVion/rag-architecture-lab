@@ -26,3 +26,16 @@ The script first runs pytest, then loads the SciFact TRAIN cached corpus and the
 - Scientific validity and deployment metrics still require an independently labelled train/dev set, reviewer agreement or a separately validated semantic judge.
 
 This pilot progresses from a purely structural audit to measurable predictions, **not** to a completed ground-truth accuracy benchmark.
+
+
+## Actual local outcome and mandatory sanity check
+
+On 2026-11-04 the maintainer ran the 18-case SciFact TRAIN pilot successfully: 12/12 nonempty cases produced a neutral prediction, 0 entailment, 0 contradiction, and six empty controls were skipped. The cached public NLI weights downloaded successfully. Only harmless unauthenticated HF Hub / Windows symlink warnings appeared. This is NOT an observed scientific accuracy score.
+
+New command (fully automatic, no human prompts):
+
+    .\scripts\diagnose-m2-nli-local.ps1
+
+It checks the saved probability vectors and their class order, compares predictions across the two nonempty source-selection arms, validates the original TRAIN data, and runs three common-language classifier probes (one entailment, one contradiction, one neutral). The same cached model is loaded on CPU; this is only a functionality smoke, not an out-of-domain benchmark.
+
+Whether toy probes pass or fail, this uncalibrated NLI model does not become a production abstention filter. No SciFact TEST data or human truth labels are used, no runtime policy is updated. Diagnostic JSON and Markdown are stored only in the git-ignored TRAIN suite folder.
