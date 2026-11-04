@@ -188,6 +188,12 @@ def _build_parser() -> argparse.ArgumentParser:
     dev_review.add_argument("--suite", required=True)
     dev_review.add_argument("--max-cases", type=int, default=3)
 
+    auto_audit = subparsers.add_parser(
+        "audit-dev-suite",
+        help="Non-interactive structural and evidence-availability checks for TRAIN cases",
+    )
+    auto_audit.add_argument("--suite", required=True)
+
     experiment = subparsers.add_parser(
         "experiment",
         help="Compare a specified RAG architecture against a matched baseline",
@@ -659,6 +665,36 @@ def _experiment(args: argparse.Namespace) -> int:
     return 0
 
 
+def _audit_dev_suite(args: argparse.Namespace) -> int:
+    from raglab.evaluation.dev_automatic_audit import (
+        audit_dev_suite,
+        audit_report_markdown,
+    )
+
+    suite = Path(args.suite)
+    dataset = load_ir_dataset("beir/scifact/train")
+    report = audit_dev_suite(suite, dataset)
+    report_path = suite / "AUTO_AUDIT.json"
+    markdown_path = suite / "AUTO_AUDIT.md"
+    report_path.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    markdown_path.write_text(
+        audit_report_markdown(report), encoding="utf-8"
+    )
+    print("=== M2 automatic train-only audit ===")
+    print(f"Status: {report['status']}")
+    print(f"Cases structurally checked: {report['case_count']}")
+    print(f"Training propositions: {report['query_count']}")
+    print(f"No-context abstention controls: {report['no_context_control_count']}")
+    print(f"Cases requiring semantic assessment: {report['semantic_unassessed_count']}")
+    print(f"Existing human review files: {report['existing_human_review_files']}")
+    print(f"JSON: {report_path}")
+    print(f"Markdown: {markdown_path}")
+    print("No questions, models, embeddings, semantic labels, or test-set qrels.")
+    return 0
+
+
 def _review_dev_batch(args: argparse.Namespace) -> int:
     from raglab.evaluation.dev_review_batch import review_next_dev_group
 
@@ -808,6 +844,8 @@ def main() -> int:
         return _design_dev_cases(args)
     if args.command == "review-dev-batch":
         return _review_dev_batch(args)
+    if args.command == "audit-dev-suite":
+        return _audit_dev_suite(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 

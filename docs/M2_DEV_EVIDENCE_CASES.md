@@ -49,3 +49,16 @@ To review **only three cases for one training proposition**, use:
 The script runs the tests, selects the latest training suite and opens a small interactive group. The source origin (qrel-positive / cross-query / empty) is concealed from the terminal prompts; opaque filenames are used to avoid exposing the arm. Reviewers see the proposition and actual snippets, and choose source relevance and whether evidence is sufficient to answer. **No claims are generated** and their support scores remain unavailable. `u` means uncertain; it is valid for complex biomedical propositions. A second invocation continues with the next unreviewed group, keeping all previously saved files unchanged. The program does not infer any labels.
 
 Completed or incomplete review snapshots are stored in git-ignored `human-reviews` within the suite; originals and manifest are preserved. An incomplete review is not counted as a finished label. The experimenter must separately check adjudication and labeling disagreements before calibrating decision thresholds. This remains a development sample, not a held-out benchmark or proof of model accuracy.
+
+
+## No-prompt audit — operator preferred mode
+
+You can skip all interactive review and run the **entire 18-case objective audit** using:
+
+```powershell
+.\scripts\run-m2-dev-automatic-local.ps1
+```
+
+This validates all tests and every original case against the local SciFact **TRAIN** corpus, including source document integrity, selected qrels, query mapping, all 3 balanced arms, and no-context controls. Writes `AUTO_AUDIT.json` and `AUTO_AUDIT.md` under the suite; rerunning replaces only these machine-generated reports, **never original packets or human reviews**.
+
+The safe deterministic policy is: **no context means abstain without generation**. For the 12 nonempty evidence scenarios, relevance/sufficiency/entailment remain `not_evaluated`. This is intentionally not a fabricated 18/18 semantic score, does not call Qwen or embeddings, and does not learn/calibrate an abstention threshold. `human-reviews` is optional and separate. A valid semantic benchmark will later need actual verified labels or a separately measured automated judge with audited error rates.
