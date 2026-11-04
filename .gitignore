@@ -17,6 +17,7 @@ htmlcov/
 .cache/
 benchmarks/results/*.json
 !benchmarks/results/.gitkeep
+runs/
 
 # OS / editors
 .DS_Store
