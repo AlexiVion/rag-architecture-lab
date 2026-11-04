@@ -57,6 +57,9 @@ def fixtures():
         "benchmark_run": False,
     }
     report = aggregate(rows, lock=lock)
+    # aggregate() records the real frozen cohort by default; the toy fixture
+    # must identify its own three synthetic question IDs instead.
+    report["cohort_hash"] = digest
     return report, cohort, lock
 
 
@@ -70,6 +73,13 @@ def test_valid_synthetic_archive_audits_without_model_calls():
     assert summary["source_report_sha256"] == "a" * 64
     assert "Aster Rover" not in str(summary)
     assert "Bootstrap CI95" in markdown(summary)
+
+
+def test_even_synthetic_audit_rejects_wrong_cohort_fingerprint():
+    report, cohort, lock = fixtures()
+    report["cohort_hash"] = "f" * 64
+    with pytest.raises(ValueError, match="provenance"):
+        audit(report, cohort, lock, "h", canonical=False)
 
 
 def test_wrong_paired_delta_fails():
