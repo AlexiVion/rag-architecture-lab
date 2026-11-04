@@ -102,7 +102,10 @@ def check_repository(root: Path = PROJECT_ROOT) -> dict:
         raw = fixture_path.read_bytes()
         fixture = json.loads(raw)
         validate_observatory_artifact(fixture)
-        expected = create_demo_artifact()
+        # JSON arrays encode Python tuple fields as lists. Compare exactly
+        # the *serializable published representation*, not raw dataclass
+        # tuple/list container types (same safeguard as archived M2 audits).
+        expected = json.loads(json.dumps(create_demo_artifact(), ensure_ascii=False))
         if fixture != expected:
             raise ValueError("Published fictional graph differs from deterministic source: " + str(_first_difference(fixture, expected)))
         if any(x.get("answer") is not None for x in fixture["traces"]):

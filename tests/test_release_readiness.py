@@ -28,6 +28,15 @@ def sandbox_snapshot(tmp_path):
     return tmp_path
 
 
+def test_fixture_release_gate_compares_json_serialized_arrays_not_python_tuples():
+    from raglab.observatory.fixture import create_demo_artifact
+    artifact = create_demo_artifact()
+    assert isinstance(artifact["graph"]["nodes"][0]["aliases"], tuple)
+    serialized = json.loads(json.dumps(artifact))
+    assert isinstance(serialized["graph"]["nodes"][0]["aliases"], list)
+    assert check_repository()["checks"]["offline_graph_fixture"]["status"] == "PASS"
+
+
 def test_missing_policy_or_fixture_fails_closed(tmp_path):
     root = sandbox_snapshot(tmp_path)
     (root / "SECURITY.md").unlink()
