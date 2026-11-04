@@ -39,6 +39,9 @@ def test_conflicting_irrelevant_and_unknown_grammars_fail_closed():
     assert assess_evidence(QUESTION, [{"id": "x", "text": "Maybe Thornwood Automation made it."}]).reason == "DENY_UNPARSEABLE_SOURCE"
     assert assess_evidence(QUESTION, [{"id": "x", "text": VALID["text"] + " This is uncertain."}]).reason == "DENY_UNPARSEABLE_SOURCE"
     assert assess_evidence(QUESTION, [VALID, VALID]).reason == "DENY_DUPLICATE_SOURCE_ID"
+    assert assess_evidence(QUESTION, [None]).reason == "DENY_UNTRUSTED_SOURCE_FORMAT"
+    assert assess_evidence(QUESTION, [{"id": "x", "text": None}]).reason == "DENY_UNTRUSTED_SOURCE_FORMAT"
+
 
 
 def test_postgeneration_structured_relation_and_exact_labels_not_syntax_only():

@@ -65,15 +65,18 @@ def assess_evidence(question: str, sources: list[dict[str, str]]) -> EvidenceDec
         return EvidenceDecision(False, "DENY_UNSUPPORTED_QUESTION_GRAMMAR", None, ())
     if not sources:
         return EvidenceDecision(False, "DENY_NO_CONTEXT", None, ())
-    if len({source.get("id") for source in sources}) != len(sources):
+    if any(
+        not isinstance(source, dict)
+        or not isinstance(source.get("text"), str)
+        or not isinstance(source.get("id"), str)
+        or not source["id"]
+        for source in sources
+    ):
+        return EvidenceDecision(False, "DENY_UNTRUSTED_SOURCE_FORMAT", None, ())
+    if len({source["id"] for source in sources}) != len(sources):
         return EvidenceDecision(False, "DENY_DUPLICATE_SOURCE_ID", None, ())
     values: list[str] = []
     for source in sources:
-        if (not isinstance(source, dict)
-            or not isinstance(source.get("text"), str)
-            or not isinstance(source.get("id"), str)
-            or not source["id"]):
-            return EvidenceDecision(False, "DENY_UNTRUSTED_SOURCE_FORMAT", None, ())
         fact = EVIDENCE.fullmatch(source["text"].strip())
         if not fact:
             return EvidenceDecision(False, "DENY_UNPARSEABLE_SOURCE", None, ())
