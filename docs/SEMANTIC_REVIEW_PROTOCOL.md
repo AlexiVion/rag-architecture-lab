@@ -49,3 +49,17 @@ This reads the latest **original** packet and displays the claim and every retri
 The tool also asks for a reviewer identifier and expected behavior (`a`=answer, `b`=abstain, `u`=uncertain, `s`=skip), and writes a distinct **annotated** JSON file without overwriting the original packet. It computes a support rate **only if all labels and reviewer identity are supplied**. Reviewer labels are treated as human observations, not automatically proven facts.
 
 The source passages may be truncated, and domain expertise may be needed to interpret biomedical studies. It is valid to answer **uncertain** rather than assert unsupported biomedical claims. This held-out query is diagnostic only and cannot be used for test-set tuning.
+
+## Distinguishing answer adequacy from claim support (M2-HUMAN-001)
+
+The first **completed** human annotation on the historical `beir/scifact/test` claim #1 found five source passages irrelevant, a generated statement supported by an irrelevant article, no citations, and an expectation to **abstain**. The case report is `benchmarks/M2_SCIFACT_TEST_Q1_HUMAN_REVIEW_20261104.md`.
+
+The scorer now outputs **separate** fields: `source_adequacy_from_human_labels`, `observed_behavior`, `observed_behavior_evidence` and `behavior_alignment_with_human_review`, while retaining `fully_supported_claim_rate` strictly as a claim-level label summary. The last metric **cannot** be interpreted as answer relevance or end-to-end task success. Those scores remain `null` because they need an additional independently specified rubric. Older annotated packets lacking an explicit `actual_abstained` property are supported: a nonempty, legacy candidate text is taken as an **inferred** attempt to answer, and the inference is explicitly labeled.
+
+To re-score the latest annotated JSON, without overwriting the human input or invoking models:
+
+```powershell
+.\scripts\audit-latest-annotated-v2-local.ps1
+```
+
+The script creates a separate `summary_*.json` next to the annotated packet and will not overwrite an existing summary. This is still held-out test diagnostics only, **not** a train/dev calibration exercise.

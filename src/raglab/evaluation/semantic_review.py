@@ -62,6 +62,8 @@ def prepare_review_packet(artifact: Mapping[str, Any]) -> dict[str, Any]:
             "retrieval_name": result.get("retrieval_name"),
             "generator_name": result.get("generator_name"),
             "output_status": status,
+            "actual_abstained": result.get("abstained")
+            if isinstance(result.get("abstained"), bool) else None,
         },
         "question": result.get("question"),
         "candidate_text": generated_text,
@@ -173,6 +175,55 @@ def summarize_review_packet(packet: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(citation_gate, dict) or not isinstance(citation_gate.get("passed"), bool):
         raise ValueError("Missing independent citation gate result")
 
+    # Preserve annotation meaning: claim support, source relevance, and
+    # action appropriateness are separate measured dimensions. The legacy
+    # packet omitted actual_abstained, so a nonempty generated candidate is
+    # only an observed attempt to answer, explicitly marked as an inference.
+    provenance = packet.get("provenance", {})
+    if not isinstance(provenance, dict):
+        raise ValueError("Invalid provenance record")
+    actual_abstained = provenance.get("actual_abstained")
+    output_status = provenance.get("output_status")
+    observed_text = packet.get("candidate_text")
+    if type(actual_abstained) is bool:
+        actual_behavior = "abstain" if actual_abstained else "answer"
+        behavior_evidence = "explicit_saved_abstained"
+    elif output_status in ("abstained_no_context", "abstained_evidence_gate",
+                           "rejected_citation_contract"):
+        actual_behavior = "abstain"
+        behavior_evidence = "explicit_output_status"
+    elif output_status == "accepted":
+        actual_behavior = "answer"
+        behavior_evidence = "explicit_output_status"
+    elif output_status == "unknown_legacy" and isinstance(observed_text, str) and observed_text.strip():
+        actual_behavior = "answer"
+        behavior_evidence = "legacy_nonempty_generation_inferred"
+    else:
+        actual_behavior = "unknown"
+        behavior_evidence = "unavailable"
+
+    if complete and expected in ("answer", "abstain") and actual_behavior != "unknown":
+        if expected == actual_behavior:
+            behavior_alignment = "matches_human_expected_behavior"
+        elif expected == "abstain":
+            behavior_alignment = "answered_when_human_expected_abstention"
+        else:
+            behavior_alignment = "abstained_when_human_expected_answer"
+    else:
+        behavior_alignment = "not_evaluated"
+
+    if complete:
+        if not sources:
+            source_adequacy = "no_sources"
+        elif relevance_counts["relevant"] or relevance_counts["partially_relevant"]:
+            source_adequacy = "at_least_one_relevant_or_partial_source"
+        elif relevance_counts["uncertain"]:
+            source_adequacy = "uncertain"
+        else:
+            source_adequacy = "all_sources_judged_irrelevant"
+    else:
+        source_adequacy = "not_evaluated"
+
     return {
         "schema_version": 1,
         "dataset": packet.get("provenance", {}).get("dataset"),
@@ -188,6 +239,16 @@ def summarize_review_packet(packet: Mapping[str, Any]) -> dict[str, Any]:
         "fully_supported_claim_rate": (
             support_counts["supported"] / len(claims)
             if complete and claims else None
+        ),
+        "source_adequacy_from_human_labels": source_adequacy,
+        "observed_behavior": actual_behavior,
+        "observed_behavior_evidence": behavior_evidence,
+        "behavior_alignment_with_human_review": behavior_alignment,
+        "answer_relevance_score": None,
+        "task_success_score": None,
+        "interpretation_warning": (
+            "A source-supported claim can be irrelevant to the user task. "
+            "Claim support is NOT a measure of answer relevance or task success."
         ),
         "quality_conclusion": (
             "Human-reviewed support labels; still not an automated semantic validator."
