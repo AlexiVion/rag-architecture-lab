@@ -18,7 +18,7 @@
 | GEN-02 | Query decomposition | Can multi-hop questions be decomposed? | direct vs decomposed | answer support and task accuracy | Proposed |
 | GEN-03 | Self-reflective RAG | Can a critique loop improve response faithfulness? | one pass vs bounded critique | correctness, loops, latency | Proposed |
 | AGT-00 | Agentic RAG | When is iterative tool use justified? | bounded tool budget vs one shot | quality, steps, latency | Proposed |
-| GRF-00 | Source-provenance graph retrieval (GraphRAG baseline) | When do entity relations help multi-hop retrieval? | graph vs equivalent text baseline | multi-hop accuracy, index cost | 2-hop graph prototype + curated fixture validated; HotpotQA DEV paired study code added, local results pending |
+| GRF-00 | Source-provenance graph retrieval (GraphRAG baseline) | When do entity relations help multi-hop retrieval? | graph vs equivalent text baseline | multi-hop accuracy, index cost | 2-hop graph + curated fixture validated; HotpotQA DEV real-data paired experiment completed: graph-first NO-GO vs BM25 (Recall@5 delta -0.1167), analysis pending |
 | XTR-00 | Cross-domain / multilingual | Do findings generalize beyond English SciFact? | multiple domains and ES/FR/EN | slice-level metrics, failure modes | Proposed |
 
 ## Experiment deliverables (mandatory)

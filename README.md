@@ -27,15 +27,15 @@ The command runs the full test suite, re-exports the verified static JSON and op
 
 **Do not treat the demo as a GraphRAG benchmark or a finished v1.0.** Source-quoted two-hop traversal and the viewer are implemented; scalable entity extraction, real multi-hop quality results, M2 answer-quality validation, the ten new model experiments and a hosted explorer remain pending. The current feature branch PR is still draft.
 
-## GRF-00 — First real-document paired benchmark (awaiting local results)
+## GRF-00 — Real-document paired benchmark: negative result (2026-11-04)
 
-The next optional no-prompt experiment measures **BM25 vs source-quoted graph + BM25** over the same candidate article contexts for 60 deterministic HotpotQA DEV bridge questions. The graph builder never reads the gold supporting facts; those are reserved for ranking evaluation. First run downloads approximately 46 MB of checksum-verified **CC BY-SA 4.0** data; no models are loaded:
+The completed local experiment measured **BM25 vs source-quoted graph + BM25** over the same candidate article contexts for 60 deterministic HotpotQA DEV bridge questions. The graph builder never reads the gold supporting facts; those are reserved for ranking evaluation. First run downloads approximately 46 MB of checksum-verified **CC BY-SA 4.0** data; no models are loaded:
 
 ```powershell
 .\scripts\run-hotpotqa-graph-benchmark-local.ps1
 ```
 
-This study measures *supporting-document Recall@1/3/5* and paired uncertainty, not answer faithfulness or an open-domain graph benchmark. [Design and limitations](docs/GRF_00_HOTPOTQA_STUDY.md). The script and tests are committed but **have not been run on the user's machine yet**.
+This study measures *supporting-document Recall@1/3/5* and paired uncertainty, not answer faithfulness or an open-domain graph benchmark. [Design and limitations](docs/GRF_00_HOTPOTQA_STUDY.md). The user executed the script successfully; all tests passed. On 60 DEV bridge questions, BM25 beat Graph+BM25: Recall@1 0.4333 vs 0.3500; Recall@3 0.6833 vs 0.5917; Recall@5 0.8250 vs 0.7083. All paired bootstrap CIs for the differences were negative. **NO-GO for this graph-first policy in this DEV sample**, not for all GraphRAG. The raw per-query JSON remains local. Use the post-run audit to verify and display the aggregate in the observatory.
 
 ## Why this project exists
 

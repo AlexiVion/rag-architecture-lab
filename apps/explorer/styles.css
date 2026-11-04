@@ -6,3 +6,18 @@
 @media(max-width:1150px){.shell{grid-template-columns:206px minmax(0,1fr)}.content{padding:28px}.topbar{padding:0 26px}.work-grid{grid-template-columns:minmax(0,1fr)}.graph-canvas{min-height:295px}.graph-canvas svg{height:295px}}
 @media(max-width:730px){.shell{display:block}.sidebar{position:static;height:auto;padding:16px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:4px 6px 16px}.nav{display:flex;flex-wrap:wrap;gap:5px}.nav-link{width:auto;padding:10px 12px;font-size:11px}.sidebar-label,.sidebar-label-spaced,.side-info,.sidebar-footer{display:none}.topbar{height:58px;padding:0 18px}.topbar-right .tag-outline{display:none}.content{padding:22px 15px}.intro h1{letter-spacing:-1px}.section-top{flex-direction:column}.stats{grid-template-columns:repeat(2,1fr)}.stat{min-height:105px}.graph-caption{flex-wrap:wrap}.method-panel{flex-wrap:wrap}.outline-button{width:100%}.legend{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+
+.bench-section{margin-top:18px;padding:24px}.bench-header{display:flex;justify-content:space-between;gap:18px;align-items:start}
+.bench-header h2{font:600 24px/1.2 var(--display);letter-spacing:-.5px;margin:7px 0}.bench-header p{font-size:12px;line-height:1.7;color:var(--muted);max-width:700px}
+.bench-badge{display:inline-block;padding:8px 10px;border-radius:6px;background:#342823;border:1px solid #775043;color:#f4b6a2;font-size:10px;font-weight:700;white-space:nowrap}
+.bench-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0;color:var(--muted);font-size:12px}
+.bench-metric{background:#121f31;padding:16px;border-radius:9px;border:1px solid #2b3e55}
+.bench-key{font-weight:700;font-size:11px;color:#c4d3e6}
+.bench-values{margin-top:11px;color:#d0ddeb;line-height:1.5;font-size:11px}
+.bench-delta{font:600 28px/1.2 var(--display);margin:9px 0 6px;color:#81eac4}
+.bench-delta.negative{color:#f3a28f}
+.bench-metric small{font-size:10px;color:#8ca0bb}
+.bench-groups{display:flex;flex-wrap:wrap;gap:9px}.bench-group{background:#1a293d;color:#bad0e8;border:1px solid #354a62;padding:8px;border-radius:6px;font-size:11px}
+.bench-footer{margin-top:20px;color:#8198b2;line-height:1.6;font-size:10px}
+@media(max-width:950px){.bench-metrics{grid-template-columns:1fr}}
+@media(max-width:630px){.bench-header{display:block}.bench-badge{margin-top:10px}}

@@ -81,6 +81,18 @@
         </div>
 
         <section class="method-panel" id="research-section"><div class="method-icon">◇</div><div><div class="micro-label">RESEARCH INTEGRITY</div><h3>Every claim should have a trail.</h3><p>Source text, relation edges, entity paths and retrieval results are inspectable. The recorded graph is a manually curated seed fixture, <strong>not</strong> a GraphRAG performance benchmark or validated semantic answer.</p></div><button id="export-trace" class="outline-button" type="button">Export current trace <span>↗</span></button></section>
+
+        <section class="panel bench-section" id="benchmark-section" aria-labelledby="benchmark-heading">
+          <div class="bench-header">
+            <div><div class="micro-label">04 / REAL-WORLD RETRIEVAL STUDY</div><h2 id="benchmark-heading">When the graph loses.</h2>
+              <p>Measured HotpotQA DEV retrieval: the honest negative result matters as much as a win. Metrics appear only after verifying your local benchmark JSON.</p>
+            </div>
+            <span class="bench-badge" id="benchmark-badge">LOCAL RESULT PENDING</span>
+          </div>
+          <div id="benchmark-metrics" class="bench-metrics" aria-live="polite">Verified local benchmark aggregate not loaded. Run the GRF-00 post-run audit to populate this view.</div>
+          <div id="benchmark-groups" class="bench-groups"></div>
+          <div class="bench-footer" id="benchmark-provenance">Source: HotpotQA DEV distractor, CC BY-SA 4.0. No answer generation, no model tuning, no claim of GraphRAG accuracy.</div>
+        </section>
         <footer>RAG Architecture Lab <span>·</span> GRF-00 deterministic graph retrieval <span>·</span> No paid APIs <span>·</span> <span id="footer-fingerprint">—</span></footer>
       </div>
     </main>

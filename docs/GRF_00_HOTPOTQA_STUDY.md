@@ -1,6 +1,6 @@
 # GRF00-HOTPOTQA-DEV-01 — Source-quoted graph retrieval vs BM25
 
-**Status:** Implementation committed; real run and empirical results require local validation. Do not publish a GO/NO-GO until the run is inspected.
+**Status:** Local run completed and observed results recorded (2026-11-04); graph-first **NO-GO on this DEV subset**. Raw per-query JSON is local only; post-run diagnostic audits it before web export.
 
 The repo's first deterministic GRF-00 seed graph is real code but uses fictional curated texts. To reach a controlled **real-document** comparison, this study uses the original HotpotQA dev distractor setting: candidate article titles and passages per question, plus separate supporting-fact labels for retrieval evaluation. The official HotpotQA code and dataset describe the source schema and CC BY-SA 4.0 license: https://github.com/hotpotqa/hotpot/blob/master/README.md and https://hotpotqa.github.io/.
 
@@ -38,3 +38,28 @@ The command runs all tests, downloads the official unchanged dataset once (about
 - Latency and indexing are simple sequential desktop measures, not production percentiles or GPU claims.
 - These results cannot be compared directly to SciFact retrieval because datasets, candidates and relevance definitions differ.
 - The **final GRF-00 release gate** still requires a comparison against a matched Hybrid RRF baseline and an explicit multi-hop answer-quality study, with model revision, RAM/cost and licensing checks.
+
+
+## Recorded 60-question local results (2026-11-04)
+
+The operator ran the full pytest suite successfully; the deterministic HotpotQA DEV benchmark finished with no paid models or generated answers.
+
+| Retrieval recall | BM25 | Graph+BM25 | Delta | 95% paired bootstrap CI |
+|---|---:|---:|---:|---|
+| Recall@1 | 0.4333 | 0.3500 | −0.0833 | [−0.1500, −0.0167] |
+| Recall@3 | 0.6833 | 0.5917 | −0.0917 | [−0.1750, −0.0083] |
+| Recall@5 | 0.8250 | 0.7083 | **−0.1167** | [−0.1917, −0.0583] |
+
+- Graph seed entities found: **43 of 60 questions**; graph relations constructed: **52 of 60**.
+- Decision: **NO-GO for prioritizing lexical title-link graph results ahead of BM25 in this observed setting**. Do not tune hyperparameters on the same fixed DEV evaluation cases. Hybrid RRF default remains unchanged.
+- This is **not** end-to-end GraphRAG answer-quality performance, and cannot determine whether a different graph architecture could help.
+- Known timing caveat: the original graph index timer excludes the preceding title-link relationship construction step. Do not call it complete graph build time.
+- Operator output: `runs/graph-hotpotqa/GRF00_HOTPOTQA_20261104T163545630360Z.json` and matching Markdown, stored locally. Results above were transcribed from the terminal output, **not yet independently revalidated against the full raw JSON**.
+
+To audit saved per-query data without rerunning or tuning the retriever:
+
+```powershell
+.\scripts\audit-grf00-hotpotqa-local.ps1
+```
+
+This checks query IDs, provenance, all reported recall/CI values against the saved rows, group counts, timings and no-graph fallback; it then writes a local diagnostic report and a **gitignored** safe aggregate for the web observatory. No HotpotQA questions or source passages are exported to the web.

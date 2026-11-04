@@ -154,7 +154,7 @@ function setupNavigation(){
     document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b===button));
     const label={overview:'Overview',graph:'Knowledge graph',evidence:'Evidence trace',research:'Research notes'}[button.dataset.view];
     $('current-section').textContent=label;
-    const target={overview:'.intro',graph:'.network-panel',evidence:'.inspect-panel',research:'.method-panel'}[button.dataset.view];
+    const target={overview:'.intro',graph:'.network-panel',evidence:'.inspect-panel',research:'#benchmark-section'}[button.dataset.view];
     document.querySelector(target)?.scrollIntoView({behavior:'smooth',block:'start'});
   }));
   $('export-trace').addEventListener('click',()=>{
@@ -169,10 +169,56 @@ async function load(){
   try{
     const response=await fetch('./data/demo.json',{cache:'no-store'});
     if(!response.ok)throw new Error('Fixture file missing. Run the offline exporter first.');
-    const body=await response.json();assertArtifact(body);dataset=body;render();
+    const body=await response.json();assertArtifact(body);dataset=body;render();loadLocalBenchmark();
   }catch(error){
     $('load-error').hidden=false;
     $('load-error').textContent='Unable to load verified fixture: '+error.message+'. Serve this directory through a local HTTP server, not file://.';
   }
 }
 load();
+
+async function loadLocalBenchmark() {
+  const status = $('benchmark-badge');
+  try {
+    const response = await fetch('./data/hotpotqa-summary.local.json', {cache:'no-store'});
+    if (!response.ok) throw new Error('Benchmark aggregate is not generated locally');
+    const data = await response.json();
+    if (data.schema_version !== 1 || data.kind !== 'verified_retrieval_benchmark_aggregate'
+      || data.experiment_id !== 'GRF00-HOTPOTQA-DEV-01' || data.sample_count !== 60
+      || data.publication_status !== 'verified_from_local_per_query_records'
+      || !/^[0-9a-f]{64}$/.test(data.source_report_sha256)
+      || !['NO_GO_GRAPH_FIRST_ON_THIS_DEV_SUBSET','INCONCLUSIVE_OR_MIXED_RESULTS'].includes(data.decision)) {
+      throw new Error('Invalid or unaudited local benchmark summary');
+    }
+    status.textContent = data.decision.startsWith('NO_GO') ? 'NO-GO · GRAPH FIRST' : 'RESEARCH INCONCLUSIVE';
+    const host = $('benchmark-metrics'); host.replaceChildren();
+    for (const [key, label] of [['recall@1','Recall@1'],['recall@3','Recall@3'],['recall@5','Recall@5']]) {
+      const m = data.metrics?.[key], lo = m?.paired_bootstrap_95ci?.[0], hi = m?.paired_bootstrap_95ci?.[1];
+      if (![m?.bm25,m?.graph_plus_bm25,m?.paired_delta,lo,hi].every(v=>typeof v==='number'&&Number.isFinite(v)&&Math.abs(v)<=1)) {
+        throw new Error('Invalid benchmark scores');
+      }
+      const card = el('div','bench-metric');
+      card.append(el('span','bench-key',label),el('div','bench-values',`BM25 ${(m.bm25*100).toFixed(2)}% · Graph+BM25 ${(m.graph_plus_bm25*100).toFixed(2)}%`));
+      const diff=el('div','bench-delta',`${m.paired_delta>=0?'+':''}${(m.paired_delta*100).toFixed(2)} pts`);
+      if (m.paired_delta<0) diff.classList.add('negative');
+      card.append(diff,el('small',null,`95% paired CI: [${(lo*100).toFixed(2)}, ${(hi*100).toFixed(2)}] pts`));
+      host.append(card);
+    }
+    const groups = $('benchmark-groups'); groups.replaceChildren();
+    for (const [id, label] of [['paths_present','Graph path found'],['paths_absent','No graph path']]) {
+      const group=data.subgroups?.[id];
+      if (!group || !Number.isInteger(group.cases) || group.cases<0
+          || (group.mean_delta_recall_at_5!==null && !Number.isFinite(group.mean_delta_recall_at_5))) {
+        throw new Error('Invalid benchmark subgroup');
+      }
+      const delta=group.mean_delta_recall_at_5;
+      groups.append(el('span','bench-group',`${label}: ${group.cases} cases · ΔRecall@5: ${delta===null?'n/a':(delta*100).toFixed(2)+' pts'}`));
+    }
+    $('benchmark-provenance').textContent =
+      `Verified local run · HotpotQA DEV distractor · 60 questions · CC BY-SA 4.0 · Report SHA256 ${data.source_report_sha256.slice(0,16)}… · Dataset is NOT a held-out benchmark; no generated answer metrics.`;
+  } catch (error) {
+    status.textContent = 'LOCAL RESULT PENDING';
+    $('benchmark-metrics').textContent = 'No audited local results available. Run scripts/audit-grf00-hotpotqa-local.ps1 and refresh.';
+    $('benchmark-groups').replaceChildren();
+  }
+}

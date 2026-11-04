@@ -182,3 +182,15 @@ No SaaS billing/auth, no cloud model inference requirement, no 50-model sweep, n
 
 
 **First real-source benchmark implementation status (2026-11-04):** `GRF00-HOTPOTQA-DEV-01` now has a frozen protocol and code (HotpotQA original CC BY-SA 4.0 DEV distractor, 60 deterministic eligible bridge queries, 2-hop quoted title-mention graph + BM25 vs BM25, same per-query candidates, recall@1/3/5 with paired bootstrap confidence intervals). The source download is SHA256 pinned, ~46 MB; query labels are not passed to the graph builder. Results have **not** been executed or verified locally yet. This is **not** a Hybrid RRF comparison or answer-quality study; both remain future gates.
+
+## GRF-00 empirical decision — 2026-11-04
+
+The user's Windows run of `GRF00-HOTPOTQA-DEV-01` completed successfully with all local tests passing, 60 DEV bridge questions, and the following BM25 vs graph-first+BM25 retrieval metrics:
+
+| Metric | BM25 | Graph+BM25 | Paired delta | 95% CI |
+|---|---:|---:|---:|---|
+| Recall@1 | 0.4333 | 0.3500 | -0.0833 | [-0.1500, -0.0167] |
+| Recall@3 | 0.6833 | 0.5917 | -0.0917 | [-0.1750, -0.0083] |
+| Recall@5 | 0.8250 | 0.7083 | -0.1167 | [-0.1917, -0.0583] |
+
+**Decision: NO-GO for the current graph-first title-mention prioritization policy on this DEV sample.** The graph is still a functioning learning/demo component and not evidence that GraphRAG generally fails. Its construction was unsupervised by the relevance labels. Do not tune on the same 60 DEV cases. Local diagnostics and a web-safe aggregate exporter have been added but still await local validation. Full graph extraction, correct production indexing time, Hybrid RRF comparison and answer quality remain unmet gates. No default retrieval changes.
