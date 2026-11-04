@@ -181,6 +181,13 @@ def _build_parser() -> argparse.ArgumentParser:
     dev_design.add_argument("--seed", type=int, default=17)
     dev_design.add_argument("--output-dir", required=True)
 
+    dev_review = subparsers.add_parser(
+        "review-dev-batch",
+        help="Blind human annotation of the next SciFact TRAIN case group",
+    )
+    dev_review.add_argument("--suite", required=True)
+    dev_review.add_argument("--max-cases", type=int, default=3)
+
     experiment = subparsers.add_parser(
         "experiment",
         help="Compare a specified RAG architecture against a matched baseline",
@@ -652,6 +659,17 @@ def _experiment(args: argparse.Namespace) -> int:
     return 0
 
 
+def _review_dev_batch(args: argparse.Namespace) -> int:
+    from raglab.evaluation.dev_review_batch import review_next_dev_group
+
+    stats = review_next_dev_group(
+        Path(args.suite), max_cases=args.max_cases, ask=input, show=print
+    )
+    print(json.dumps(stats, indent=2, ensure_ascii=False))
+    print("No labels were inferred, and no models or retrieval were run.")
+    return 0
+
+
 def _design_dev_cases(args: argparse.Namespace) -> int:
     from raglab.evaluation.dev_case_design import (
         design_dev_cases,
@@ -788,6 +806,8 @@ def main() -> int:
         return _review_interactive(args)
     if args.command == "design-dev-cases":
         return _design_dev_cases(args)
+    if args.command == "review-dev-batch":
+        return _review_dev_batch(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 

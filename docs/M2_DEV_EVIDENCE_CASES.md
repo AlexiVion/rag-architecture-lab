@@ -37,3 +37,15 @@ The reviewer chooses source relevance and expected answer/abstain behavior. As n
 - Define a decision policy (answer / abstain / uncertain) using **train/dev** only.
 - Freeze and benchmark that policy independently on a held-out test split *once*, preserving prior test-set diagnostic exposure.
 - Document model/corpus revisions, latency/cost and per-class confusion before promoting defaults.
+
+## Blind, resumable annotation of a small group (2026-11-04)
+
+To review **only three cases for one training proposition**, use:
+
+```powershell
+.\scripts\review-next-m2-dev-group-local.ps1
+```
+
+The script runs the tests, selects the latest training suite and opens a small interactive group. The source origin (qrel-positive / cross-query / empty) is concealed from the terminal prompts; opaque filenames are used to avoid exposing the arm. Reviewers see the proposition and actual snippets, and choose source relevance and whether evidence is sufficient to answer. **No claims are generated** and their support scores remain unavailable. `u` means uncertain; it is valid for complex biomedical propositions. A second invocation continues with the next unreviewed group, keeping all previously saved files unchanged. The program does not infer any labels.
+
+Completed or incomplete review snapshots are stored in git-ignored `human-reviews` within the suite; originals and manifest are preserved. An incomplete review is not counted as a finished label. The experimenter must separately check adjudication and labeling disagreements before calibrating decision thresholds. This remains a development sample, not a held-out benchmark or proof of model accuracy.

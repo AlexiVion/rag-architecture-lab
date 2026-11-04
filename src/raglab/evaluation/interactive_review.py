@@ -90,7 +90,13 @@ def annotate_packet(
     show("Respuesta original para auditar: ")
     show(str(packet.get("candidate_text", "")) or "(No se generó ninguna respuesta)")
     show("Las citas correctas NO prueban veracidad. Usa 'incierto' si no puedes verificar.")
-    show("La evaluación de SciFact TEST es diagnóstica, no entrenamiento.")
+    dataset_id = str(packet.get("provenance", {}).get("dataset", ""))
+    if dataset_id == "beir/scifact/test":
+        show("SciFact TEST: diagnóstico solamente; no usar para calibración.")
+    elif dataset_id == "beir/scifact/train":
+        show("SciFact TRAIN: evaluación humana de desarrollo; sin etiquetas inferidas.")
+    else:
+        show("Evaluación humana: comprobar procedencia del conjunto de datos.")
 
     reviewer = ask(
         "Identificador del revisor (Enter para dejar pendiente): "
