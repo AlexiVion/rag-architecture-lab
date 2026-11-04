@@ -10,7 +10,7 @@ No arbitrary release dates. An experiment advances only when the preceding accep
 | M3 — Retrieval architecture series | RET-03 multi-query and RET-04 parent-child, matched baselines, error analysis | two experiment result cards with reproducible configs | Retrieval research underway. RET-04 10-query smoke negative; RET-FUSION-01 809-query train study favors retaining original RRF; RET-RERANK-20 60-query train smoke negative (Recall@5 delta −0.10833, exploratory bootstrap CI [−0.19167,−0.03333]) and ~47x slower; provisional NO-GO |
 | M4 — Recovery and routing | RET-05 contextual, RET-06 HyDE, RET-07 corrective, RET-08 adaptive | controlled resource budgets, baselines and failures | RET-05/06/07/08 adapters started; benchmark runs pending |
 | M5 — Reasoning architectures | GEN-02 decomposition, GEN-03 self-reflection, AGT-00 agentic | full answer-quality evaluation, bounded loops, costs | Proposed |
-| M6 — Relational and transfer | GRF-00 GraphRAG, XTR-00 cross-domain/multilingual | demonstrated improvement or explicit NO-GO on appropriate task | GRF-00 2-hop retrieval + offline fixture verified in user's Windows browser and full pytest PASS; paired HotpotQA DEV 60-query study completed (Graph+BM25 Recall@5 0.7083 vs BM25 0.8250, delta −0.1167, CI below zero): graph-first NO-GO here. Post-run row audit and web summary added; full GraphRAG remains open. |
+| M6 — Relational and transfer | GRF-00 GraphRAG, XTR-00 cross-domain/multilingual | demonstrated improvement or explicit NO-GO on appropriate task | GRF-00 2-hop retrieval + offline fixture verified in user's Windows browser and full pytest PASS; paired HotpotQA DEV 60-query study completed (Graph+BM25 Recall@5 0.7083 vs BM25 0.8250, delta −0.1167, CI below zero): graph-first NO-GO here. Post-run auditor locally PASS, original source SHA256 962dc3b12d008685…; path-active 40 cases delta@5 −0.175 (0 wins/11 losses), no-path 20 cases delta 0 (all ties). Source-safe browser summary generated locally. Full GraphRAG remains open. |
 | M7 — Portfolio explorer | static interactive observatory, later benchmark explorer | loads published artifacts only; no invented live data | Prototype viewer implemented: 3 query fixtures, clickable graph paths/source quotes and JSON export; not yet verified on user browser, no public deployment. |
 
 ## First implementation batch (M0)
@@ -43,7 +43,7 @@ No hosted multi-user chatbot, billing, client CRM, platform integrations, GPU cl
 |---|---|---|
 | R0 release spine | PR #2 draft; LICENSE/CONTRIBUTING there, not main | clean install and verified tag |
 | M2 generation/evidence | claim-styled NLI NO-GO, citation syntax gate, answer validation open | independently measured support, answer quality and abstention |
-| GRF-00 | proposed, no graph implementation | true provenance graph, multi-hop retrieval and controlled benchmark |
+| GRF-00 | 2-hop prototype + 60-query HotpotQA DEV study completed; graph-first NO-GO, archived report audited locally | independent matched Hybrid RRF comparison, stronger relation extraction, multi-hop answer quality |
 | MOD-10 | 10 candidates defined in proposed registry, no matched full matrix | role-specific sequential CPU results and artifacts |
-| WEB-01 | no app | accessible static-first explorer with real manifests and graph paths |
+| WEB-01 | functional local browser explorer, sample graph trace and locally verified benchmark aggregate | public deployed viewer, accessible browser QA and reproducible published manifests |
 | REL-01 | no v1.0 release | documented external clone, deployed public explorer, verified release |

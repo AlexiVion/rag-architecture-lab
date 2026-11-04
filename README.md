@@ -35,7 +35,7 @@ The completed local experiment measured **BM25 vs source-quoted graph + BM25** o
 .\scripts\run-hotpotqa-graph-benchmark-local.ps1
 ```
 
-This study measures *supporting-document Recall@1/3/5* and paired uncertainty, not answer faithfulness or an open-domain graph benchmark. [Design and limitations](docs/GRF_00_HOTPOTQA_STUDY.md). The user executed the script successfully; all tests passed. On 60 DEV bridge questions, BM25 beat Graph+BM25: Recall@1 0.4333 vs 0.3500; Recall@3 0.6833 vs 0.5917; Recall@5 0.8250 vs 0.7083. All paired bootstrap CIs for the differences were negative. **NO-GO for this graph-first policy in this DEV sample**, not for all GraphRAG. The raw per-query JSON remains local. Use the post-run audit to verify and display the aggregate in the observatory.
+This study measures *supporting-document Recall@1/3/5* and paired uncertainty, not answer faithfulness or an open-domain graph benchmark. [Design and limitations](docs/GRF_00_HOTPOTQA_STUDY.md). The user executed the script successfully; all tests passed. An independent saved-report audit subsequently passed with SHA256 `962dc3b12d0086857ad94198cf2b1fff7a49ca5f7df069e9575a6daaf778f016`: all graph-path-present cases combined had **−17.5 percentage points Recall@5** (11 losses, 0 wins, 29 ties); the 20 no-path cases exactly matched BM25. On 60 DEV bridge questions, BM25 beat Graph+BM25: Recall@1 0.4333 vs 0.3500; Recall@3 0.6833 vs 0.5917; Recall@5 0.8250 vs 0.7083. All paired bootstrap CIs for the differences were negative. **NO-GO for this graph-first policy in this DEV sample**, not for all GraphRAG. The raw per-query JSON remains local. Use the post-run audit to verify and display the aggregate in the observatory.
 
 ## Why this project exists
 
@@ -247,3 +247,5 @@ The current experiments run at **$0 paid API cost**. They use public benchmark d
 ## Status
 
 The initial retrieval phase is complete. Hybrid RRF is the default retrieval architecture. A 10-candidate cross-encoder reranker remains available as an optional/adaptive quality mode. The next project phase is **V2: generation, context construction, and citations**.
+
+**GRF-01 next experiment:** [predeclared independent Hybrid RRF comparison protocol](docs/GRF_01_HYBRID_RRF_PROTOCOL.md). The exposed 60-query DEV subset will not be reused to tune new retrieval parameters.

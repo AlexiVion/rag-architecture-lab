@@ -1,6 +1,6 @@
 # GRF00-HOTPOTQA-DEV-01 — Source-quoted graph retrieval vs BM25
 
-**Status:** Local run completed and observed results recorded (2026-11-04); graph-first **NO-GO on this DEV subset**. Raw per-query JSON is local only; post-run diagnostic audits it before web export.
+**Status:** Local run completed and observed results recorded (2026-11-04); graph-first **NO-GO on this DEV subset**. Raw per-query JSON is local only; the post-run diagnostic has now **passed locally**, verifying the archived metrics before exporting a gitignored aggregate to the viewer.
 
 The repo's first deterministic GRF-00 seed graph is real code but uses fictional curated texts. To reach a controlled **real-document** comparison, this study uses the original HotpotQA dev distractor setting: candidate article titles and passages per question, plus separate supporting-fact labels for retrieval evaluation. The official HotpotQA code and dataset describe the source schema and CC BY-SA 4.0 license: https://github.com/hotpotqa/hotpot/blob/master/README.md and https://hotpotqa.github.io/.
 
@@ -54,7 +54,7 @@ The operator ran the full pytest suite successfully; the deterministic HotpotQA 
 - Decision: **NO-GO for prioritizing lexical title-link graph results ahead of BM25 in this observed setting**. Do not tune hyperparameters on the same fixed DEV evaluation cases. Hybrid RRF default remains unchanged.
 - This is **not** end-to-end GraphRAG answer-quality performance, and cannot determine whether a different graph architecture could help.
 - Known timing caveat: the original graph index timer excludes the preceding title-link relationship construction step. Do not call it complete graph build time.
-- Operator output: `runs/graph-hotpotqa/GRF00_HOTPOTQA_20261104T163545630360Z.json` and matching Markdown, stored locally. Results above were transcribed from the terminal output, **not yet independently revalidated against the full raw JSON**.
+- Operator output: `runs/graph-hotpotqa/GRF00_HOTPOTQA_20261104T163545630360Z.json` and matching Markdown, stored locally. The 60-query result was subsequently independently reaudited locally against the archived JSON: full tests PASS, source report SHA256 `962dc3b12d0086857ad94198cf2b1fff7a49ca5f7df069e9575a6daaf778f016`. No raw report uploaded to GitHub.
 
 To audit saved per-query data without rerunning or tuning the retriever:
 
@@ -63,3 +63,11 @@ To audit saved per-query data without rerunning or tuning the retriever:
 ```
 
 This checks query IDs, provenance, all reported recall/CI values against the saved rows, group counts, timings and no-graph fallback; it then writes a local diagnostic report and a **gitignored** safe aggregate for the web observatory. No HotpotQA questions or source passages are exported to the web.
+
+## Verified failure localization
+
+The independent post-run auditor found **40/60 cases with a traversed graph path**, where the mean Graph−BM25 Recall@5 was **−0.1750** (0 wins, 11 losses, 29 ties). The other **20/60 had no activated path**, where the graph fallback exactly matched BM25 (0 wins, 0 losses, 20 ties).
+
+This reconciles to the full-sample difference: `(40×−0.175 + 20×0)/60 = −0.1167`.
+
+The evidence supports a **NO-GO on graph-first source prioritization**, but does not isolate whether particular extracted relations, entity seeding or ranking cause each loss. Do not tune using these now-inspected DEV examples. For next comparison see `docs/GRF_01_HYBRID_RRF_PROTOCOL.md`.

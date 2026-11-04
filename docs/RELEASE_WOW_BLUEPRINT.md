@@ -194,3 +194,9 @@ The user's Windows run of `GRF00-HOTPOTQA-DEV-01` completed successfully with al
 | Recall@5 | 0.8250 | 0.7083 | -0.1167 | [-0.1917, -0.0583] |
 
 **Decision: NO-GO for the current graph-first title-mention prioritization policy on this DEV sample.** The graph is still a functioning learning/demo component and not evidence that GraphRAG generally fails. Its construction was unsupervised by the relevance labels. Do not tune on the same 60 DEV cases. Local diagnostics and a web-safe aggregate exporter have been added but still await local validation. Full graph extraction, correct production indexing time, Hybrid RRF comparison and answer quality remain unmet gates. No default retrieval changes.
+
+## Updated graph-first research decision — audited 2026-11-04
+
+After running the original 60-query DEV study, the operator executed the separate post-run audit. **Full test suite PASS**; archived report SHA256 `962dc3b12d0086857ad94198cf2b1fff7a49ca5f7df069e9575a6daaf778f016`. Mean delta Recall@5 was **−0.1750 for 40 path-active cases** (11 losses, 0 wins, 29 ties) and **0.0000 for 20 path-inactive fallback cases** (20 ties), reconciling to **−0.1167 across all 60**.
+
+**Conclusion:** current graph-first prioritization is NO-GO in this DEV subset. The audit does not establish that GraphRAG in general fails, nor does it explain each loss causally. Retain default Hybrid RRF unchanged. Any new design must freeze its retrieval strategy and evaluation cohort before observing performance; see `docs/GRF_01_HYBRID_RRF_PROTOCOL.md`. No GraphRAG release gate should be marked complete merely because the seed fixture works.
