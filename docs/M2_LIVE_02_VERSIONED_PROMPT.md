@@ -36,3 +36,9 @@ Outputs: gitignored runs/m2-live-v2/M2_LIVE02_<timestamp>.json and matching Mark
 ## Scientific boundaries
 
 This is a *prompt-development check on known cases*, not an unbiased accuracy estimate or a causal model comparison under fully pinned weights. Correct citation syntax alone cannot prove entailment, answer relevance, or source adequacy. Independently reviewed labels and an untouched set of queries will be needed to evaluate correct refusals, false acceptance and scientific answer faithfulness before closing M2.
+
+## Observed real Qwen result and strictly syntactic follow-up
+
+The operator executed the new prompt on 2026-11-04 (full Python suite PASS). Outputs were: `Meridian Robotics developed the Orion Navigation System used by the Aster Rover. [S1]`; `Helios Instruments developed the Orion Navigation System for the Aster Rover [Solis Probe].`; and `The Zenith Probe launched on July 9, 2021.` All three were rejected under the legacy citation gate. No-context generation was correctly skipped. The first case demonstrates **a parser boundary defect with a conventional post-punctuation source label**, whereas the latter two show unsupported relevance/conflict handling and still cannot be made safe by merely changing citation syntax.
+
+The strictly opt-in parser/replay is documented in `docs/M2_CITATIONS_V2_REPLAY.md`. No new model run or promotion of experimental citation logic to the main RAGPipeline is warranted before review. The **actual** existing pipeline status remains rejected for all three factual candidates, as recorded by the original experiment.
