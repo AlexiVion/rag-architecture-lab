@@ -1,5 +1,7 @@
 # RAG Architecture Lab
 
+**Complete WOW v1.0 program:** [Release blueprint](docs/RELEASE_WOW_BLUEPRINT.md) · [Ten-model proposed registry](experiments/model_matrix_10_proposed.json) · [Master tracking issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9). **This is a plan, not completed functionality.**
+
 **Open-source architecture research laboratory**, not a hosted RAG product. The goal is to implement and benchmark composable RAG strategies, publish reproducible evidence, and document engineering trade-offs. Existing V0/V1/V1.1 results are preserved; the V2 code requires an independently recorded local smoke test and answer-quality evaluation.
 
 **Research guide:** [Reference architecture](docs/LAB_ARCHITECTURE.md) · [Architecture catalog](docs/ARCHITECTURE_CATALOG.md) · [Experiment protocol](docs/EXPERIMENT_PROTOCOL.md) · [Evidence-gated roadmap](docs/ROADMAP.md) · [Contributing](CONTRIBUTING.md).

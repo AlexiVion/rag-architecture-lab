@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "registry_id": "MOD-10-WOW-v1-proposals",
+  "created_at": "2026-11-04",
+  "status": "proposed_not_an_executed_10_model_comparison",
+  "strict_policy": {
+    "no_test_tuning": true,
+    "execution": "sequential_CPU_first",
+    "model_revisions": "must_pin_before_running",
+    "licenses": "must_verify_per_model",
+    "resource_budget": "local_16GiB_RAM",
+    "do_not_compare_across_roles": true
+  },
+  "models": [
+    {
+      "id": "EMB-01",
+      "role": "embedding",
+      "hub_id": "sentence-transformers/all-MiniLM-L6-v2",
+      "baseline": true,
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "EMB-02",
+      "role": "embedding",
+      "hub_id": "BAAI/bge-small-en-v1.5",
+      "baseline": false,
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "EMB-03",
+      "role": "embedding",
+      "hub_id": "intfloat/e5-small-v2",
+      "baseline": false,
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "RR-01",
+      "role": "reranking",
+      "hub_id": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+      "baseline": true,
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "RR-02",
+      "role": "reranking",
+      "hub_id": "BAAI/bge-reranker-base",
+      "baseline": false,
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "NLI-01",
+      "role": "stance_nli",
+      "hub_id": "cross-encoder/nli-MiniLM2-L6-H768",
+      "historical_status": "NO_GO_scifact_train_11_of_40",
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "NLI-02",
+      "role": "stance_nli",
+      "hub_id": "microsoft/deberta-base-mnli",
+      "baseline": false,
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "GEN-01",
+      "role": "generation",
+      "hub_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "baseline": true,
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "GEN-02",
+      "role": "generation",
+      "hub_id": "Qwen/Qwen2.5-1.5B-Instruct",
+      "baseline": false,
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "GEN-03",
+      "role": "generation",
+      "hub_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+      "baseline": false,
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    }
+  ]
+}

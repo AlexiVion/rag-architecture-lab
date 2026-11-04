@@ -33,3 +33,17 @@ No arbitrary release dates. An experiment advances only when the preceding accep
 ## Explicit non-goals
 
 No hosted multi-user chatbot, billing, client CRM, platform integrations, GPU cluster, compulsory cloud vector DB or premature web UI. These belong to applications built using RAG, not to a first-principles research lab.
+
+
+## WOW v1.0 — full portfolio-quality release track (requested 2026-11-04)
+
+**Scope and acceptance contracts:** [WOW release blueprint](RELEASE_WOW_BLUEPRINT.md) and [master issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9). This is a separate larger milestone; it is not a claim that M2, GraphRAG, ten-model comparison or the web observatory are complete.
+
+| Track | Current verification | Required output |
+|---|---|---|
+| R0 release spine | PR #2 draft; LICENSE/CONTRIBUTING there, not main | clean install and verified tag |
+| M2 generation/evidence | claim-styled NLI NO-GO, citation syntax gate, answer validation open | independently measured support, answer quality and abstention |
+| GRF-00 | proposed, no graph implementation | true provenance graph, multi-hop retrieval and controlled benchmark |
+| MOD-10 | 10 candidates defined in proposed registry, no matched full matrix | role-specific sequential CPU results and artifacts |
+| WEB-01 | no app | accessible static-first explorer with real manifests and graph paths |
+| REL-01 | no v1.0 release | documented external clone, deployed public explorer, verified release |
