@@ -165,6 +165,12 @@ def _build_parser() -> argparse.ArgumentParser:
     review_score.add_argument("--path", required=True)
     review_score.add_argument("--output", default=None)
 
+    review_interactive = subparsers.add_parser(
+        "review-interactive",
+        help="Guide a human through source and claim review, saving a new JSON file",
+    )
+    review_interactive.add_argument("--path", required=True)
+    review_interactive.add_argument("--output", required=True)
 
     experiment = subparsers.add_parser(
         "experiment",
@@ -637,6 +643,32 @@ def _experiment(args: argparse.Namespace) -> int:
     return 0
 
 
+def _review_interactive(args: argparse.Namespace) -> int:
+    from raglab.evaluation.interactive_review import annotate_packet
+    from raglab.evaluation.semantic_review import summarize_review_packet
+
+    input_path = Path(args.path)
+    output_path = Path(args.output)
+    if input_path.resolve() == output_path.resolve():
+        raise ValueError("The annotated review must not overwrite the source packet")
+    if output_path.exists():
+        raise FileExistsError(f"Will not overwrite previous human annotations: {output_path}")
+
+    packet = json.loads(input_path.read_text(encoding="utf-8"))
+    annotated = annotate_packet(packet, ask=input, show=print)
+    result = summarize_review_packet(annotated)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("x", encoding="utf-8") as stream:
+        json.dump(annotated, stream, indent=2, ensure_ascii=False)
+    print(f"Human review saved: {output_path}")
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+    if result["review_status"] != "complete":
+        print("This review is incomplete; no semantic quality score was calculated.")
+    else:
+        print("Review completed with human labels; this does NOT certify a model-wide score.")
+    return 0
+
+
 def _review_export(args: argparse.Namespace) -> int:
     from raglab.evaluation.semantic_review import prepare_review_packet
 
@@ -719,6 +751,8 @@ def main() -> int:
         return _review_export(args)
     if args.command == "review-score":
         return _review_score(args)
+    if args.command == "review-interactive":
+        return _review_interactive(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 
