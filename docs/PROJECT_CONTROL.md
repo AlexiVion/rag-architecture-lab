@@ -5,6 +5,8 @@
 > **Program:** WOW v1.0; publication **NOT APPROVED**.  
 > **Tracker:** [master issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9) · [research draft PR #2](https://github.com/AlexiVion/rag-architecture-lab/pull/2) · [append-only execution log](EXECUTION_LOG.md)
 
+> **Research focus amendment (2026-11-08):** owner-selected **Extreme Efficiency / Tiny-Model RAG** is the proposed primary direction: 135M–600M open-weight generators, CPU-first, optimize useful evidence per token and supported-answer quality per latency/RAM. See [ADR-0005](adr/0005-tiny-model-efficiency-research-pivot.md) and [MICRO issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11). This research pivot is **PLANNED**, not a measured breakthrough. The earlier ten-model/full-v1.0 scope remains a historical signed-off plan and must be explicitly reconciled in issue #9 before changing final release acceptance.
+
 ## Operating contract: how to keep this project truthful
 
 This document is the **single operational status** for current gates, next actions, blockers and handoffs. The existing [ROADMAP](ROADMAP.md), [WOW blueprint](RELEASE_WOW_BLUEPRINT.md), [release matrix](RELEASE_EXECUTION_MATRIX.md) and [experiment protocol](EXPERIMENT_PROTOCOL.md) remain the scope, technical requirements and historical evidence references, **not parallel competing progress trackers**. If these documents disagree about *current* status, verify evidence at the HEAD, update this control record and log the reconciliation. Do not silently erase historical findings.
@@ -26,6 +28,24 @@ This document is the **single operational status** for current gates, next actio
 - `G4/WEB-01`: seven-view typed React/Vite observatory **IMPLEMENTED** and inspected HEAD CI **PASS**, including a Chromium smoke. Outstanding: reproducible Node lockfile / `npm ci` gate, broader accessibility/perf/manual visual acceptance and **verified public Pages URL**. Older WEB-01 docs were written before latest CI and must be reconciled.
 - `G5/REL-01`: no public v1.0 GitHub release/tag or verified live deployment. Repository is already public; that is not the same as a finished release.
 
+## Current research priority — MICRO / Extreme Efficiency
+
+**Goal:** determine whether targeted query-aware, source-verbatim evidence selection, small-model-aware context budgets and selective extractive/generative/abstain routing improve **independently supported useful answers per CPU second, token and RAM** relative to same-model naive/Hybrid baselines. An unverified improvement is not innovation; run blinded heldout and document prior-art overlap (MiniRAG, TripletRAG, context compression).
+
+| ID | Task | Acceptance / evidence | Status | Dependency |
+| --- | --- | --- | --- | --- |
+| MICRO-00 | Prior art, 135M/360M/500M/600M model and license/revision audit | Cited study/revision/rights registry + actual local CPU/RAM feasibility | OPEN | CTRL-01 |
+| MICRO-01 | Frozen independent benchmark and decision metrics | Natural-language evidence/answer annotations, entity/document split, heldout hashes, p95/RAM/resource budgets, rubric and quality/error gates predeclared | OPEN | MICRO-00 |
+| MICRO-02 | Matched real tiny-model baselines | No-RAG, naive top-k, Hybrid RRF, oracle passage (diagnostic only); same model/hardware/precision; auditable per-case traces | OPEN | MICRO-01 and R0-01 |
+| MICRO-03 | Adaptive minimal verbatim evidence packing | Genuine source offsets/quotes, fixed context tokens, stage ablations, measured retrieval+generation quality and cost | OPEN | MICRO-02 |
+| MICRO-04 | Extractive versus generative versus abstain | Report exact source-backed extraction separately; human-supported/unsupported answer and false refusal; bounded conditional reranking | OPEN | MICRO-03 and M2 labels |
+| MICRO-05 | Frozen holdout & Pareto analysis | One-time preregistered matched study, paired uncertainty, quality/error/risk coverage, p95, peak RSS, tokens, no score fabrication | OPEN | MICRO-04 |
+| MICRO-06 | Micro-efficiency observatory | Experiment trace/size/budget, side-by-side baseline vs optimized real artifacts, provenance and known failures | OPEN | MICRO-05, WEB-01 |
+
+**First action:** MICRO-00/MICRO-01 protocols, then **the first 135M baseline measurement**. Do not run arbitrary ten-model sweeps, promise dramatic improvements, or tune/test against previously exposed cohorts. Current fixed retrieval baseline and all archived NO-GO results remain unchanged. Generation quality remains scientifically blocked until independently measured.
+
+**Scope policy:** MICRO work is now the primary proposed research track, not a silent replacement of all original release requirements. The older 10-model evaluation is **deprioritized, pending a reviewed explicit v1.0 scope amendment**. A release still needs clean install, web publication and scientific disclosure. Never label G3 `PASS` without meeting its original contract or changing that contract explicitly.
+
 ## Roadmap — strict acceptance gates
 
 | Phase / ID | Deliverable and status | Concrete acceptance gate | Dependencies | Priority |
@@ -41,7 +61,7 @@ This document is the **single operational status** for current gates, next actio
 
 **Milestone sequencing:** CTRL-01 -> R0/PR audit -> WEB-01 public presentation; M2 + GRF studies may proceed in parallel only after frozen protocol; MOD-10 sequential local runs; REL-01 only after the full agreed v1.0 contract is satisfied. A publicly inspectable **preview** may be deployed earlier, but it must be labelled preview, never v1.0.
 
-## Immediate working queue (next 5 actionable tasks)
+## Legacy integration work queue (still required; coordinate with MICRO-00/01)
 
 | Task ID | Specific next action | Evidence needed | Status |
 | --- | --- | --- | --- |
