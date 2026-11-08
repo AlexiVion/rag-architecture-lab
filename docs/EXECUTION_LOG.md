@@ -36,3 +36,16 @@ This log records **work actually checked**. It is not a plan or a place to inven
 - [Original v1.0 scope](RELEASE_WOW_BLUEPRINT.md), [acceptance matrix](RELEASE_EXECUTION_MATRIX.md), [research protocol](EXPERIMENT_PROTOCOL.md).
 
 **Rule:** append future dated entries at the end; corrections must identify the incorrect entry and supply new evidence without deleting the previous observation.
+
+## 2026-11-08 — MICRO-00 / SCOPE — Tiny-model efficiency research pivot documented
+
+- Operator / reviewer: owner-directed research focus change; sources and repository contracts reviewed in documentation only.
+- Branch / research baseline: `feat/research-lab-architecture-catalog-20261104` at `01a6dfbd7792d1f7a214998727de1c14ce6f1a51`. Planning changes are on `docs/project-control-20261108`.
+- Change: [ADR-0005](adr/0005-tiny-model-efficiency-research-pivot.md), [MICRO tracking issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11) and [PROJECT_CONTROL.md](PROJECT_CONTROL.md) introduce a primary research hypothesis on CPU-first 135M–600M open-weight generators, evidence-per-token optimization, matched baselines and independently supported-answer/abstention evaluation.
+- Prior art consulted: [MiniRAG](https://github.com/HKUDS/MiniRAG), [TripletRAG](https://aclanthology.org/2026.groundlm-1.72/), [small-model context-utilization analysis](https://arxiv.org/abs/2603.11513), [BRIEF context compression](https://aclanthology.org/2025.findings-naacl.301/). Distinguish **research proposal** from novelty claim.
+- Candidate official cards reviewed (license and rough scale only; revisions not pinned): [SmolLM2-135M](https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct), [SmolLM2-360M](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct), [Qwen2.5-0.5B](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct), [Qwen3-0.6B](https://huggingface.co/Qwen/Qwen3-0.6B), [BGE-small](https://huggingface.co/BAAI/bge-small-en-v1.5).
+- Verification: documentation link/readback and GitHub issue/PR presence only. **No local CPU benchmark, model inference, holdout creation, new scientific result, license redistribution certification, CI rerun or publication occurred.**
+- Result: **RESEARCH_DIRECTION_DEFINED / TECHNICAL_VALIDATION_OPEN**.
+- Scope & limitations: pre-existing exact ten additional model candidates and full WOW v1.0 requirements remain historic scope until formally reconciled via reviewed release acceptance amendment. Original experiments preserved.
+- Decision: prioritize MICRO-00/MICRO-01 methods before changing implementation. Negative/no-gain results count as valid research.
+- Follow-up: MICRO-00 and MICRO-01.
