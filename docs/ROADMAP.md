@@ -1,5 +1,7 @@
 # Technical roadmap — evidence-gated releases
 
+> **Current operational status (2026-11-08):** [PROJECT_CONTROL.md](PROJECT_CONTROL.md) is the canonical live gate/next-action tracker; [EXECUTION_LOG.md](EXECUTION_LOG.md) is the append-only evidence and handoff journal. This ROADMAP preserves the scientific milestones and dated historical experiments, including earlier statements that may be superseded by later evidence. **Do not interpret historical "pending" notes as current without checking PROJECT_CONTROL.md.**
+
 No arbitrary release dates. An experiment advances only when the preceding acceptance gate is satisfied. Historical V0/V1/V1.1 results are preserved.
 
 | Milestone | Deliverables | Acceptance gate | Current state |
