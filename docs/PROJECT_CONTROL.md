@@ -7,7 +7,7 @@
 
 > **Research focus amendment (2026-11-08):** owner-selected **Extreme Efficiency / Tiny-Model RAG** is the proposed primary direction: 135M–600M open-weight generators, CPU-first, optimize useful evidence per token and supported-answer quality per latency/RAM. See [ADR-0005](adr/0005-tiny-model-efficiency-research-pivot.md) and [MICRO issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11). This research pivot is **PLANNED**, not a measured breakthrough. The earlier ten-model/full-v1.0 scope remains a historical signed-off plan and must be explicitly reconciled in issue #9 before changing final release acceptance.
 
-> **Future research reservation (2026-11-08):** [PHY issue #12](https://github.com/AlexiVion/rag-architecture-lab/issues/12) and [ADR-0006](adr/0006-tiny-world-models-physical-ai-future-track.md) track **Tiny World Models, bio-inspired physical AI and minimum viable embodied intelligence**. This is **PROPOSED / NOT IMPLEMENTED** and explicitly **out of scope of current WOW v1.0 / MICRO milestone** until a separate reviewed roadmap decision. Never confuse an 867-parameter controller with total system parameters.
+> **Future research reservation (2026-11-08):** [PHY issue #12](https://github.com/AlexiVion/rag-architecture-lab/issues/12) and [ADR-0006](adr/0006-tiny-world-models-physical-ai-future-track.md) track **Tiny World Models, bio-inspired physical AI, bacterial/cellular adaptation (BIO-CELL) and minimum viable embodied intelligence**. This is **PROPOSED / NOT IMPLEMENTED** and explicitly **out of scope of current WOW v1.0 / MICRO milestone** until a separate reviewed roadmap decision. Never confuse an 867-parameter controller with total system parameters.
 
 ## Operating contract: how to keep this project truthful
 
