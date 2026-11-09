@@ -30,7 +30,7 @@ def test_input_fingerprint_is_deterministic_and_fixture_is_explicit():
     assert len(data.fingerprint) == 64
 
 
-def test_preparation_has_four_matched_modes_and_no_generated_answers():
+def test_preparation_has_five_matched_modes_and_quote_only_control():
     data = read_dataset(FIXTURE)
     result = run_micro_suite(data, model_id="pythia-14m", max_context_tokens=80)
     assert result["scientific_validation"] == "NOT_RUN"
@@ -39,7 +39,7 @@ def test_preparation_has_four_matched_modes_and_no_generated_answers():
     assert {x["mode"] for x in result["cases"]} == {
         "no_retrieval", "naive", "spans", "extractive_quote", "oracle"
     }
-    assert all(x["generation"] is None for x in result["cases"])
+    assert all(x["generation"] is None for x in result["cases"] if x["mode"] != "extractive_quote")
     assert all(
         x["context"]["used_tokens"] <= x["context"]["budget_tokens"]
         for x in result["cases"]
