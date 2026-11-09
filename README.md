@@ -1,6 +1,20 @@
 # RAG Architecture Lab
 
-**WOW v1.0 in development** — an open-source research platform for inspectable retrieval architectures, source-provenance graphs, grounded generation experiments and honest model comparisons. The repository is public; **the full v1.0 release has not been tagged or scientifically certified**.
+**Open-source · CPU-first · from-first-principles retrieval research.** Build and compare BM25, local dense embeddings, Hybrid RRF and reranking; inspect source provenance, honest negative GraphRAG experiments and a seven-section React/TypeScript observatory.
+
+**Portfolio release v0.1.0 candidate:** engineering and measured **retrieval** research, not a production chatbot or scientifically validated generator. The larger **WOW v1.0 research program remains open**. [Exact scope and acceptance](docs/PORTFOLIO_RELEASE.md) · [LinkedIn walkthrough](docs/LINKEDIN_LAUNCH.md) · [Release tracker #13](https://github.com/AlexiVion/rag-architecture-lab/issues/13).
+
+| Measured study | Finding |
+| --- | --- |
+| BEIR SciFact, **5,183 documents / 300 queries** | Hybrid RRF MRR@10 **0.6484** vs BM25 **0.6328** and dense **0.6047** |
+| Local CPU 50-candidate cross-encoder | MRR@10 **0.6484 → 0.6615** while mean retrieval latency **34.53 ms → 3706.43 ms** |
+| Graph-first + BM25, **60 HotpotQA DEV** | Recall@5 **0.7083 vs 0.8250** (NO-GO for this policy/cohort) |
+
+These results evaluate **retrieval rankings**, not answer correctness. The graph fixture is deliberately fictional and separately labelled. M2 auto-publishing factual answers remains **NO-GO**; ten additional model entries are proposals, not tested winners.
+
+**Local observatory:** `cd apps/observatory && npm install && npm run dev` (Node 22). Static build only; no hosted inference or paid API. A public demo URL will be linked **only after GitHub Pages deployment is verified**.
+
+
 
 **Start here:** [WOW delivery matrix](docs/RELEASE_EXECUTION_MATRIX.md) · [R0 clean installation](docs/RELEASE_INSTALLATION.md) · [Offline observatory](apps/explorer/index.html) · [Measured results and limitations](docs/ROADMAP.md) · [Full v1.0 blueprint](docs/RELEASE_WOW_BLUEPRINT.md).
 

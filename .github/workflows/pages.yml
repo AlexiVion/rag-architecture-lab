@@ -6,6 +6,7 @@ on:
     paths:
       - "apps/explorer/**"
       - "apps/observatory/**"
+      - "docs/RELEASE_NOTES_v0.1.0.md"
       - "experiments/model_matrix_10_proposed.json"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
@@ -59,3 +60,32 @@ jobs:
       - name: Deploy site
         id: deployment
         uses: actions/deploy-pages@v4
+
+  publish-portfolio-release:
+    name: Publish scoped v0.1.0 after verified Pages deployment
+    needs: deploy
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout verified deployment commit
+        uses: actions/checkout@v7
+      - name: Create release once, only after deployment succeeds
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f docs/PORTFOLIO_RELEASE.md
+          test -f docs/RELEASE_NOTES_v0.1.0.md
+          if gh release view v0.1.0 >/dev/null 2>&1; then
+            echo "v0.1.0 already released; no new tag or science claims"
+            exit 0
+          fi
+          gh release create v0.1.0 \
+            --target "$GITHUB_SHA" \
+            --title "RAG Architecture Lab v0.1.0 — Retrieval Research Portfolio" \
+            --notes-file docs/RELEASE_NOTES_v0.1.0.md \
+            --prerelease

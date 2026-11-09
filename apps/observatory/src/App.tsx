@@ -302,7 +302,7 @@ export default function App(){
             {page==="models"&&<Models data={data}/>}
             {page==="methodology"&&<Methodology data={data}/>}
           </>}
-      </main><footer>RAG Architecture Lab · WOW v1.0 in development <span>·</span> Evidence-first retrieval · No model server</footer>
+      </main><footer>RAG Architecture Lab · Portfolio research preview <span>·</span> Evidence-first retrieval · No model server</footer>
     </div>
   </div>;
 }
