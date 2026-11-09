@@ -1,6 +1,6 @@
 # RAG Architecture Lab — Project control (single operational status)
 
-> **Updated:** 2026-11-08 (America/Argentina/Buenos_Aires)  
+> **Updated:** 2026-11-09 (America/Argentina/Buenos_Aires)  
 > **Baseline:** `feat/research-lab-architecture-catalog-20261104` @ `01a6dfbd7792d1f7a214998727de1c14ce6f1a51`  
 > **Program:** WOW v1.0; publication **NOT APPROVED**.  
 > **Tracker:** [master issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9) · [research draft PR #2](https://github.com/AlexiVion/rag-architecture-lab/pull/2) · [append-only execution log](EXECUTION_LOG.md)
