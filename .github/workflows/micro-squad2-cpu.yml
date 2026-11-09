@@ -1,0 +1,68 @@
+name: MICRO SQuAD2 natural QA CPU benchmark pilot
+
+on:
+  pull_request:
+    paths:
+      - "src/raglab/micro/squad_benchmark.py"
+      - "src/raglab/micro/squad_metrics.py"
+      - "scripts/micro/squad2_natural_cpu_pilot.py"
+      - "tests/test_micro_squad_benchmark.py"
+      - ".github/workflows/micro-squad2-cpu.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: micro-squad2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  natural-qa-cpu-pilot:
+    name: Public SQuAD2 DEV real CPU / ${{ matrix.model_id }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        model_id: [pythia-14m, smollm2-135m]
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      OMP_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+    steps:
+      - name: Checkout exact research commit
+        uses: actions/checkout@v7
+      - name: Python 3.11
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install CPU-only public research runtime
+        run: |
+          set -euo pipefail
+          python -m pip install -e ".[generation]"
+          python -m pip install "huggingface-hub>=0.29,<2"
+      - name: Natural English QA with source-hashed official SQuAD2 DEV
+        run: |
+          set -euo pipefail
+          python scripts/micro/squad2_natural_cpu_pilot.py \
+            --model-id "${{ matrix.model_id }}" \
+            --output-dir "runs/micro-natural/${{ matrix.model_id }}" \
+            --max-cases 8 \
+            --distractors 96 \
+            --max-context-tokens 128 \
+            --max-new-tokens 24
+      - name: Upload limited machine-verifiable pilot (not model weights)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: micro-squad2-${{ matrix.model_id }}
+          path: |
+            runs/micro-natural/${{ matrix.model_id }}/dataset_manifest.json
+            runs/micro-natural/${{ matrix.model_id }}/qa_reference_metrics.json
+            runs/micro-natural/${{ matrix.model_id }}/per_case_trace.json
+            runs/micro-natural/${{ matrix.model_id }}/integrity_manifest.json
+          retention-days: 30
+          if-no-files-found: warn
