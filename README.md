@@ -2,6 +2,8 @@
 
 **Open-source · CPU-first · from-first-principles retrieval research.** Build and compare BM25, local dense embeddings, Hybrid RRF and reranking; inspect source provenance, honest negative GraphRAG experiments and a seven-section React/TypeScript observatory.
 
+> **New development track (MICRO, experimental):** a CPU-first tiny-model registry, paired no-RAG/naive/span/quote/oracle context preparation, exact quoted evidence offsets, and independent human-review scoring are implemented as research tools. **No tiny-model quality scores or optimization wins are claimed.** [MICRO implementation & CLI](docs/MICRO_RESEARCH_IMPLEMENTATION.md) · [Track issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11).
+
 **Portfolio release v0.1.0 candidate:** engineering and measured **retrieval** research, not a production chatbot or scientifically validated generator. The larger **WOW v1.0 research program remains open**. [Exact scope and acceptance](docs/PORTFOLIO_RELEASE.md) · [LinkedIn walkthrough](docs/LINKEDIN_LAUNCH.md) · [Release tracker #13](https://github.com/AlexiVion/rag-architecture-lab/issues/13).
 
 | Measured study | Finding |
