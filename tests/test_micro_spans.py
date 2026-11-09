@@ -87,3 +87,31 @@ def test_custom_token_counter_is_honored():
     )
     assert p.used_tokens == len(p.text)
     assert p.used_tokens <= 110
+
+
+def test_compact_and_verbose_share_exact_audit_provenance():
+    docs = _docs()
+    for func in (pack_naive,):
+        verbose = func(docs, _results(), max_tokens=100)
+        compact = func(docs, _results(), max_tokens=100, compact_render=True)
+        assert compact.spans
+        assert "doc_id=" not in compact.text
+        assert "chars=" not in compact.text
+        assert "[S1]" in compact.text
+        for s in compact.spans:
+            assert docs[s.doc_id].text[s.start:s.end] == s.quote
+            assert s.quote in compact.text
+        assert compact.used_tokens <= verbose.used_tokens or len(compact.spans) > len(verbose.spans)
+
+    verbose = pack_evidence("garden roses", docs, _results(), max_tokens=100)
+    compact = pack_evidence(
+        "garden roses", docs, _results(),
+        max_tokens=100, compact_render=True,
+    )
+    assert compact.spans and verbose.spans
+    assert "doc_id=" not in compact.text
+    assert "chars=" not in compact.text
+    assert compact.used_tokens <= compact.budget_tokens
+    assert all(
+        docs[s.doc_id].text[s.start:s.end] == s.quote for s in compact.spans
+    )

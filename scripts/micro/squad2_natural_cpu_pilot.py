@@ -170,7 +170,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model-id", choices=sorted(MODEL_REVISION), required=True)
     parser.add_argument("--output-dir", required=True)
-    parser.add_argument("--max-cases", type=int, default=8)
+    parser.add_argument("--max-cases", type=int, default=32)
     parser.add_argument("--distractors", type=int, default=96)
     parser.add_argument("--max-context-tokens", type=int, default=128)
     parser.add_argument("--max-new-tokens", type=int, default=24)
@@ -215,7 +215,7 @@ def main() -> None:
         protocol.dataset,
         model_id=args.model_id,
         generator=generator,
-        modes=("no_retrieval", "naive", "spans"),
+        modes=("no_retrieval", "naive", "naive_compact", "spans", "spans_compact"),
         top_k=5,
         max_context_tokens=args.max_context_tokens,
         max_new_tokens=args.max_new_tokens,
@@ -260,7 +260,7 @@ def main() -> None:
             "process_peak_rss_kib": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
         },
         "limitations": [
-            "8-case natural QA exploratory pilot, not a preregistered scientific study",
+            "32-case natural QA exploratory DEV pilot, not a preregistered scientific study",
             "Published SQuAD DEV may be contaminated in model pretraining",
             "Balanced positive/negative by article, not representative prevalence",
             "Gold short-answer EM/F1 is not semantic source-support verification",

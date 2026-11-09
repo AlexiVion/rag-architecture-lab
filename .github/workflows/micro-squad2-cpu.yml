@@ -21,7 +21,7 @@ jobs:
   natural-qa-cpu-pilot:
     name: Public SQuAD2 DEV real CPU / ${{ matrix.model_id }}
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 28
     strategy:
       fail-fast: false
       matrix:
@@ -50,7 +50,7 @@ jobs:
           python scripts/micro/squad2_natural_cpu_pilot.py \
             --model-id "${{ matrix.model_id }}" \
             --output-dir "runs/micro-natural/${{ matrix.model_id }}" \
-            --max-cases 8 \
+            --max-cases 32 \
             --distractors 96 \
             --max-context-tokens 128 \
             --max-new-tokens 24

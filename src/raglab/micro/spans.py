@@ -91,7 +91,10 @@ def _segments(text: str, chunk_tokens: int) -> list[tuple[int, int, str]]:
     return pieces
 
 
-def _render(span: EvidenceSpan) -> str:
+def _render(span: EvidenceSpan, *, compact_render: bool = False) -> str:
+    """Keep audit metadata out of model-facing evidence in the compact ablation."""
+    if compact_render:
+        return f"[{span.label}]\n{span.quote}"
     return f"[{span.label}] doc_id={span.doc_id} chars={span.start}:{span.end}\n{span.quote}"
 
 
@@ -105,6 +108,7 @@ def pack_evidence(
     max_per_document: int = 2,
     count_tokens: Callable[[str], int] = proxy_tokens,
     count_method: str = "lexical_proxy_not_model_tokenizer",
+    compact_render: bool = False,
 ) -> EvidencePack:
     """Select rank-aware overlapping snippets under an exact supplied counter.
 
@@ -156,7 +160,7 @@ def pack_evidence(
             retrieval_score=float(result.score),
             overlap_terms=overlap,
         )
-        proposed = rendered + ("\n\n" if rendered else "") + _render(span)
+        proposed = rendered + ("\n\n" if rendered else "") + _render(span, compact_render=compact_render)
         if count_tokens(proposed) > max_tokens:
             continue
         selected.append(span)
@@ -173,6 +177,7 @@ def pack_naive(
     max_spans: int = 4,
     count_tokens: Callable[[str], int] = proxy_tokens,
     count_method: str = "lexical_proxy_not_model_tokenizer",
+    compact_render: bool = False,
 ) -> EvidencePack:
     """Contiguous top-ranked source prefixes using the SAME token counter.
 
@@ -209,7 +214,7 @@ def pack_naive(
                 retrieval_score=float(result.score),
                 overlap_terms=0,
             )
-            proposed = rendered + ("\n\n" if rendered else "") + _render(span)
+            proposed = rendered + ("\n\n" if rendered else "") + _render(span, compact_render=compact_render)
             if count_tokens(proposed) > max_tokens:
                 break
             best, best_rendered = span, proposed

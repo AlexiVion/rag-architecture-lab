@@ -145,7 +145,10 @@ def run_micro_suite(
     a deployable technique or independent benchmark candidate.
     """
     candidate = get_candidate(model_id)
-    allowed = {"no_retrieval", "naive", "spans", "extractive_quote", "oracle"}
+    allowed = {
+        "no_retrieval", "naive", "naive_compact", "spans", "spans_compact",
+        "extractive_quote", "oracle",
+    }
     if not modes or any(mode not in allowed for mode in modes):
         raise ValueError("modes must contain valid research modes")
     if top_k <= 0 or max_context_tokens <= 0 or max_new_tokens <= 0:
@@ -171,15 +174,17 @@ def run_micro_suite(
             begin = time.perf_counter()
             if mode == "no_retrieval":
                 pack = EvidencePack((), "", max_context_tokens, 0, counter_method)
-            elif mode == "naive":
+            elif mode in {"naive", "naive_compact"}:
                 pack = pack_naive(
                     docs, ranked, max_tokens=max_context_tokens,
                     count_tokens=counter, count_method=counter_method,
+                    compact_render=mode == "naive_compact",
                 )
-            elif mode in {"spans", "extractive_quote"}:
+            elif mode in {"spans", "spans_compact", "extractive_quote"}:
                 pack = pack_evidence(
                     case.question, docs, ranked, max_tokens=max_context_tokens,
                     count_tokens=counter, count_method=counter_method,
+                    compact_render=mode == "spans_compact",
                 )
             else:
                 # Oracle is explicitly evaluation-only. No retrieval-based
