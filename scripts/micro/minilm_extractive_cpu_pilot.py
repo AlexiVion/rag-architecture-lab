@@ -28,10 +28,9 @@ from squad2_natural_cpu_pilot import (
 )
 
 SOURCE = "deepset/minilm-uncased-squad2"
-# On the first diagnostic run, main will be resolved to an immutable source
-# revision SHA. Freeze that exact revision in a follow-up source review before
-# calling this an independently replicated checkpoint.
-MODEL_REVISION: str | None = None
+# Pinned after verified first real CPU run #42699698248. Re-run the exact
+# official checkpoint; no floating main branch in published experiments.
+MODEL_REVISION: str | None = "934656cdda79824eabf503ed56e15c01ddbdbe3f"
 EXPECTED_LICENSE = "cc-by-4.0"
 MODES = ("bm25_top1", "bm25_top5", "oracle_original_paragraph")
 
