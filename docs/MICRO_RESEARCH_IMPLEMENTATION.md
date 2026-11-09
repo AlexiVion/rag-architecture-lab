@@ -2,6 +2,8 @@
 
 **Status:** prototype implementation, **NOT** a validated improvement or model leaderboard. **This file documents what code can actually do**, not an empirical claim about 1M–600M models. LinkedIn portfolio release v0.1.0 is separate and remains unchanged.
 
+> **Implementation status update (2026-11-09):** The original offline research foundation has now been exercised on **three real pinned open-weight CPU models**, including the dedicated **33.4M SQuAD2-fine-tuned MiniLM extractive reader**. The [32-case actual gold-oracle versus extractive comparison](MICRO_ORACLE_VS_EXTRACTIVE_RESULTS.md) records generation **NO-GO** even with gold-answer windows and a task-specific encoder **24/32** reference exact matches on the same public DEV cohort. **No new independent semantic-support, broader-domain holdout or fair cross-model-training efficiency improvement has been demonstrated.** Source-code and experimental task milestones only.
+
 Primary idea: compare the **same tiny generator** with controlled evidence packing and a consistent retrieval setup, then independently inspect task correctness, source support, abstention and end-to-end resource cost.
 
 - [MICRO issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11)
