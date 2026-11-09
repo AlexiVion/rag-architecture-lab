@@ -141,7 +141,7 @@ def test_task_prompt_formatting_is_static_without_squad_examples():
     assert "SYSTEM:" not in base and "USER:" not in base
     assert "SQuAD" not in base
     assert "The silver comet" in base
-    assert "shortest" in instruction_chat_system()
+    assert "short exact answer phrase" in instruction_chat_system()
     assert instruction_chat_user(question, evidence).endswith(
         "Question:\nWho discovered it?\n\nAnswer:"
     )
