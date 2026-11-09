@@ -15,7 +15,7 @@ Primary idea: compare the **same tiny generator** with controlled evidence packi
 | --- | --- | --- |
 | MICRO-00 | Explicit proposed 1M/14M/31M/70M/135M/360M/500M/600M registry with license-review flags | **Model performance NOT MEASURED; revisions NOT PINNED** |
 | MICRO-01 | Versioned dev fixture, source hash, case groups and split leakage checks; all "holdout" execution blocked in default driver | **Mechanical fixture ONLY; independent labeled dataset NOT CREATED** |
-| MICRO-02 | Paired CPU-first BM25 trial preparation: no RAG, naive full-passage prefix, query-aware spans and oracle-gold **diagnostic** | **No actual tiny-model scores until operator supplies local weights and independent reviews** |
+| MICRO-02 | Paired CPU-first BM25 trial preparation: no RAG, naive full-passage prefix, query-aware spans, separately labeled quote-only extraction and oracle-gold **diagnostic** | **No actual tiny-model scores until operator supplies local weights and independent reviews** |
 | MICRO-03 | Verbatim source-span selection with original document ID, offsets, quote, rank, bounded lexical-token context; matched naive-prefix budget | **Algorithm implemented; quality improvement NOT ESTABLISHED** |
 | MICRO-04 | Explicit refusal when retrieved evidence unavailable; unverified generation drafts; source quote is not proof of factuality | **Semantic support/calibrated refusal NOT VALIDATED** |
 | MICRO-05 | Human review consensus aggregator, two reviewer IDs, disputes excluded and denominators explicit | **A scoring tool, not completed human review or holdout** |
@@ -75,7 +75,7 @@ Reported denominators distinguish total consensus cases, answered, answerable, u
 
 1. **Model family matters:** TinyStories 1M is trained for a restricted domain; Pythia 14M–70M are base language models; SmolLM2 and Qwen instruction checkpoints have different instruction-following ability. This is not a comparable leaderboard without tasks, revisions and prompt adaptations.
 2. **Licenses are provisional:** each checkpoint has `license_review=PENDING_EXACT_REVISION_REVIEW`; `license_claim` is metadata to verify. No weight redistribution and no "fully open-source" assertion.
-3. **Budget unit:** `lexical_proxy_not_model_tokenizer`. Both naive and span-selection use the same explicit proxy budget and log the full prompt proxy count. True per-model token-count benchmarking requires a pinned tokenizer and exact prompt-template measurement before scientific conclusions.
+3. **Budget unit:** `lexical_proxy_not_model_tokenizer`. Both naive and span-selection use the same explicit proxy budget (or a model tokenizer when provided) and log the full prompt proxy count. A local checkpoint provides its own tokenizer for context budgets; exact prompt-template and special-token accounting still requires pinned template measurement before scientific conclusions.
 4. **Provenance:** every chosen quote is an exact slice of the original input document with start/end offsets; an ellipsis is **never** inserted and reported as verbatim evidence.
 5. **Retrieval is not truth:** lexical query overlap is a selection heuristic, not support, entailment, answerability or factual-correctness validation.
 6. **Oracle mode:** uses annotated evidence document IDs; must never be compared as a deployable pipeline or used to tune a frozen holdout.
