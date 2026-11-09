@@ -49,3 +49,13 @@ This log records **work actually checked**. It is not a plan or a place to inven
 - Scope & limitations: pre-existing exact ten additional model candidates and full WOW v1.0 requirements remain historic scope until formally reconciled via reviewed release acceptance amendment. Original experiments preserved.
 - Decision: prioritize MICRO-00/MICRO-01 methods before changing implementation. Negative/no-gain results count as valid research.
 - Follow-up: MICRO-00 and MICRO-01.
+
+## 2026-11-09 — REL-PORTFOLIO-01 — Scoped release candidate staged (verification pending)
+
+- Operator: automated connected GitHub writes and prior audited CI artifact review.
+- Starting research source: `991271c691edfbaf26eb0e02e9d74e7ae00f3c88` following merger of documentation PR #10.
+- Working branch: `release/portfolio-v0.1-20261109` (exact post-PR SHA to record after integration).
+- Change: create release [scope](PORTFOLIO_RELEASE.md), [notes](RELEASE_NOTES_v0.1.0.md), [LinkedIn draft](LINKEDIN_LAUNCH.md), improve README landing, fix logo layout and make a scoped GitHub release follow a **successful Pages deployment** only.
+- Evidence: original [#41935324313](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/41935324313) Chromium/browser artifact included Overview/Experiments/Graph screenshots and generated npm dependency lockfile. Visual inspection completed; these artifacts correspond to the **earlier** research commit `01a6dfbd` and do **not** prove the new branch passed CI.
+- Result: **IMPLEMENTED / VERIFICATION PENDING**. No new benchmark/LLM calls, no unsupported science claims, no Pages URL verified, no tag/release claimed.
+- Follow-up: CI for scoped release PR; integrate research branch only upon valid checks; verify Pages and final public release.
