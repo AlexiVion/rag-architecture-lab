@@ -27,7 +27,7 @@ def test_prepare_cli_exercises_real_offline_bm25_and_context(tmp_path):
     )
     result = json.loads(out.read_text(encoding="utf-8"))
     assert result["scientific_validation"] == "NOT_RUN"
-    assert len(result["cases"]) == 12
+    assert len(result["cases"]) == 15
 
 
 def test_cli_refuses_implicit_remote_model_download(tmp_path):
