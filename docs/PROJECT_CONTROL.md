@@ -23,6 +23,10 @@ This document is the **single operational status** for current gates, next actio
 
 ## Evidence snapshot — 2026-11-09 (latest)
 
+**New verified inference checkpoint:** [PR #16](https://github.com/AlexiVion/rag-architecture-lab/pull/16) merged to main at `6083e061751817d699492e289e9b0c135ebfacd0`; [real CPU weights workflow #42656944850](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42656944850) **SUCCESS** for pinned Pythia-14M and SmolLM2-135M-Instruct on one synthetic case, three contexts each. [Full artifact hashes, observations and limitations](MICRO_REAL_MODEL_PILOT.md). **MICRO-02 remains PARTIAL**, because there is no independent natural-language answer-quality benchmark, warmed CPU/peak RSS comparison or sealed holdout.
+
+
+
 - **Portfolio code:** [PR #2](https://github.com/AlexiVion/rag-architecture-lab/pull/2) integrated to `main` at `0e7c1c43d65e8d79e3e80ac794b1fd3965ef44ca`; [main CI #42623333760](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42623333760) **SUCCESS** (Python, frontend, browser). [Deployment CI #42623333621](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42623333621) **FAILED at Pages setup** (repository Pages disabled); the `v0.1.0` GitHub release was **not created**. [Operational blocker #13](https://github.com/AlexiVion/rag-architecture-lab/issues/13).
 - **New research branch:** [PR #15](https://github.com/AlexiVion/rag-architecture-lab/pull/15) implements offline MICRO candidate registry, BM25 paired baseline *preparation*, exact-source context packing, quote-only route and reviewer-consensus scoring. [Initial exact-head CI #42654181568](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42654181568) **SUCCESS** at `2eb22c0ababa1df2bfe5561d12ead58eb8715bca`; subsequent branch refinements **require new exact-head CI** before merge.
 - **Research limits:** **NO real new 1M–600M model inference, new human-reviewed labels, independent heldout outcome or measured optimization win.** See [implementation and CLI](MICRO_RESEARCH_IMPLEMENTATION.md). Phase 4 GraphRAG/agentic quality remains outside this PR and earlier NO-GO findings remain preserved.
