@@ -104,6 +104,7 @@ def pack_evidence(
     max_spans: int = 4,
     max_per_document: int = 2,
     count_tokens: Callable[[str], int] = proxy_tokens,
+    count_method: str = "lexical_proxy_not_model_tokenizer",
 ) -> EvidencePack:
     """Select rank-aware overlapping snippets under an exact supplied counter.
 
@@ -114,7 +115,7 @@ def pack_evidence(
         raise ValueError("Budgets and limits must be positive")
     terms = query_terms(question)
     if not terms:
-        return EvidencePack((), "", max_tokens, 0)
+        return EvidencePack((), "", max_tokens, 0, count_method)
     candidates: list[tuple[float, int, int, str, int, int, int]] = []
     seen: set[tuple[str, int, int]] = set()
     for result in results:
@@ -161,7 +162,7 @@ def pack_evidence(
         selected.append(span)
         per_doc[doc_id] = per_doc.get(doc_id, 0) + 1
         rendered = proposed
-    return EvidencePack(tuple(selected), rendered, max_tokens, count_tokens(rendered))
+    return EvidencePack(tuple(selected), rendered, max_tokens, count_tokens(rendered), count_method)
 
 
 def pack_naive(
@@ -171,6 +172,7 @@ def pack_naive(
     max_tokens: int = 128,
     max_spans: int = 4,
     count_tokens: Callable[[str], int] = proxy_tokens,
+    count_method: str = "lexical_proxy_not_model_tokenizer",
 ) -> EvidencePack:
     """Contiguous top-ranked source prefixes using the SAME token counter.
 
@@ -214,4 +216,4 @@ def pack_naive(
         if best is not None:
             selected.append(best)
             rendered = best_rendered
-    return EvidencePack(tuple(selected), rendered, max_tokens, count_tokens(rendered))
+    return EvidencePack(tuple(selected), rendered, max_tokens, count_tokens(rendered), count_method)
