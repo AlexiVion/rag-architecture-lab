@@ -1,7 +1,7 @@
 # RAG Architecture Lab — Project control (single operational status)
 
 > **Updated:** 2026-11-09 (America/Argentina/Buenos_Aires)  
-> **Current main science baseline:** 2026-11-09 SHA **7b385cbf6d67709e0be7665359ce6e277ac81abe** (merged natural SQuAD2 experiments); see execution log for subsequent docs-only commits  
+> **Current main science baseline:** 2026-11-09 SHA **5bf037da83b3ae8151cfd82307e9c3202d306137** (merged gold-oracle generator and task-matched 33M extractive CPU studies); see execution log for subsequent documentation commits  
 > **Program:** v0.1 portfolio source integrated and CI PASS; **public Pages deployment still blocked** by repository admin configuration. Full scientific WOW v1.0 **NOT APPROVED**.  
 > **Tracker:** [master issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9) · [merged research PR #2](https://github.com/AlexiVion/rag-architecture-lab/pull/2) · [append-only execution log](EXECUTION_LOG.md)
 
@@ -20,6 +20,14 @@ This document is the **single operational status** for current gates, next actio
 **Status vocabulary:** `PASS` = verified against stated scope; `PARTIAL` = some accepted substeps; `OPEN` = required work missing; `NO_GO` = evidence rejects candidate under measured conditions; `BLOCKED` = dependency/acceptance gate unresolved. Never turn a negative study into a general claim.
 
 **Safety and publication:** keep private/raw model reports, secrets and restricted datasets out of Git. Do not promote a model for automatic answer publication from citation syntax, synthetic templated proxies or exposed test cohorts. Run paid model calls only with explicit setup; this project is CPU-first and no-paid-API by default. Model weights and benchmark corpora may need downloads; no GitHub CI job should run large model sweeps.
+
+## Newest measured MICRO result — 2026-11-09, gold oracle and specialized reader
+
+- [PR #21](https://github.com/AlexiVion/rag-architecture-lab/pull/21) merged into main at `1ae1e1e71e4b57fa2ae5558063af779d58233b74`. [Real 14M/135M CPU oracle and model-role prompt matrix #42698423912](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42698423912), [prior SQuAD baseline regression #42698423705](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42698423705) and [offline/browser CI #42698423895](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42698423895) **SUCCESS** at exact PR HEAD.
+- **Privileged gold oracle** inserted literal gold answer-bearing excerpt into model input for **16/16 positive questions per model**. On the frozen 32-question DEV cohort, **both causal generators achieved zero exact answers to any answerable question** under either legacy or model-family-adapted prompt. This is negative evidence under the tested constraints, **not a universal inability theorem**. The oracle must never be credited as a retriever.
+- [PR #22](https://github.com/AlexiVion/rag-architecture-lab/pull/22) merged at `5bf037da83b3ae8151cfd82307e9c3202d306137`. [Real CPU MiniLM-33M extractive #42700210942](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42700210942) and [offline/browser CI #42700211099](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42700211099) **SUCCESS** at the pinned exact PR HEAD. On the *same* 32-question public SQuAD2 DEV cohort, specialized **SQuAD2-finetuned** 33.4M extractive QA achieved **24/32 reference EM** using BM25 top-1, and **23/32** using BM25 top-5. This is **task-matched training advantage, not a fair generator-versus-reader or model-size superiority proof**.
+- **Engineering decision:** source-verbatim extractive routing may be more useful than tiny free generation for some specific supported QA tasks; preserve no-go on free generation, independent semantic support, answerability calibration, multi-domain untouched holdout and real complete-system efficiency studies.
+- **Detailed immutable evidence:** [gold-oracle versus specialized-reader results, licenses, hashes, timings and failure modes](MICRO_ORACLE_VS_EXTRACTIVE_RESULTS.md). No SQuAD data or model weights redistributed. The only public deployment blocker is still the independent GitHub Pages admin setting; the scientific issue #11 remains OPEN.
 
 ## Latest MICRO result — real natural QA, 2026-11-09
 
@@ -57,11 +65,11 @@ This document is the **single operational status** for current gates, next actio
 
 | ID | Task | Acceptance / evidence | Status | Dependency |
 | --- | --- | --- | --- | --- |
-| MICRO-00 | Prior art, 1M–600M candidate registry and license/revision audit | Proposed registry plus 14M/135M exact checkpoint hashes, Apache metadata and actual GitHub CPU feasibility; remaining candidates unverified | PARTIAL — TWO CHECKPOINTS VERIFIED | CTRL-01 |
+| MICRO-00 | Prior art, 1M–600M candidate registry and license/revision audit | 14M/135M generator checkpoint SHA plus 33.4M SQuAD2-trained extractive reader checksum/CC BY 4.0 rights metadata and real CPU feasibility; remaining candidates unverified | PARTIAL — THREE CHECKPOINTS VERIFIED | CTRL-01 |
 | MICRO-01 | Benchmark, split and leakage integrity | Official SQuAD2 DEV source hash and article-group partition + 32 human-written gold-reference questions tested; no independent blinded sources/heldout | PARTIAL — PUBLIC DEV ONLY | MICRO-00 |
-| MICRO-02 | Matched small-model baselines | Actual 32 human-written DEV QAs × 2 pinned CPU models × 5 matched none/naive/spans verbose/compact runs; real Hybrid and independent quality remain OPEN | PARTIAL — REAL DEV PILOT, SCIENTIFIC NO-GO | MICRO-01 and R0-01 |
+| MICRO-02 | Matched small-model baselines | Original 32-case 2-generator 5-mode study plus real gold-answer oracle windows (0 exact answers under all prompt families) and 33M SQuAD-finetuned extractive reader (BM25 top1 24/32); Hybrid and independent source-supported holdout remain OPEN | PARTIAL — GENERATOR NO-GO / TASK QA DEV ONLY | MICRO-01 and R0-01 |
 | MICRO-03 | Query-aware exact-source evidence packing | Verbatim offset-preserving 128-token selection and compact metadata ablations actually run; automatic reference EM overwhelmingly 0 — NO-GO for reliable answering | PARTIAL — REAL ABLATION, NO-GO | MICRO-02 |
-| MICRO-04 | Extractive quote vs generation vs abstention | Quote-only route separated from draft generation and abstention; no semantic calibration or conditional reranking evidence | PARTIAL — CODE ONLY | MICRO-03 and M2 labels |
+| MICRO-04 | Extractive quote vs generation vs abstention | Verbatim quote control, privileged gold-answer window and real 33M encoder span extraction implemented; top1 24/32 reference EM vs top5 23/32 on public same-task DEV. Reader calibration and independent faithfulness/abstention remain OPEN | PARTIAL — REAL EXTRACTIVE CONTROL, NOT CERTIFIED | MICRO-03 and M2 labels |
 | MICRO-05 | Independently assessed heldout Pareto study | Double-reviewer scorer + article-group DEV bootstrap, p50/p95 CPU latency and peak RSS executed; new blinded source-support labels and sealed holdout still missing | PARTIAL — NO SEALED HOLDOUT | MICRO-04 |
 | MICRO-06 | Micro-efficiency observatory | Experiment trace/size/budget, side-by-side baseline vs optimized real artifacts, provenance and known failures | OPEN | MICRO-05, WEB-01 |
 
