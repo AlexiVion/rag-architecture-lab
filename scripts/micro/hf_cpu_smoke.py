@@ -47,7 +47,11 @@ def main() -> None:
     sha = str(info.sha)
     if pinned_revision and sha != pinned_revision:
         raise RuntimeError("MODEL_REVISION_MISMATCH")
-    license_id = str((info.card_data or {}).get("license", "UNKNOWN"))
+    card = info.card_data
+    license_id = str(
+        card.get("license", "UNKNOWN") if isinstance(card, dict)
+        else getattr(card, "license", "UNKNOWN")
+    )
     if license_id != "apache-2.0":
         raise RuntimeError(f"Unexpected model license metadata: {license_id}")
 
