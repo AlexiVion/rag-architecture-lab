@@ -18,7 +18,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var
 .shell{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
 .sidebar{position:sticky;top:0;height:100vh;background:var(--sidebar);border-right:1px solid var(--line);padding:32px 20px;display:flex;flex-direction:column}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;padding:1px 10px 34px}
-.brand-mark{font:700 18px "Space Grotesk",sans-serif;background:var(--accent-bg);border:1px solid var(--accent);color:var(--accent);width:44px;height:44px;border-radius:12px;display:grid;place-items:center;letter-spacing:-2px}
+.brand-mark{font:700 18px "Space Grotesk",sans-serif;background:var(--accent-bg);border:1px solid var(--accent);color:var(--accent);width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:0;letter-spacing:-2px}
 .brand-mark span{color:var(--text)}
 .brand strong{font:700 18px "Space Grotesk",sans-serif;letter-spacing:.3px;display:block}
 .brand small{font-size:8px;color:var(--muted);letter-spacing:1px;font-weight:700;display:block;white-space:nowrap}
