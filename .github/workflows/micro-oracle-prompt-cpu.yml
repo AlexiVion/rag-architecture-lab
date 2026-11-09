@@ -1,0 +1,73 @@
+name: MICRO Oracle + role-prompt CPU diagnosis (public DEV only)
+
+on:
+  pull_request:
+    paths:
+      - "src/raglab/micro/oracle_diagnostics.py"
+      - "src/raglab/micro/experiment.py"
+      - "src/raglab/micro/role_prompts.py"
+      - "src/raglab/micro/squad_metrics.py"
+      - "scripts/micro/squad2_oracle_prompt_cpu_pilot.py"
+      - "tests/test_micro_oracle_prompt.py"
+      - ".github/workflows/micro-oracle-prompt-cpu.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: micro-oracle-prompt-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  oracle-diagnostic:
+    name: Pinned public CPU diagnostic / ${{ matrix.model_id }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        model_id: [pythia-14m, smollm2-135m]
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      OMP_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+    steps:
+      - name: Check out test commit
+        uses: actions/checkout@v7
+      - name: Python 3.11
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install local CPU and safe Hugging Face snapshot tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e ".[generation]"
+          python -m pip install "huggingface-hub>=0.29,<2"
+      - name: Run 32 natural QA examples against original and role-appropriate prompts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/micro/squad2_oracle_prompt_cpu_pilot.py \
+            --model-id "${{ matrix.model_id }}" \
+            --output-dir "runs/micro-oracle/${{ matrix.model_id }}" \
+            --max-cases 32 \
+            --max-new-tokens 32
+      - name: Keep only model-free portable evidence (never weights)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: micro-oracle-prompt-${{ matrix.model_id }}
+          path: |
+            runs/micro-oracle/${{ matrix.model_id }}/dataset_manifest.json
+            runs/micro-oracle/${{ matrix.model_id }}/legacy_trace.json
+            runs/micro-oracle/${{ matrix.model_id }}/legacy_qa_metrics.json
+            runs/micro-oracle/${{ matrix.model_id }}/role_adapted_trace.json
+            runs/micro-oracle/${{ matrix.model_id }}/role_adapted_qa_metrics.json
+            runs/micro-oracle/${{ matrix.model_id }}/paired_prompt_differences.json
+            runs/micro-oracle/${{ matrix.model_id }}/integrity_manifest.json
+          retention-days: 30
+          if-no-files-found: warn
