@@ -1,0 +1,59 @@
+name: MICRO extractive 33M CPU control (public SQuAD DEV only)
+
+on:
+  pull_request:
+    paths:
+      - "src/raglab/micro/extractive_reader.py"
+      - "scripts/micro/minilm_extractive_cpu_pilot.py"
+      - "tests/test_micro_extractive_reader.py"
+      - ".github/workflows/micro-minilm-extractive-cpu.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: micro-extractive-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  extractive-cpu:
+    name: Real open-weight MiniLM-33M SQuAD2-trained CPU baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      OMP_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+    steps:
+      - name: Exact research revision
+        uses: actions/checkout@v7
+      - name: Python 3.11
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install CPU research runtime and public snapshot tool
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e ".[generation]"
+          python -m pip install "huggingface-hub>=0.29,<2"
+      - name: Verify CC BY 4.0 model metadata and run BM25/extractive reader controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/micro/minilm_extractive_cpu_pilot.py \
+            --output-dir runs/micro-extractive/minilm33m \
+            --max-cases 32 --distractors 96
+      - name: Publish reproducibility manifests only, no model weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: micro-minilm-33m-extractive-qa-dev
+          path: |
+            runs/micro-extractive/minilm33m/integrity_manifest.json
+            runs/micro-extractive/minilm33m/reference_qa_metrics.json
+          if-no-files-found: warn
+          retention-days: 30
