@@ -8,6 +8,7 @@ from collections.abc import Sequence
 import numpy as np
 
 from raglab.core import Document, SearchResult
+from raglab.core.fingerprint import fingerprint_documents
 
 _TOKEN_RE = re.compile(r"(?u)\b\w+\b")
 
@@ -33,11 +34,13 @@ class BM25Retriever:
         self._avg_doc_length = 0.0
         self._postings: dict[str, list[tuple[int, int]]] = {}
         self._document_frequency: dict[str, int] = {}
+        self._index_fingerprint: str | None = None
 
     def index(self, documents: Sequence[Document]) -> None:
-        doc_ids = [doc.id for doc in documents]
-        if self._doc_lengths is not None and doc_ids == self._doc_ids:
+        fingerprint = fingerprint_documents(documents)
+        if self._doc_lengths is not None and fingerprint == self._index_fingerprint:
             return
+        doc_ids = [doc.id for doc in documents]
         if not documents:
             raise ValueError("Cannot index an empty document collection")
 
@@ -58,6 +61,7 @@ class BM25Retriever:
         self._avg_doc_length = float(lengths.mean()) if len(lengths) else 0.0
         self._postings = dict(postings)
         self._document_frequency = dict(document_frequency)
+        self._index_fingerprint = fingerprint
 
     def _idf(self, term: str) -> float:
         n_docs = len(self._doc_ids)

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080e1b">
+  <meta name="description" content="RAG Architecture Lab — open-source evidence and retrieval architecture observatory.">
+  <title>RAG Architecture Lab · Evidence Observatory</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a href="#overview" class="brand" id="home-link" aria-label="RAG Architecture Lab home">
+        <span class="brand-icon" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span><strong>RAG<span class="brand-accent">/</span>LAB</strong><small>ARCHITECTURE OBSERVATORY</small></span>
+      </a>
+      <div class="sidebar-label">WORKSPACE</div>
+      <nav class="nav" aria-label="Sections">
+        <button class="nav-link active" data-view="overview"><span class="nav-symbol">◈</span> Overview</button>
+        <button class="nav-link" data-view="graph"><span class="nav-symbol">⌘</span> Knowledge graph</button>
+        <button class="nav-link" data-view="evidence"><span class="nav-symbol">▣</span> Evidence trace</button>
+        <button class="nav-link" data-view="research"><span class="nav-symbol">▥</span> Research notes</button>
+      </nav>
+      <div class="sidebar-label sidebar-label-spaced">RESEARCH STATUS</div>
+      <div class="side-info">
+        <div><span class="status-dot"></span><strong>GRF-00</strong><span class="muted">Seed graph</span></div>
+        <p>Real two-hop traversal over curated, source-quoted relations. This is a fixture, not a benchmark.</p>
+      </div>
+      <div class="sidebar-footer">
+        <span class="avatar" aria-hidden="true">RL</span>
+        <div><strong>Open-source research</strong><small>MIT · Python · Local first</small></div>
+        <a aria-label="View repository" href="https://github.com/AlexiVion/rag-architecture-lab" target="_blank" rel="noreferrer">↗</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <span class="breadcrumb">Research platform <span>/</span> <strong id="current-section">Overview</strong></span>
+        <div class="topbar-right"><span class="tag-outline">● OFFLINE FIXTURE</span><a class="github" href="https://github.com/AlexiVion/rag-architecture-lab" target="_blank" rel="noreferrer">GitHub ↗</a></div>
+      </header>
+      <div class="content">
+        <div class="intro">
+          <div class="eyebrow"><span class="eyebrow-line"></span> UNDERSTAND THE ARCHITECTURE, NOT JUST THE ANSWER</div>
+          <h1>Evidence, <em>made visible.</em></h1>
+          <p>Trace exactly how a graph retrieval system connects entities to original documents. Every edge is backed by a verbatim source passage.</p>
+          <div class="intro-actions"><span class="pill">GRF-00 · Evidence Graph</span><span class="pill muted-pill">Demo dataset · 3 documents</span><span class="pill muted-pill">No LLM invoked</span></div>
+        </div>
+
+        <div id="load-error" class="error" role="alert" hidden></div>
+        <section class="selection-panel" aria-labelledby="query-title">
+          <div class="section-top"><div><div class="micro-label">01 / QUERY EXPLORER</div><h2 id="query-title">Select a research question</h2></div><span class="mini-state">DATASET: ASTER-DEMO-V1</span></div>
+          <div class="query-list" id="queries" role="group" aria-label="Select demo question"></div>
+        </section>
+
+        <div class="stats" role="group" aria-label="Current fixture statistics">
+          <div class="stat"><div class="stat-top">GRAPH ENTITIES <span>◎</span></div><div class="stat-num" id="metric-nodes">—</div><small>Curated, identifiable nodes</small></div>
+          <div class="stat"><div class="stat-top">VERIFIED EDGES <span>⌁</span></div><div class="stat-num" id="metric-edges">—</div><small>Exact source-quoted relations</small></div>
+          <div class="stat"><div class="stat-top">DISCOVERED PATHS <span>⇄</span></div><div class="stat-num" id="metric-paths">—</div><small>Bounded to two graph hops</small></div>
+          <div class="stat accent-stat"><div class="stat-top">SEMANTIC TRUTH <span>◇</span></div><div class="stat-text">NOT EVALUATED</div><small>No generator, no accuracy claim</small></div>
+        </div>
+
+        <div class="work-grid" id="work-grid">
+          <section class="panel network-panel" aria-labelledby="graph-heading">
+            <div class="panel-head"><div><div class="micro-label">02 / RETRIEVAL GRAPH</div><h2 id="graph-heading">Provenance network</h2></div><div class="legend"><span><i class="legend-dot active-legend"></i> Active path</span><span><i class="legend-dot"></i> Background</span></div></div>
+            <div class="network-description">Select an evidence path below, or click an edge to inspect its original supporting passage.</div>
+            <div id="graph-canvas" class="graph-canvas" role="region" aria-label="Clickable entity and evidence relation graph"></div>
+            <div class="graph-caption"><span>◉ <strong>Deterministic traversal</strong> · No entity extraction model</span><span id="seed-label">Seed: —</span></div>
+            <div class="panel-divider"></div>
+            <div class="paths-heading"><h3>Evidence paths</h3><span id="path-count">—</span></div>
+            <div id="paths" class="path-list"></div>
+          </section>
+          <section class="panel inspect-panel" aria-labelledby="evidence-heading">
+            <div class="panel-head"><div><div class="micro-label">03 / PROVENANCE INSPECTOR</div><h2 id="evidence-heading">Source evidence</h2></div><span class="inspector-icon">▤</span></div>
+            <p class="inspector-subtitle" id="inspector-status">Select a path or relation to inspect its source.</p>
+            <div id="evidence-list" class="evidence-list"></div>
+            <div class="no-gen"><span class="no-gen-mark">!</span><div><strong>Generation intentionally disabled</strong><p>This fixture demonstrates graph traversal and source provenance only. No answer correctness or factuality metric is claimed.</p></div></div>
+          </section>
+        </div>
+
+        <section class="method-panel" id="research-section"><div class="method-icon">◇</div><div><div class="micro-label">RESEARCH INTEGRITY</div><h3>Every claim should have a trail.</h3><p>Source text, relation edges, entity paths and retrieval results are inspectable. The recorded graph is a manually curated seed fixture, <strong>not</strong> a GraphRAG performance benchmark or validated semantic answer.</p></div><button id="export-trace" class="outline-button" type="button">Export current trace <span>↗</span></button></section>
+
+        <section class="panel bench-section" id="benchmark-section" aria-labelledby="benchmark-heading">
+          <div class="bench-header">
+            <div><div class="micro-label">04 / REAL-WORLD RETRIEVAL STUDY</div><h2 id="benchmark-heading">When the graph loses.</h2>
+              <p>Measured HotpotQA DEV retrieval: the honest negative result matters as much as a win. The viewer uses the local audited JSON when available, otherwise a publicly recorded aggregate from the successful audit log.</p>
+            </div>
+            <span class="bench-badge" id="benchmark-badge">RESEARCH RESULT</span>
+          </div>
+          <div id="benchmark-metrics" class="bench-metrics" aria-live="polite">Loading verified research summary…</div>
+          <div id="benchmark-groups" class="bench-groups"></div>
+          <div class="bench-footer" id="benchmark-provenance">Source: HotpotQA DEV distractor, CC BY-SA 4.0. No answer generation, no model tuning, no claim of GraphRAG accuracy.</div>
+        </section>
+        <section class="panel bench-section" id="grf01-section" aria-labelledby="grf01-heading">
+          <div class="bench-header">
+            <div><div class="micro-label">05 / FROZEN FOUR-WAY COMPARISON</div><h2 id="grf01-heading">Graph-Hybrid vs Hybrid RRF</h2>
+              <p>One-pass HotpotQA DEV retrieval study with pre-registered model and graph policy. The original run is never recomputed to populate this view.</p></div>
+            <span class="bench-badge" id="grf01-badge">RESEARCH RESULT</span>
+          </div>
+          <div id="grf01-metrics" class="bench-metrics" aria-live="polite">Loading verified research summary…</div>
+          <div id="grf01-groups" class="bench-groups"></div>
+          <div id="grf01-source" class="bench-footer">60 disjoint HotpotQA DEV queries; not an untouched held-out set. No answer-generation quality measured.</div>
+        </section>
+        <footer>RAG Architecture Lab <span>·</span> GRF-00 deterministic graph retrieval <span>·</span> No paid APIs <span>·</span> <span id="footer-fingerprint">—</span></footer>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

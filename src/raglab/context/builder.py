@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 
 from raglab.core import Document, SearchResult
 
@@ -31,7 +31,7 @@ class ContextBundle:
 
 
 class ContextBuilder:
-    """Turn ranked retrieval results into a bounded, citation-addressable context."""
+    """Construct context with an exact total-character budget and source mapping."""
 
     def __init__(self, max_chars: int = 10_000, per_source_chars: int = 2_200) -> None:
         if max_chars <= 0:
@@ -50,47 +50,50 @@ class ContextBuilder:
         sections: list[str] = []
         used_chars = 0
 
-        for index, result in enumerate(results, start=1):
+        for result in results:
             document = documents.get(result.doc_id)
             if document is None:
                 continue
 
-            label = f"S{index}"
-            body = document.text.strip()
-            if len(body) > self.per_source_chars:
-                body = body[: self.per_source_chars].rstrip() + "..."
-
+            label = f"S{len(sources) + 1}"
             title = document.title.strip() or "(untitled)"
-            section = (
+            prefix = (
                 f"[{label}]\n"
                 f"doc_id: {document.id}\n"
                 f"title: {title}\n"
-                f"text: {body}"
+                "text: "
             )
-
             separator_cost = 2 if sections else 0
-            remaining = self.max_chars - used_chars - separator_cost
-            if remaining <= 0:
+            body_budget = min(
+                self.per_source_chars,
+                self.max_chars - used_chars - separator_cost - len(prefix),
+            )
+            if body_budget <= 0:
                 break
 
-            if len(section) > remaining:
-                # Keep a final source only if enough room remains to preserve useful evidence.
-                if remaining < 200:
-                    break
-                section = section[:remaining].rstrip() + "..."
+            # Keep the recorded ContextSource.text exactly equal to the evidence
+            # actually sent to the generator, even at the last budget boundary.
+            full_body = document.text.strip()
+            if len(full_body) > body_budget and body_budget >= 4:
+                body = full_body[: body_budget - 3].rstrip() + "..."
+            else:
+                body = full_body[:body_budget]
+            if not body:
+                continue
 
-            source = ContextSource(
-                label=label,
-                doc_id=document.id,
-                title=document.title,
-                text=body,
-                score=float(result.score),
-                rank=int(result.rank),
+            section = prefix + body
+            sources.append(
+                ContextSource(
+                    label=label,
+                    doc_id=document.id,
+                    title=document.title,
+                    text=body,
+                    score=float(result.score),
+                    rank=int(result.rank),
+                )
             )
-            sources.append(source)
             sections.append(section)
             used_chars += separator_cost + len(section)
-
             if used_chars >= self.max_chars:
                 break
 

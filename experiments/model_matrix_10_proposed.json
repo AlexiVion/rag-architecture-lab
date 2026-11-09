@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "registry_id": "MOD-10-WOW-v1-TEN-ADDITIONAL",
+  "created_at": "2026-11-04",
+  "status": "proposed_ten_additional_models_not_run_and_not_in_existing_baselines",
+  "strict_policy": {
+    "no_test_tuning": true,
+    "execution": "sequential_CPU_first",
+    "model_revisions": "must_pin_before_running",
+    "licenses": "must_verify_per_model",
+    "resource_budget": "local_16GiB_RAM",
+    "do_not_compare_across_roles": true
+  },
+  "models": [
+    {
+      "id": "EMB-NEW-01",
+      "role": "embedding",
+      "hub_id": "BAAI/bge-small-en-v1.5",
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "EMB-NEW-02",
+      "role": "embedding",
+      "hub_id": "intfloat/e5-small-v2",
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "EMB-NEW-03",
+      "role": "embedding",
+      "hub_id": "sentence-transformers/all-mpnet-base-v2",
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "RR-NEW-01",
+      "role": "reranking",
+      "hub_id": "BAAI/bge-reranker-base",
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "RR-NEW-02",
+      "role": "reranking",
+      "hub_id": "cross-encoder/ms-marco-MiniLM-L12-v2",
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "NLI-NEW-01",
+      "role": "stance_nli",
+      "hub_id": "microsoft/deberta-base-mnli",
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "NLI-NEW-02",
+      "role": "stance_nli",
+      "hub_id": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "GEN-NEW-01",
+      "role": "generation",
+      "hub_id": "Qwen/Qwen2.5-1.5B-Instruct",
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "GEN-NEW-02",
+      "role": "generation",
+      "hub_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    },
+    {
+      "id": "GEN-NEW-03",
+      "role": "generation",
+      "hub_id": "Qwen/Qwen2.5-3B-Instruct",
+      "special_license_note": "Model card lists qwen-research license; requires extra review before public redistribution or demo use",
+      "revision": null,
+      "license_review": "pending",
+      "input_contract_review": "pending",
+      "execution_status": "not_run_in_this_registry",
+      "measured_metrics": null
+    }
+  ],
+  "previously_evaluated_baselines": [
+    {
+      "id": "BASE-EMB",
+      "role": "embedding",
+      "hub_id": "sentence-transformers/all-MiniLM-L6-v2",
+      "historical_status": "existing_retrieval_baseline"
+    },
+    {
+      "id": "BASE-RR",
+      "role": "reranking",
+      "hub_id": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+      "historical_status": "existing_canonical_reranker"
+    },
+    {
+      "id": "BASE-NLI",
+      "role": "stance_nli",
+      "hub_id": "cross-encoder/nli-MiniLM2-L6-H768",
+      "historical_status": "NO_GO_11_correct_of_40"
+    },
+    {
+      "id": "BASE-GEN",
+      "role": "generation",
+      "hub_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "historical_status": "uncited_off_task_smoke"
+    }
+  ],
+  "model_count": 10,
+  "baseline_model_count": 4
+}

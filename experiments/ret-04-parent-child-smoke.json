@@ -1,0 +1,15 @@
+{
+  "experiment_id": "RET-04-smoke",
+  "dataset": "nano-beir/scifact",
+  "limit_queries": 10,
+  "architecture": "parent-child",
+  "base": "bm25",
+  "k": [5, 10],
+  "seed": 42,
+  "params": {
+    "chunk_chars": 512,
+    "overlap_chars": 64,
+    "candidate_k": 100
+  },
+  "notes": "Exploratory local runner; not a canonical outcome."
+}

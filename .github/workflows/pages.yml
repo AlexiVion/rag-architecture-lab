@@ -1,0 +1,91 @@
+name: Publish static RAG evidence observatory
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/explorer/**"
+      - "apps/observatory/**"
+      - "docs/RELEASE_NOTES_v0.1.0.md"
+      - "experiments/model_matrix_10_proposed.json"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Check static site has no inference endpoint
+        shell: bash
+        run: |
+          test -f apps/explorer/index.html
+          test -f apps/explorer/app.js
+          test -f apps/explorer/data/demo.json
+          test -f apps/explorer/data/grf00-summary.public.json
+          test -f apps/explorer/data/grf01-summary.public.json
+          if grep -E -r -i 'api[_-]?key|bearer [a-z0-9]|sk-[a-z0-9]+' apps/explorer/data/; then
+            echo "Possible credential detected in published data"
+            exit 1
+          fi
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Build verified React / TypeScript observatory
+        run: |
+          npm install --prefix apps/observatory --no-audit --no-fund
+          npm run --prefix apps/observatory check
+          npm run --prefix apps/observatory build
+      - name: Set up GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload read-only static site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: apps/observatory/dist
+      - name: Deploy site
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  publish-portfolio-release:
+    name: Publish scoped v0.1.0 after verified Pages deployment
+    needs: deploy
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout verified deployment commit
+        uses: actions/checkout@v7
+      - name: Create release once, only after deployment succeeds
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f docs/PORTFOLIO_RELEASE.md
+          test -f docs/RELEASE_NOTES_v0.1.0.md
+          if gh release view v0.1.0 >/dev/null 2>&1; then
+            echo "v0.1.0 already released; no new tag or science claims"
+            exit 0
+          fi
+          gh release create v0.1.0 \
+            --target "$GITHUB_SHA" \
+            --title "RAG Architecture Lab v0.1.0 — Retrieval Research Portfolio" \
+            --notes-file docs/RELEASE_NOTES_v0.1.0.md \
+            --prerelease
