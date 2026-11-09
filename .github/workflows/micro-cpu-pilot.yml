@@ -1,6 +1,11 @@
 name: MICRO experimental CPU smoke with real public weights
 
 on:
+  push:
+    branches: ["feat/micro-rag-public-weights-cpu-smoke-20261109"]
+    paths:
+      - "scripts/micro/hf_cpu_smoke.py"
+      - ".github/workflows/micro-cpu-pilot.yml"
   pull_request:
     paths:
       - "scripts/micro/hf_cpu_smoke.py"
