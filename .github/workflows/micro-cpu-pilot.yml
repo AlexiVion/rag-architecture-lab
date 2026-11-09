@@ -1,11 +1,6 @@
 name: MICRO experimental CPU smoke with real public weights
 
 on:
-  push:
-    branches: ["feat/micro-rag-public-weights-cpu-smoke-20261109"]
-    paths:
-      - "scripts/micro/hf_cpu_smoke.py"
-      - ".github/workflows/micro-cpu-pilot.yml"
   pull_request:
     paths:
       - "scripts/micro/hf_cpu_smoke.py"
@@ -21,9 +16,9 @@ concurrency:
 
 jobs:
   micro-cpu-pilot:
-    name: Run one real 14M-model CPU inference (not a benchmark)
+    name: Run two public tiny models on CPU (not a benchmark)
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 24
     env:
       HF_HUB_DISABLE_TELEMETRY: "1"
       HF_HUB_DISABLE_PROGRESS_BARS: "1"
@@ -46,14 +41,22 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/micro/hf_cpu_smoke.py --model-id pythia-14m --output-dir runs/micro-cpu-pilot/pythia-14m
+      - name: Pin verified 135M public checkpoint and run local CPU draft inference
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/micro/hf_cpu_smoke.py --model-id smollm2-135m --output-dir runs/micro-cpu-pilot/smollm2-135m
       - name: Upload source-hashed unreviewed draft evidence only (never weights)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: micro-real-14m-diagnostic
+          name: micro-real-14m-and-135m-diagnostic
           path: |
             runs/micro-cpu-pilot/pythia-14m/manifest.json
             runs/micro-cpu-pilot/pythia-14m/per_case_drafts.json
             runs/micro-cpu-pilot/pythia-14m/one-case-dev.json
+            runs/micro-cpu-pilot/smollm2-135m/manifest.json
+            runs/micro-cpu-pilot/smollm2-135m/per_case_drafts.json
+            runs/micro-cpu-pilot/smollm2-135m/one-case-dev.json
           if-no-files-found: warn
           retention-days: 30
