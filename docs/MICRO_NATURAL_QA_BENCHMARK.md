@@ -1,6 +1,6 @@
 # MICRO-NATURAL-QA-01 — Public natural-question CPU research pilot
 
-**Status:** first 8-case natural QA pilot [PR #18](https://github.com/AlexiVion/rag-architecture-lab/pull/18) merged and **both model jobs PASS** in [Actions #42660611766](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42660611766). **New 32-case matched ablation is proposed and requires its own CI and output review.** This pilot is an **exploratory public DEV** benchmark, **not** untouched external validation, publication-ready science, or independent source support.
+**Status:** first 8-case natural QA pilot [PR #18](https://github.com/AlexiVion/rag-architecture-lab/pull/18) merged and **both model jobs PASS** in [Actions #42660611766](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42660611766). **The 32-case matched ablation has also been executed and independently artifact-audited: both real-model CPU jobs and CI PASS.** [Observed (mostly negative) results and checksums](MICRO_NATURAL_QA_32_RESULTS.md). This pilot is an **exploratory public DEV** benchmark, **not** untouched external validation, publication-ready science, or independent source support.
 
 ## Objective
 

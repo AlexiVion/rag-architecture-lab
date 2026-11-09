@@ -1,11 +1,11 @@
 # RAG Architecture Lab — Project control (single operational status)
 
 > **Updated:** 2026-11-09 (America/Argentina/Buenos_Aires)  
-> **Baseline:** `feat/research-lab-architecture-catalog-20261104` @ `01a6dfbd7792d1f7a214998727de1c14ce6f1a51`  
-> **Program:** WOW v1.0; publication **NOT APPROVED**.  
-> **Tracker:** [master issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9) · [research draft PR #2](https://github.com/AlexiVion/rag-architecture-lab/pull/2) · [append-only execution log](EXECUTION_LOG.md)
+> **Current main science baseline:** 2026-11-09 SHA **7b385cbf6d67709e0be7665359ce6e277ac81abe** (merged natural SQuAD2 experiments); see execution log for subsequent docs-only commits  
+> **Program:** v0.1 portfolio source integrated and CI PASS; **public Pages deployment still blocked** by repository admin configuration. Full scientific WOW v1.0 **NOT APPROVED**.  
+> **Tracker:** [master issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9) · [merged research PR #2](https://github.com/AlexiVion/rag-architecture-lab/pull/2) · [append-only execution log](EXECUTION_LOG.md)
 
-> **Research focus amendment (2026-11-08):** owner-selected **Extreme Efficiency / Tiny-Model RAG** is the proposed primary direction: 135M–600M open-weight generators, CPU-first, optimize useful evidence per token and supported-answer quality per latency/RAM. See [ADR-0005](adr/0005-tiny-model-efficiency-research-pivot.md) and [MICRO issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11). This research pivot is **PLANNED**, not a measured breakthrough. The earlier ten-model/full-v1.0 scope remains a historical signed-off plan and must be explicitly reconciled in issue #9 before changing final release acceptance.
+> **Research focus amendment (2026-11-08):** owner-selected **Extreme Efficiency / Tiny-Model RAG** is the proposed primary direction: 135M–600M open-weight generators, CPU-first, optimize useful evidence per token and supported-answer quality per latency/RAM. See [ADR-0005](adr/0005-tiny-model-efficiency-research-pivot.md) and [MICRO issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11). This research pivot now has experimental tools and actual 14M/135M CPU inference and SQuAD2 public-DEV results; **no reliable grounded-answer improvement has been measured**. The earlier ten-model/full-v1.0 scope remains a historical signed-off plan and must be explicitly reconciled in issue #9 before changing final release acceptance.
 
 > **Future research reservation (2026-11-08):** [PHY issue #12](https://github.com/AlexiVion/rag-architecture-lab/issues/12) and [ADR-0006](adr/0006-tiny-world-models-physical-ai-future-track.md) track **Tiny World Models, bio-inspired physical AI, bacterial/cellular adaptation (BIO-CELL) and minimum viable embodied intelligence**. This is **PROPOSED / NOT IMPLEMENTED** and explicitly **out of scope of current WOW v1.0 / MICRO milestone** until a separate reviewed roadmap decision. Never confuse an 867-parameter controller with total system parameters.
 
@@ -20,6 +20,14 @@ This document is the **single operational status** for current gates, next actio
 **Status vocabulary:** `PASS` = verified against stated scope; `PARTIAL` = some accepted substeps; `OPEN` = required work missing; `NO_GO` = evidence rejects candidate under measured conditions; `BLOCKED` = dependency/acceptance gate unresolved. Never turn a negative study into a general claim.
 
 **Safety and publication:** keep private/raw model reports, secrets and restricted datasets out of Git. Do not promote a model for automatic answer publication from citation syntax, synthetic templated proxies or exposed test cohorts. Run paid model calls only with explicit setup; this project is CPU-first and no-paid-API by default. Model weights and benchmark corpora may need downloads; no GitHub CI job should run large model sweeps.
+
+## Latest MICRO result — real natural QA, 2026-11-09
+
+- [PR #18](https://github.com/AlexiVion/rag-architecture-lab/pull/18) and [PR #19](https://github.com/AlexiVion/rag-architecture-lab/pull/19) **MERGED**; research baseline `7b385cbf6d67709e0be7665359ce6e277ac81abe`. [Full browser/Python CI #42662178199](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42662178199) **SUCCESS**; [real two-model 32-case CPU matrix #42662178196](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42662178196) **SUCCESS**. [Full audited study](MICRO_NATURAL_QA_32_RESULTS.md).
+- **32 real human-written public SQuAD2 DEV questions** (16 answerable, 16 unanswerable; 16 article groups; 128 reference/distractor contexts) × **2 public models** (Pythia-14M / SmolLM2-135M) × **5 modes** (none, naive verbose/compact, spans verbose/compact), token-bounded, exact checkpoint and dataset hashes, per-case CPU latency/peak RSS and automatic short-answer reference metrics. Both artifact ZIPs independently SHA-verified.
+- **Outcome: Scientific generation quality NO-GO.** BM25 found the gold paragraph for all 16 answerable queries, but **neither model produced an exact answer to any of those 16** under the frozen prompt and 24-new-token conditions. Pythia correctly refused just one unanswerable example in a compact-span mode; Smol exact matches were 0/32 in all modes. More answer text reaching prompts is **NOT** a proved quality optimization.
+- **Decision:** do not advertise tiny-RAG answer reliability or efficiency breakthroughs. Next: matched answer-bearing oracle excerpt diagnostics; model-appropriate prompts; extractive/non-generative competitors; independent blinded source-supported holdout and genuine uncertainty/CPU cost validation. Public SQuAD DEV is not a private contamination-free scientific test.
+- **Remaining release blocker:** GitHub Pages is not enabled in repository settings; this is unrelated to new model code and should stay outside the scientific research acceptance contract.
 
 ## Evidence snapshot — 2026-11-09 (latest)
 
@@ -49,12 +57,12 @@ This document is the **single operational status** for current gates, next actio
 
 | ID | Task | Acceptance / evidence | Status | Dependency |
 | --- | --- | --- | --- | --- |
-| MICRO-00 | Prior art, 1M–600M candidate registry and license/revision audit | Proposed catalog implemented; exact revisions/rights/real CPU feasibility not yet verified | PARTIAL — REGISTRY ONLY | CTRL-01 |
-| MICRO-01 | Benchmark, split and leakage integrity | Fixture hash/group validation implemented; independent human-labeled DEV/CALIBRATION/HOLDOUT not created | PARTIAL — FIXTURE ONLY | MICRO-00 |
-| MICRO-02 | Matched small-model baselines | CLI prepares no-RAG/naive/spans/oracle BM25 traces and can use local checkpoint; Hybrid/actual model measurements remain OPEN | PARTIAL — INSTRUMENTATION | MICRO-01 and R0-01 |
-| MICRO-03 | Query-aware exact-source evidence packing | Implemented original offsets, source excerpts and matched budget; no measured quality win or heldout ablation | PARTIAL — CODE ONLY | MICRO-02 |
+| MICRO-00 | Prior art, 1M–600M candidate registry and license/revision audit | Proposed registry plus 14M/135M exact checkpoint hashes, Apache metadata and actual GitHub CPU feasibility; remaining candidates unverified | PARTIAL — TWO CHECKPOINTS VERIFIED | CTRL-01 |
+| MICRO-01 | Benchmark, split and leakage integrity | Official SQuAD2 DEV source hash and article-group partition + 32 human-written gold-reference questions tested; no independent blinded sources/heldout | PARTIAL — PUBLIC DEV ONLY | MICRO-00 |
+| MICRO-02 | Matched small-model baselines | Actual 32 human-written DEV QAs × 2 pinned CPU models × 5 matched none/naive/spans verbose/compact runs; real Hybrid and independent quality remain OPEN | PARTIAL — REAL DEV PILOT, SCIENTIFIC NO-GO | MICRO-01 and R0-01 |
+| MICRO-03 | Query-aware exact-source evidence packing | Verbatim offset-preserving 128-token selection and compact metadata ablations actually run; automatic reference EM overwhelmingly 0 — NO-GO for reliable answering | PARTIAL — REAL ABLATION, NO-GO | MICRO-02 |
 | MICRO-04 | Extractive quote vs generation vs abstention | Quote-only route separated from draft generation and abstention; no semantic calibration or conditional reranking evidence | PARTIAL — CODE ONLY | MICRO-03 and M2 labels |
-| MICRO-05 | Independently assessed heldout Pareto study | Two-reviewer consensus scorer implemented; frozen real-world holdout, annotations, paired CIs, p95/RAM study still OPEN | PARTIAL — SCORING TOOL ONLY | MICRO-04 |
+| MICRO-05 | Independently assessed heldout Pareto study | Double-reviewer scorer + article-group DEV bootstrap, p50/p95 CPU latency and peak RSS executed; new blinded source-support labels and sealed holdout still missing | PARTIAL — NO SEALED HOLDOUT | MICRO-04 |
 | MICRO-06 | Micro-efficiency observatory | Experiment trace/size/budget, side-by-side baseline vs optimized real artifacts, provenance and known failures | OPEN | MICRO-05, WEB-01 |
 
 **First action:** MICRO-00/MICRO-01 protocols, then **the first 135M baseline measurement**. Do not run arbitrary ten-model sweeps, promise dramatic improvements, or tune/test against previously exposed cohorts. Current fixed retrieval baseline and all archived NO-GO results remain unchanged. Generation quality remains scientifically blocked until independently measured.
