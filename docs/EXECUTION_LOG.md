@@ -59,3 +59,13 @@ This log records **work actually checked**. It is not a plan or a place to inven
 - Evidence: original [#41935324313](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/41935324313) Chromium/browser artifact included Overview/Experiments/Graph screenshots and generated npm dependency lockfile. Visual inspection completed; these artifacts correspond to the **earlier** research commit `01a6dfbd` and do **not** prove the new branch passed CI.
 - Result: **IMPLEMENTED / VERIFICATION PENDING**. No new benchmark/LLM calls, no unsupported science claims, no Pages URL verified, no tag/release claimed.
 - Follow-up: CI for scoped release PR; integrate research branch only upon valid checks; verify Pages and final public release.
+
+## 2026-11-09 — REL-PORTFOLIO-01 — Scoped release PR #14 CI PASS and merged; main deployment still pending
+
+- Operator: GitHub Actions offline verification; source review of 236-file research PR history.
+- Evidence: [workflow #42622741997](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42622741997) **SUCCESS** for `6e53f1e0427a5c711211013b1d632cd5cdf017f6`. Verified Python v3.11 tests/package/CLI/readiness, TypeScript test/build and Chromium visual/provenance/mobile E2E.
+- Integration: [PR #14](https://github.com/AlexiVion/rag-architecture-lab/pull/14) **MERGED**, squash integration commit `7d7ee6594643f7ecb583d43abcdc5eb437adf0a1` into research branch; no science data modifications. Previous project-control [PR #10](https://github.com/AlexiVion/rag-architecture-lab/pull/10) also merged.
+- Audit: research diff contained retrieval/graph and deterministic evaluation code, documentation, three-document fictional graph evidence fixture, static frontend and no readily recognizable secret tokens in per-file patch scan. This **does not certify a complete security or dependency audit**. MIT code license; external model/data licenses are independent.
+- Follow-up fix: `apps/observatory/package.json` version aligned to portfolio `0.1.0` at `a4481f6f52fef9c1d21b0cceab869d183461cfe1`; this later SHA **needs its own exact-head CI**.
+- Status: **PR14_CI_PASS / RESEARCH_INTEGRATION_PASS; MAIN_MERGE / PAGES / RELEASE_OPEN**. No unverified public URL or automatic factual quality claim.
+- Next: exact-head CI on PR #2, integrate to main, verify GitHub Pages and conditional release outcome. Do not complete REL-PORTFOLIO-01 until true.
