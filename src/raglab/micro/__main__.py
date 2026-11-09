@@ -47,7 +47,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     prepare.add_argument("--backend", choices=("none", "local"), default="none")
     prepare.add_argument("--local-model-dir")
-    prepare.add_argument("--modes", nargs="+", default=["no_retrieval", "naive", "spans", "oracle"])
+    prepare.add_argument("--modes", nargs="+", default=["no_retrieval", "naive", "spans", "extractive_quote", "oracle"])
     prepare.add_argument("--top-k", type=int, default=5)
     prepare.add_argument("--max-context-tokens", type=int, default=128)
     prepare.add_argument("--max-new-tokens", type=int, default=64)
@@ -86,6 +86,7 @@ def main(argv: list[str] | None = None) -> None:
             top_k=args.top_k,
             max_context_tokens=args.max_context_tokens,
             max_new_tokens=args.max_new_tokens,
+            count_tokens=(generator.count_tokens if generator is not None else None),
         )
     except (ValueError, KeyError) as exc:
         parser.error(str(exc))
