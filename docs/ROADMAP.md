@@ -1,5 +1,9 @@
 # Technical roadmap — evidence-gated releases
 
+> **Current operational status (2026-11-08):** [PROJECT_CONTROL.md](PROJECT_CONTROL.md) is the canonical live gate/next-action tracker; [EXECUTION_LOG.md](EXECUTION_LOG.md) is the append-only evidence and handoff journal. This ROADMAP preserves the scientific milestones and dated historical experiments, including earlier statements that may be superseded by later evidence. **Do not interpret historical "pending" notes as current without checking PROJECT_CONTROL.md.**
+
+> **Research direction update (2026-11-08):** the primary new experiment track is **MICRO / Extreme Efficiency** — evidence-efficient RAG with locally executed, permissively licensed open-weight **135M–600M** generators and independently validated quality/resource trade-offs. See [ADR-0005](adr/0005-tiny-model-efficiency-research-pivot.md), the [current MICRO gate plan](PROJECT_CONTROL.md#current-research-priority--micro--extreme-efficiency) and [issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11). Earlier milestones and ten-model plan below are **preserved as historical scope**, not silently declared done or cancelled. Original release contract requires explicit reconciliation in issue #9.
+
 No arbitrary release dates. An experiment advances only when the preceding acceptance gate is satisfied. Historical V0/V1/V1.1 results are preserved.
 
 | Milestone | Deliverables | Acceptance gate | Current state |
