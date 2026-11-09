@@ -35,9 +35,9 @@ def test_preparation_has_four_matched_modes_and_no_generated_answers():
     result = run_micro_suite(data, model_id="pythia-14m", max_context_tokens=80)
     assert result["scientific_validation"] == "NOT_RUN"
     assert result["research_status"] == "prepared_no_model_run"
-    assert len(result["cases"]) == len(data.cases) * 4
+    assert len(result["cases"]) == len(data.cases) * 5
     assert {x["mode"] for x in result["cases"]} == {
-        "no_retrieval", "naive", "spans", "oracle"
+        "no_retrieval", "naive", "spans", "extractive_quote", "oracle"
     }
     assert all(x["generation"] is None for x in result["cases"])
     assert all(
