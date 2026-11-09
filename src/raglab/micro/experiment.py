@@ -193,6 +193,15 @@ def run_micro_suite(
                     count_tokens=counter, count_method=counter_method,
                 )
             packing_ms = (time.perf_counter() - begin) * 1000
+            # An oracle receives annotated sources; no retrieval latency is
+            # billed to it. No-RAG has no search. Both still get a transparent
+            # label distinguishing them from deployable retrieved systems.
+            mode_retrieval_ms = 0.0 if mode in {"no_retrieval", "oracle"} else retrieval_ms
+            visible_ranked = (
+                [] if mode == "no_retrieval"
+                else list(case.oracle_doc_ids) if mode == "oracle"
+                else [r.doc_id for r in ranked]
+            )
             prompt = _question_prompt(case.question, pack)
             generation_ms = 0.0
             answer = None
@@ -220,7 +229,7 @@ def run_micro_suite(
                     "group_id": case.group_id,
                     "mode": mode,
                     "question": case.question,
-                    "retrieved_ids": [r.doc_id for r in ranked],
+                    "retrieved_ids": visible_ranked,
                     "context": pack.as_dict(),
                     "prompt": prompt,
                     "prompt_proxy_tokens": proxy_tokens(prompt),
@@ -228,10 +237,10 @@ def run_micro_suite(
                     "generation": answer,
                     "generation_status": status,
                     "timing_ms": {
-                        "retrieval": retrieval_ms,
+                        "retrieval": mode_retrieval_ms,
                         "context": packing_ms,
                         "generation": generation_ms,
-                        "total": retrieval_ms + packing_ms + generation_ms,
+                        "total": mode_retrieval_ms + packing_ms + generation_ms,
                     },
                     "oracle_used": mode == "oracle",
                 }
@@ -270,7 +279,8 @@ def run_micro_suite(
             "Extractive quote mode is source reproduction, not task correctness",
             "A tokenizer counter excludes model-specific chat wrappers/special tokens",
             "Oracle uses gold evidence IDs and is diagnostic only",
-            "BM25 retrieval time is repeated across modes for fair input comparison",
+            "BM25 retrieval is computed once per question then reused across retrieval modes",
+            "No-RAG and oracle are reported with zero measured retrieval time; total excludes shared suite setup",
             "Default mode uses BM25; hybrid comparison awaits pinned retrieval run",
         ],
     }
