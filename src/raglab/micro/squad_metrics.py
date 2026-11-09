@@ -8,6 +8,7 @@ their citations, provenance, entailment, safety, or independent human judgments.
 from __future__ import annotations
 
 import math
+import random
 import re
 import string
 from collections import Counter, defaultdict
@@ -113,7 +114,6 @@ def evaluate_squad_traces(
         raise ValueError("Benchmark source and trace dataset fingerprints differ")
     if result.get("scientific_validation") != "NOT_RUN":
         raise ValueError("Only raw unverified experiment traces can be scored here")
-    cases_by_id = {case.id if hasattr(case, "id") else case.case_id: case for case in benchmark.dataset.cases}
     seen: set[tuple[str, str]] = set()
     by_mode: dict[str, list[dict]] = defaultdict(list)
     detail = []
@@ -137,6 +137,7 @@ def evaluate_squad_traces(
         is_gold_in_retrieved_ids = ref.gold_doc_id in row["retrieved_ids"]
         scored = {
             "case_id": case_id,
+            "article_group": ref.official_title,
             "mode": mode,
             "answerable": ref.answerable,
             "reference_em": metric["reference_em"],
@@ -180,6 +181,10 @@ def evaluate_squad_traces(
             "gold_doc_recall_at_k": mean(
                 [float(x["gold_doc_in_retrieved_ids"]) for x in retrieval_positives]
             ) if retrieval_positives else None,
+            "gold_literal_answer_coverage_answerable": (
+                mean([float(x["literal_gold_answer_in_context"]) for x in positives])
+                if positives and mode != "no_retrieval" else None
+            ),
             "mean_evidence_tokens": mean([x["context_tokens"] for x in rows]),
             "p50_generation_ms": _percentile(
                 [x["timing_ms"]["generation"] for x in answered], 0.5
@@ -191,9 +196,11 @@ def evaluate_squad_traces(
                 [x["timing_ms"]["total"] for x in answered], 0.95
             ),
         }
+    bootstrap = paired_group_bootstrap(detail)
     return {
         "schema_version": 1,
         "status": "PUBLIC_DEV_REFERENCE_METRICS_NOT_SEMANTIC_VALIDATION",
+        "paired_article_bootstrap": bootstrap,
         "data": benchmark.manifest(),
         "candidate": result["candidate"],
         "experiment_config": result["config"],
@@ -208,6 +215,75 @@ def evaluate_squad_traces(
             "Small pilot does not support statistical superiority, reliability or p95 generalization",
             "Retrieval scores and answer reference metrics are different outcomes",
             "Oracle gold context excluded from deployable model comparisons",
+            "SQuAD unanswerability is relative to the original single paragraph, NOT necessarily the entire retrieved multi-document corpus",
+            "Article-group bootstrap describes DEV uncertainty only, not pretraining-independent generalization",
             "Cross-model training, size and instructions differ; compare systems not model superiority",
         ],
     }
+
+
+def paired_group_bootstrap(rows: Sequence[dict], *, iterations: int = 1000) -> dict:
+    """Paired CI resampling *articles*, not correlated questions independently.
+
+    CIs are suppressed with fewer than 10 distinct article groups. Published DEV
+    contamination limits all generalization inferences even when CI is nonzero.
+    """
+    if iterations < 100:
+        raise ValueError("At least 100 bootstrap replicates required")
+    by_mode_case = {(r["mode"], r["case_id"]): r for r in rows}
+    comparisons = (
+        ("naive", "spans"),
+        ("naive_compact", "spans_compact"),
+        ("naive", "naive_compact"),
+        ("spans", "spans_compact"),
+    )
+    result: dict[str, dict] = {}
+    for base_mode, candidate_mode in comparisons:
+        base = {case for mode, case in by_mode_case if mode == base_mode}
+        candidate = {case for mode, case in by_mode_case if mode == candidate_mode}
+        if not base or base != candidate:
+            continue
+        paired = [
+            (
+                by_mode_case[(candidate_mode, case)]["article_group"],
+                by_mode_case[(candidate_mode, case)]["reference_f1"]
+                - by_mode_case[(base_mode, case)]["reference_f1"],
+            )
+            for case in sorted(base)
+            if by_mode_case[(candidate_mode, case)]["is_scored"]
+            and by_mode_case[(base_mode, case)]["is_scored"]
+        ]
+        groups: dict[str, list[float]] = defaultdict(list)
+        for group, delta in paired:
+            groups[group].append(delta)
+        names = sorted(groups)
+        key = f"{base_mode}_to_{candidate_mode}"
+        if len(names) < 10:
+            result[key] = {
+                "status": "INSUFFICIENT_ARTICLE_GROUPS",
+                "paired_questions": len(paired),
+                "distinct_articles": len(names),
+                "minimum_articles": 10,
+            }
+            continue
+        rng = random.Random(20261109)
+        values = [delta for _, delta in paired]
+        replicates = []
+        for _ in range(iterations):
+            sampled = [rng.choice(names) for _ in names]
+            deltas = [d for title in sampled for d in groups[title]]
+            replicates.append(mean(deltas))
+        result[key] = {
+            "status": "EXPLORATORY_DEV_ARTICLE_BOOTSTRAP",
+            "paired_questions": len(paired),
+            "distinct_articles": len(names),
+            "reference_f1_delta": mean(values),
+            "percentile_ci95": [
+                _percentile(replicates, 0.025),
+                _percentile(replicates, 0.975),
+            ],
+            "seed": 20261109,
+            "iterations": iterations,
+            "limitations": "Public DEV, possibly pretrained; interval is descriptive only",
+        }
+    return result
