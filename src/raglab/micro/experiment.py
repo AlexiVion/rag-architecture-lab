@@ -8,7 +8,7 @@ Each emitted model answer remains an unverified draft until independent review.
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 import json
 import platform
 import time
@@ -20,6 +20,7 @@ from raglab.core import Document, SearchResult
 from raglab.retrieval import BM25Retriever
 
 from raglab.micro.registry import get_candidate
+from raglab.micro.oracle_diagnostics import gold_answer_window
 from raglab.micro.spans import EvidencePack, pack_evidence, pack_naive, proxy_tokens
 
 
@@ -138,6 +139,7 @@ def run_micro_suite(
     max_context_tokens: int = 128,
     max_new_tokens: int = 64,
     count_tokens: Callable[[str], int] | None = None,
+    gold_answers_by_case: Mapping[str, tuple[str, ...]] | None = None,
 ) -> dict:
     """Return inspectable per-case traces; no automatic correctness score.
 
@@ -147,7 +149,7 @@ def run_micro_suite(
     candidate = get_candidate(model_id)
     allowed = {
         "no_retrieval", "naive", "naive_compact", "spans", "spans_compact",
-        "extractive_quote", "oracle",
+        "extractive_quote", "oracle", "oracle_window",
     }
     if not modes or any(mode not in allowed for mode in modes):
         raise ValueError("modes must contain valid research modes")
@@ -158,6 +160,13 @@ def run_micro_suite(
         "injected_model_tokenizer_without_chat_template"
         if count_tokens is not None else "lexical_proxy_not_model_tokenizer"
     )
+    if "oracle_window" in modes:
+        if gold_answers_by_case is None or any(
+            case.case_id not in gold_answers_by_case for case in dataset.cases
+        ):
+            raise ValueError(
+                "oracle_window requires explicit complete privileged gold annotations"
+            )
     docs = {doc.id: doc for doc in dataset.documents}
     retriever = BM25Retriever()
     retriever.index(dataset.documents)
@@ -172,6 +181,8 @@ def run_micro_suite(
         retrieval_ms = (time.perf_counter() - start) * 1000
         for mode in modes:
             begin = time.perf_counter()
+            oracle_status = None
+            oracle_answer_visible = None
             if mode == "no_retrieval":
                 pack = EvidencePack((), "", max_context_tokens, 0, counter_method)
             elif mode in {"naive", "naive_compact"}:
@@ -186,6 +197,20 @@ def run_micro_suite(
                     count_tokens=counter, count_method=counter_method,
                     compact_render=mode == "spans_compact",
                 )
+            elif mode == "oracle_window":
+                if len(case.oracle_doc_ids) != 1:
+                    raise ValueError("oracle_window needs exactly one official source paragraph")
+                source = docs[case.oracle_doc_ids[0]]
+                selection = gold_answer_window(
+                    source,
+                    tuple(gold_answers_by_case[case.case_id]),  # type: ignore[index]
+                    max_tokens=max_context_tokens,
+                    count_tokens=counter,
+                    count_method=counter_method,
+                )
+                pack = selection.pack
+                oracle_status = selection.status
+                oracle_answer_visible = selection.answer_visible
             else:
                 # Oracle is explicitly evaluation-only. No retrieval-based
                 # evidence identification is credited to an oracle run.
@@ -201,10 +226,10 @@ def run_micro_suite(
             # An oracle receives annotated sources; no retrieval latency is
             # billed to it. No-RAG has no search. Both still get a transparent
             # label distinguishing them from deployable retrieved systems.
-            mode_retrieval_ms = 0.0 if mode in {"no_retrieval", "oracle"} else retrieval_ms
+            mode_retrieval_ms = 0.0 if mode in {"no_retrieval", "oracle", "oracle_window"} else retrieval_ms
             visible_ranked = (
                 [] if mode == "no_retrieval"
-                else list(case.oracle_doc_ids) if mode == "oracle"
+                else list(case.oracle_doc_ids) if mode in {"oracle", "oracle_window"}
                 else [r.doc_id for r in ranked]
             )
             prompt = _question_prompt(case.question, pack)
@@ -247,7 +272,9 @@ def run_micro_suite(
                         "generation": generation_ms,
                         "total": mode_retrieval_ms + packing_ms + generation_ms,
                     },
-                    "oracle_used": mode == "oracle",
+                    "oracle_used": mode in {"oracle", "oracle_window"},
+                    "oracle_window_status": oracle_status,
+                    "oracle_gold_literal_visible": oracle_answer_visible,
                 }
             )
     return {
@@ -284,6 +311,7 @@ def run_micro_suite(
             "Extractive quote mode is source reproduction, not task correctness",
             "A tokenizer counter excludes model-specific chat wrappers/special tokens",
             "Oracle uses gold evidence IDs and is diagnostic only",
+            "oracle_window exposes a gold-annotated answer-bearing source window; it is NOT deployable retrieval or an independent answer measure",
             "BM25 retrieval is computed once per question then reused across retrieval modes",
             "No-RAG and oracle are reported with zero measured retrieval time; total excludes shared suite setup",
             "Default mode uses BM25; hybrid comparison awaits pinned retrieval run",
