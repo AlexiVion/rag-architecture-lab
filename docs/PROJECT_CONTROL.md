@@ -9,6 +9,8 @@
 
 > **Future research reservation (2026-11-08):** [PHY issue #12](https://github.com/AlexiVion/rag-architecture-lab/issues/12) and [ADR-0006](adr/0006-tiny-world-models-physical-ai-future-track.md) track **Tiny World Models, bio-inspired physical AI, bacterial/cellular adaptation (BIO-CELL) and minimum viable embodied intelligence**. This is **PROPOSED / NOT IMPLEMENTED** and explicitly **out of scope of current WOW v1.0 / MICRO milestone** until a separate reviewed roadmap decision. Never confuse an 867-parameter controller with total system parameters.
 
+> **ACTIVE SHIP DIRECTIVE (2026-11-09):** [REL-PORTFOLIO-01 #13](https://github.com/AlexiVion/rag-architecture-lab/issues/13) is the current P0 priority: publish the *scoped v0.1.0 retrieval research portfolio*, with real Pages/CI verification, provenance and honest negative studies. The previous full scientific WOW v1.0 gates are **not waived or completed**; they remain tracked in issue #9. Proposed MICRO and PHY/BIO research remain future, explicitly not blockers for v0.1.0. [Portfolio scope](PORTFOLIO_RELEASE.md) · [LinkedIn package](LINKEDIN_LAUNCH.md).
+
 ## Operating contract: how to keep this project truthful
 
 This document is the **single operational status** for current gates, next actions, blockers and handoffs. The existing [ROADMAP](ROADMAP.md), [WOW blueprint](RELEASE_WOW_BLUEPRINT.md), [release matrix](RELEASE_EXECUTION_MATRIX.md) and [experiment protocol](EXPERIMENT_PROTOCOL.md) remain the scope, technical requirements and historical evidence references, **not parallel competing progress trackers**. If these documents disagree about *current* status, verify evidence at the HEAD, update this control record and log the reconciliation. Do not silently erase historical findings.
