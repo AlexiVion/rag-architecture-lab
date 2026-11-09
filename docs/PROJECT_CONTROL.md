@@ -57,12 +57,12 @@ This document is the **single operational status** for current gates, next actio
 
 | ID | Task | Acceptance / evidence | Status | Dependency |
 | --- | --- | --- | --- | --- |
-| MICRO-00 | Prior art, 1M–600M candidate registry and license/revision audit | Proposed catalog implemented; exact revisions/rights/real CPU feasibility not yet verified | PARTIAL — REGISTRY ONLY | CTRL-01 |
-| MICRO-01 | Benchmark, split and leakage integrity | Fixture hash/group validation implemented; independent human-labeled DEV/CALIBRATION/HOLDOUT not created | PARTIAL — FIXTURE ONLY | MICRO-00 |
-| MICRO-02 | Matched small-model baselines | CLI prepares no-RAG/naive/spans/oracle BM25 traces and can use local checkpoint; Hybrid/actual model measurements remain OPEN | PARTIAL — INSTRUMENTATION | MICRO-01 and R0-01 |
-| MICRO-03 | Query-aware exact-source evidence packing | Implemented original offsets, source excerpts and matched budget; no measured quality win or heldout ablation | PARTIAL — CODE ONLY | MICRO-02 |
+| MICRO-00 | Prior art, 1M–600M candidate registry and license/revision audit | Proposed registry plus 14M/135M exact checkpoint hashes, Apache metadata and actual GitHub CPU feasibility; remaining candidates unverified | PARTIAL — TWO CHECKPOINTS VERIFIED | CTRL-01 |
+| MICRO-01 | Benchmark, split and leakage integrity | Official SQuAD2 DEV source hash and article-group partition + 32 human-written gold-reference questions tested; no independent blinded sources/heldout | PARTIAL — PUBLIC DEV ONLY | MICRO-00 |
+| MICRO-02 | Matched small-model baselines | Actual 32 human-written DEV QAs × 2 pinned CPU models × 5 matched none/naive/spans verbose/compact runs; real Hybrid and independent quality remain OPEN | PARTIAL — REAL DEV PILOT, SCIENTIFIC NO-GO | MICRO-01 and R0-01 |
+| MICRO-03 | Query-aware exact-source evidence packing | Verbatim offset-preserving 128-token selection and compact metadata ablations actually run; automatic reference EM overwhelmingly 0 — NO-GO for reliable answering | PARTIAL — REAL ABLATION, NO-GO | MICRO-02 |
 | MICRO-04 | Extractive quote vs generation vs abstention | Quote-only route separated from draft generation and abstention; no semantic calibration or conditional reranking evidence | PARTIAL — CODE ONLY | MICRO-03 and M2 labels |
-| MICRO-05 | Independently assessed heldout Pareto study | Two-reviewer consensus scorer implemented; frozen real-world holdout, annotations, paired CIs, p95/RAM study still OPEN | PARTIAL — SCORING TOOL ONLY | MICRO-04 |
+| MICRO-05 | Independently assessed heldout Pareto study | Double-reviewer scorer + article-group DEV bootstrap, p50/p95 CPU latency and peak RSS executed; new blinded source-support labels and sealed holdout still missing | PARTIAL — NO SEALED HOLDOUT | MICRO-04 |
 | MICRO-06 | Micro-efficiency observatory | Experiment trace/size/budget, side-by-side baseline vs optimized real artifacts, provenance and known failures | OPEN | MICRO-05, WEB-01 |
 
 **First action:** MICRO-00/MICRO-01 protocols, then **the first 135M baseline measurement**. Do not run arbitrary ten-model sweeps, promise dramatic improvements, or tune/test against previously exposed cohorts. Current fixed retrieval baseline and all archived NO-GO results remain unchanged. Generation quality remains scientifically blocked until independently measured.
