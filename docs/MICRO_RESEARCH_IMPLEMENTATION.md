@@ -25,17 +25,17 @@ Primary idea: compare the **same tiny generator** with controlled evidence packi
 
 From repository root after installing the Python package as in [RELEASE_INSTALLATION.md](RELEASE_INSTALLATION.md):
 
-\`\`\`bash
+```bash
 python -m raglab.micro registry --output runs/micro-registry.json
 python -m raglab.micro prepare --data experiments/micro_smoke_fixture.json --output runs/micro-dev-smoke.json --model-id pythia-14m --max-context-tokens 128
 python -m pytest -q tests/test_micro_spans.py tests/test_micro_experiment.py tests/test_micro_review.py tests/test_micro_cli.py
-\`\`\`
+```
 
 The above is **instrumentation only**. It performs real BM25 retrieval, source span selection and prompt construction on a deliberately **synthetic demonstration**. It does **not** download, load or call Pythia; candidate name only labels the proposed model.
 
 To actually run a **locally present** compatible causal LM, after separately checking its exact license, checkpoint revision, disk/RAM requirements and model/tokenizer integrity:
 
-\`\`\`bash
+```bash
 python -m pip install -e ".[generation]"
 python -m raglab.micro prepare \
   --data experiments/micro_smoke_fixture.json \
@@ -43,7 +43,7 @@ python -m raglab.micro prepare \
   --model-id smollm2-135m \
   --backend local \
   --local-model-dir /path/to/already-downloaded/smollm2-135m
-\`\`\`
+```
 
 Use PowerShell one line on Windows and substitute the actual local model folder. **No model download is requested by this CLI.** Model-generated text is recorded as an **unverified draft**. Avoid publishing raw model prompts, nonpublic datasets or model artifacts.
 
@@ -51,7 +51,7 @@ Use PowerShell one line on Windows and substitute the actual local model folder.
 
 Reviewer judgments are a JSON array. Each item has exactly:
 
-\`\`\`json
+```json
 {
   "case_id": "dev-mars",
   "mode": "spans",
@@ -61,28 +61,28 @@ Reviewer judgments are a JSON array. Each item has exactly:
   "task_correct": true,
   "source_supported": true
 }
-\`\`\`
+```
 
-At least **two independently declared reviewers** must agree on case/mode labels for inclusion. When an answer abstains, \`task_correct\` and \`source_supported\` must be \`null\`. Disagreements/missing reviewers stay explicitly unscored. The code cannot establish that reviewers were truly blind or independent, or that the synthetic fixture is a credible scientific holdout.
+At least **two independently declared reviewers** must agree on case/mode labels for inclusion. When an answer abstains, `task_correct` and `source_supported` must be `null`. Disagreements/missing reviewers stay explicitly unscored. The code cannot establish that reviewers were truly blind or independent, or that the synthetic fixture is a credible scientific holdout.
 
-\`\`\`bash
+```bash
 python -m raglab.micro score --reviews /local/path/reviews.json --output runs/micro-review-summary.json
-\`\`\`
+```
 
 Reported denominators distinguish total consensus cases, answered, answerable, unsupported/incorrect, and false abstention. No automatic NLI/LLM judge is treated as human ground truth.
 
 ## Important controls
 
 1. **Model family matters:** TinyStories 1M is trained for a restricted domain; Pythia 14M–70M are base language models; SmolLM2 and Qwen instruction checkpoints have different instruction-following ability. This is not a comparable leaderboard without tasks, revisions and prompt adaptations.
-2. **Licenses are provisional:** each checkpoint has \`license_review=PENDING_EXACT_REVISION_REVIEW\`; \`license_claim\` is metadata to verify. No weight redistribution and no "fully open-source" assertion.
-3. **Budget unit:** \`lexical_proxy_not_model_tokenizer\`. Both naive and span-selection use the same explicit proxy budget and log the full prompt proxy count. True per-model token-count benchmarking requires a pinned tokenizer and exact prompt-template measurement before scientific conclusions.
+2. **Licenses are provisional:** each checkpoint has `license_review=PENDING_EXACT_REVISION_REVIEW`; `license_claim` is metadata to verify. No weight redistribution and no "fully open-source" assertion.
+3. **Budget unit:** `lexical_proxy_not_model_tokenizer`. Both naive and span-selection use the same explicit proxy budget and log the full prompt proxy count. True per-model token-count benchmarking requires a pinned tokenizer and exact prompt-template measurement before scientific conclusions.
 4. **Provenance:** every chosen quote is an exact slice of the original input document with start/end offsets; an ellipsis is **never** inserted and reported as verbatim evidence.
 5. **Retrieval is not truth:** lexical query overlap is a selection heuristic, not support, entailment, answerability or factual-correctness validation.
 6. **Oracle mode:** uses annotated evidence document IDs; must never be compared as a deployable pipeline or used to tune a frozen holdout.
-7. **Holdout security:** default research runner rejects all \`split=holdout\` cases. An independently pre-registered and adjudicated scientific release protocol must be approved before creating any dedicated final evaluation runner.
+7. **Holdout security:** default research runner rejects all `split=holdout` cases. An independently pre-registered and adjudicated scientific release protocol must be approved before creating any dedicated final evaluation runner.
 8. **No claim of a win:** first run real baselines, then ablations, then blinded human review on a new uncontaminated cohort. Existing SciFact TEST and exposed HotpotQA DEV cannot become untouched scientific holdout.
 9. **Cost:** current runner reports per-case retrieval/context/generation wall time. Final cross-model study still needs **p50/p95 end-to-end CPU, peak RSS, cold start, model bytes/quantization, throughput, paired CIs** and human-reviewed answer quality. CPU time is not energy.
-10. **Preserve main:** no change to \`RAGPipeline\` defaults, release-bound published JSON or the negative GRF/M2 evidence.
+10. **Preserve main:** no change to `RAGPipeline` defaults, release-bound published JSON or the negative GRF/M2 evidence.
 
 ## Next scientifically binding gates
 
