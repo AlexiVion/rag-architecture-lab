@@ -69,3 +69,13 @@ This log records **work actually checked**. It is not a plan or a place to inven
 - Follow-up fix: `apps/observatory/package.json` version aligned to portfolio `0.1.0` at `a4481f6f52fef9c1d21b0cceab869d183461cfe1`; this later SHA **needs its own exact-head CI**.
 - Status: **PR14_CI_PASS / RESEARCH_INTEGRATION_PASS; MAIN_MERGE / PAGES / RELEASE_OPEN**. No unverified public URL or automatic factual quality claim.
 - Next: exact-head CI on PR #2, integrate to main, verify GitHub Pages and conditional release outcome. Do not complete REL-PORTFOLIO-01 until true.
+
+## 2026-11-09 — MICRO-00..05 — New CPU-first research tools staged, experimental evidence not yet created
+
+- Operator: connected GitHub source edits and independent GitHub Actions testing.
+- Working PR: [#15](https://github.com/AlexiVion/rag-architecture-lab/pull/15), branch `feat/micro-rag-research-foundation-20261109` from `main` `0e7c1c43d65e8d79e3e80ac794b1fd3965ef44ca`.
+- Implemented: explicit proposed 1M–600M model metadata with pending revision/license audit; source/group split-leakage checks; DEV-only dataset-hashed BM25 matched no-RAG/naive/spans/extractive quote/oracle preparation, optional local-only causal-LM drafts, original-source offset and citation trace, same counter token budgets; separate double-reviewer consensus scoring (no entailment inference).
+- Tests: dedicated `tests/test_micro_*.py` plus existing full suite. [Early PR CI #42654181568](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42654181568) **SUCCESS** for branch `2eb22c0ababa1df2bfe5561d12ead58eb8715bca`; later source and docs revisions need exact-head CI. No measured real tiny-model claims.
+- Safety boundaries: `holdout` cases explicitly rejected by smoke runner; unreviewed generation stays draft; quote-only text is marked nonanswer; oracle context labeled diagnostic; no automatic publication or model download; relative tokenizer-count limitations disclosed.
+- Scientific result: **NOT MEASURED**. No new weights loaded, new human labels, independent heldout, semantic faithfulness, GraphRAG win, or proven optimization.
+- Follow-up: verify exact PR HEAD CI, integrate PR; then separately select and pin real model revisions/license, obtain human-labelled natural-language cohorts and measure resource-vs-supported-answer Pareto tradeoffs on actual CPUs.
