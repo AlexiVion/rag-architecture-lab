@@ -150,6 +150,9 @@ def evaluate_squad_traces(
             "prompt_content_tokens": row["prompt_content_tokens"],
             "timing_ms": row["timing_ms"],
             "generation_status": gen_status,
+            "oracle_used": bool(row.get("oracle_used", False)),
+            "oracle_window_status": row.get("oracle_window_status"),
+            "oracle_gold_literal_visible": row.get("oracle_gold_literal_visible"),
         }
         detail.append(scored)
         by_mode[mode].append(scored)
@@ -162,7 +165,7 @@ def evaluate_squad_traces(
         positives = [x for x in answered if x["answerable"]]
         negatives = [x for x in answered if not x["answerable"]]
         retrieval_positives = [
-            x for x in rows if x["answerable"] and mode not in {"no_retrieval", "oracle"}
+            x for x in rows if x["answerable"] and mode not in {"no_retrieval", "oracle", "oracle_window"}
         ]
         summaries[mode] = {
             "n_total": len(rows),
@@ -215,6 +218,7 @@ def evaluate_squad_traces(
             "Small pilot does not support statistical superiority, reliability or p95 generalization",
             "Retrieval scores and answer reference metrics are different outcomes",
             "Oracle gold context excluded from deployable model comparisons",
+            "oracle_window explicitly reads gold answer text and is a privileged upper-bound diagnostic, not a retrieval method",
             "SQuAD unanswerability is relative to the original single paragraph, NOT necessarily the entire retrieved multi-document corpus",
             "Article-group bootstrap describes DEV uncertainty only, not pretraining-independent generalization",
             "Cross-model training, size and instructions differ; compare systems not model superiority",
@@ -222,7 +226,10 @@ def evaluate_squad_traces(
     }
 
 
-def paired_group_bootstrap(rows: Sequence[dict], *, iterations: int = 1000) -> dict:
+def paired_group_bootstrap(
+    rows: Sequence[dict], *, iterations: int = 1000,
+    comparisons: tuple[tuple[str, str], ...] | None = None,
+) -> dict:
     """Paired CI resampling *articles*, not correlated questions independently.
 
     CIs are suppressed with fewer than 10 distinct article groups. Published DEV
@@ -231,12 +238,13 @@ def paired_group_bootstrap(rows: Sequence[dict], *, iterations: int = 1000) -> d
     if iterations < 100:
         raise ValueError("At least 100 bootstrap replicates required")
     by_mode_case = {(r["mode"], r["case_id"]): r for r in rows}
-    comparisons = (
-        ("naive", "spans"),
-        ("naive_compact", "spans_compact"),
-        ("naive", "naive_compact"),
-        ("spans", "spans_compact"),
-    )
+    if comparisons is None:
+        comparisons = (
+            ("naive", "spans"),
+            ("naive_compact", "spans_compact"),
+            ("naive", "naive_compact"),
+            ("spans", "spans_compact"),
+        )
     result: dict[str, dict] = {}
     for base_mode, candidate_mode in comparisons:
         base = {case for mode, case in by_mode_case if mode == base_mode}
