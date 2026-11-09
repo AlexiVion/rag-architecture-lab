@@ -9,6 +9,7 @@ from raglab.micro.experiment import run_micro_suite
 from raglab.micro.squad_benchmark import _split, load_official_squad_dev
 from raglab.micro.squad_metrics import (
     evaluate_squad_traces, is_abstention, normalize_answer, score_prediction,
+    paired_group_bootstrap,
 )
 
 
@@ -145,3 +146,56 @@ def test_placeholder_dry_run_stays_unscored(tmp_path):
     result = evaluate_squad_traces(benchmark, trace)
     assert result["by_mode"]["naive"]["reference_em"] is None
     assert result["by_mode"]["no_retrieval"]["reference_f1"] is None
+
+
+
+def test_compact_modes_can_be_scored_as_matched_pairs(tmp_path):
+    path, sha = _make_official_dev(tmp_path)
+    data = load_official_squad_dev(path, expected_sha256=sha, max_cases=8)
+    modes = ("no_retrieval", "naive", "naive_compact", "spans", "spans_compact")
+    trial = run_micro_suite(data.dataset, model_id="pythia-14m", modes=modes)
+    assert len(trial["cases"]) == 8 * 5
+    assert all(
+        "doc_id=" not in row["context"]["text"]
+        for row in trial["cases"]
+        if row["mode"] in ("naive_compact", "spans_compact")
+    )
+    out = evaluate_squad_traces(data, trial)
+    assert set(out["by_mode"]) == set(modes)
+    assert out["paired_article_bootstrap"]["naive_to_spans"]["status"] == (
+        "INSUFFICIENT_ARTICLE_GROUPS"
+    )
+
+
+def test_bootstrap_samples_articles_not_each_question_independently():
+    rows = []
+    for i in range(12):
+        for pos in (0, 1):
+            question = f"group{i}-q{pos}"
+            rows.append(
+                {
+                    "mode": "naive",
+                    "case_id": question,
+                    "article_group": f"group{i}",
+                    "is_scored": True,
+                    "reference_f1": 0.0,
+                }
+            )
+            rows.append(
+                {
+                    "mode": "spans",
+                    "case_id": question,
+                    "article_group": f"group{i}",
+                    "is_scored": True,
+                    "reference_f1": 1.0 if i % 2 else 0.0,
+                }
+            )
+    a = paired_group_bootstrap(rows, iterations=200)
+    b = paired_group_bootstrap(rows, iterations=200)
+    assert a == b
+    x = a["naive_to_spans"]
+    assert x["status"] == "EXPLORATORY_DEV_ARTICLE_BOOTSTRAP"
+    assert x["distinct_articles"] == 12
+    assert x["paired_questions"] == 24
+    assert x["reference_f1_delta"] == 0.5
+    assert x["percentile_ci95"][0] <= 0.5 <= x["percentile_ci95"][1]
