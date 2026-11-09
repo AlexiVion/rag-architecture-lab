@@ -79,3 +79,14 @@ This log records **work actually checked**. It is not a plan or a place to inven
 - Safety boundaries: `holdout` cases explicitly rejected by smoke runner; unreviewed generation stays draft; quote-only text is marked nonanswer; oracle context labeled diagnostic; no automatic publication or model download; relative tokenizer-count limitations disclosed.
 - Scientific result: **NOT MEASURED**. No new weights loaded, new human labels, independent heldout, semantic faithfulness, GraphRAG win, or proven optimization.
 - Follow-up: verify exact PR HEAD CI, integrate PR; then separately select and pin real model revisions/license, obtain human-labelled natural-language cohorts and measure resource-vs-supported-answer Pareto tradeoffs on actual CPUs.
+
+## 2026-11-09 — MICRO-LIVE-00 — Two real open-weight CPU model runs
+
+- Operator: GitHub Actions public Linux CPU runner; connected GitHub job and artifact inspection.
+- Tested source: `0ae0e36982d96672a995554002138dcb9c77de8c`, [workflow #42656944850](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42656944850) **SUCCESS**; [offline CI #42656944886](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42656944886) **SUCCESS**. [PR #16](https://github.com/AlexiVion/rag-architecture-lab/pull/16) merged into main `6083e061751817d699492e289e9b0c135ebfacd0`.
+- Real checkpoints: Pythia-14M `cf967c0a9a04383db6f7b1108d86b2962634b4ac` (weight SHA256 `116a02532db461f91386a5b20f942ff2c8d4de7341e21b55caafc3d7b25f49a1`); SmolLM2-135M-Instruct `12fd25f77366fa6b3b4b768ec3050bf629380bac` (weight SHA256 `5af571cbf074e6d21a03528d2330792e532ca608f24ac70a143f6b369968ab8c`). Metadata license Apache-2.0.
+- Artifact `micro-real-14m-and-135m-diagnostic` ID `13691264798`, source and result hashes documented in [MICRO real model pilot](MICRO_REAL_MODEL_PILOT.md). It contains no redistributed weights.
+- Execution: **one artificial DEV question**, three modes per model (none, naive, source spans), **16 new tokens max**, CPU only, all model prompts produced real unreviewed drafts.
+- Observed: Pythia output was incoherent/incomplete; SmolLM2 retrieved-context outputs quoted relevant source text but did not form a validated complete factual answer. **No answer correctness, hallucination risk, multi-query accuracy or efficiency gain measured.** The first generation contained cold-start overhead, invalidating naive latency comparisons.
+- Result: **REAL_MODEL_ENGINEERING_SMOKE_PASS / SCIENTIFIC_EVALUATION_OPEN**.
+- Follow-up: freeze natural-language paired DEV/CALIBRATION/HOLDOUT, independently review source support and answerability, warm/check model-specific full token counts and peak RSS; then run scientifically controlled ablations and GraphRAG/agentic studies.
