@@ -31,6 +31,16 @@ class LocalTransformersGenerator:
         self._tokenizer = tokenizer
         self._model = model
 
+    def count_tokens(self, text: str) -> int:
+        """Count actual plain-text tokens with this checkpoint's tokenizer.
+
+        The outer chat template/system prompt is NOT included here. Caller
+        must count the final rendered prompt separately for resource reporting.
+        """
+        self._load()
+        assert self._tokenizer is not None
+        return len(self._tokenizer.encode(text, add_special_tokens=False))
+
     def generate(
         self,
         *,

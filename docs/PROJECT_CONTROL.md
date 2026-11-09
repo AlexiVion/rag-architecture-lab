@@ -1,6 +1,6 @@
 # RAG Architecture Lab — Project control (single operational status)
 
-> **Updated:** 2026-11-08 (America/Argentina/Buenos_Aires)  
+> **Updated:** 2026-11-09 (America/Argentina/Buenos_Aires)  
 > **Baseline:** `feat/research-lab-architecture-catalog-20261104` @ `01a6dfbd7792d1f7a214998727de1c14ce6f1a51`  
 > **Program:** WOW v1.0; publication **NOT APPROVED**.  
 > **Tracker:** [master issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9) · [research draft PR #2](https://github.com/AlexiVion/rag-architecture-lab/pull/2) · [append-only execution log](EXECUTION_LOG.md)
@@ -21,6 +21,13 @@ This document is the **single operational status** for current gates, next actio
 
 **Safety and publication:** keep private/raw model reports, secrets and restricted datasets out of Git. Do not promote a model for automatic answer publication from citation syntax, synthetic templated proxies or exposed test cohorts. Run paid model calls only with explicit setup; this project is CPU-first and no-paid-API by default. Model weights and benchmark corpora may need downloads; no GitHub CI job should run large model sweeps.
 
+## Evidence snapshot — 2026-11-09 (latest)
+
+- **Portfolio code:** [PR #2](https://github.com/AlexiVion/rag-architecture-lab/pull/2) integrated to `main` at `0e7c1c43d65e8d79e3e80ac794b1fd3965ef44ca`; [main CI #42623333760](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42623333760) **SUCCESS** (Python, frontend, browser). [Deployment CI #42623333621](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42623333621) **FAILED at Pages setup** (repository Pages disabled); the `v0.1.0` GitHub release was **not created**. [Operational blocker #13](https://github.com/AlexiVion/rag-architecture-lab/issues/13).
+- **New research branch:** [PR #15](https://github.com/AlexiVion/rag-architecture-lab/pull/15) implements offline MICRO candidate registry, BM25 paired baseline *preparation*, exact-source context packing, quote-only route and reviewer-consensus scoring. [Initial exact-head CI #42654181568](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42654181568) **SUCCESS** at `2eb22c0ababa1df2bfe5561d12ead58eb8715bca`; subsequent branch refinements **require new exact-head CI** before merge.
+- **Research limits:** **NO real new 1M–600M model inference, new human-reviewed labels, independent heldout outcome or measured optimization win.** See [implementation and CLI](MICRO_RESEARCH_IMPLEMENTATION.md). Phase 4 GraphRAG/agentic quality remains outside this PR and earlier NO-GO findings remain preserved.
+- **Priority:** finish verified MICRO code integration and model/revision rights audit; only then measure real local baselines. No public deployment before repository Pages admin setting can be enabled.
+
 ## Evidence snapshot — 2026-11-08
 
 - Research PR #2: **OPEN, DRAFT, UNMERGED**, base `main`, 229 changed files and 72 commits at inspected HEAD. It requires a **structured review / decomposition decision before merge**; do not merge merely because CI is green.
@@ -38,12 +45,12 @@ This document is the **single operational status** for current gates, next actio
 
 | ID | Task | Acceptance / evidence | Status | Dependency |
 | --- | --- | --- | --- | --- |
-| MICRO-00 | Prior art, 135M/360M/500M/600M model and license/revision audit | Cited study/revision/rights registry + actual local CPU/RAM feasibility | OPEN | CTRL-01 |
-| MICRO-01 | Frozen independent benchmark and decision metrics | Natural-language evidence/answer annotations, entity/document split, heldout hashes, p95/RAM/resource budgets, rubric and quality/error gates predeclared | OPEN | MICRO-00 |
-| MICRO-02 | Matched real tiny-model baselines | No-RAG, naive top-k, Hybrid RRF, oracle passage (diagnostic only); same model/hardware/precision; auditable per-case traces | OPEN | MICRO-01 and R0-01 |
-| MICRO-03 | Adaptive minimal verbatim evidence packing | Genuine source offsets/quotes, fixed context tokens, stage ablations, measured retrieval+generation quality and cost | OPEN | MICRO-02 |
-| MICRO-04 | Extractive versus generative versus abstain | Report exact source-backed extraction separately; human-supported/unsupported answer and false refusal; bounded conditional reranking | OPEN | MICRO-03 and M2 labels |
-| MICRO-05 | Frozen holdout & Pareto analysis | One-time preregistered matched study, paired uncertainty, quality/error/risk coverage, p95, peak RSS, tokens, no score fabrication | OPEN | MICRO-04 |
+| MICRO-00 | Prior art, 1M–600M candidate registry and license/revision audit | Proposed catalog implemented; exact revisions/rights/real CPU feasibility not yet verified | PARTIAL — REGISTRY ONLY | CTRL-01 |
+| MICRO-01 | Benchmark, split and leakage integrity | Fixture hash/group validation implemented; independent human-labeled DEV/CALIBRATION/HOLDOUT not created | PARTIAL — FIXTURE ONLY | MICRO-00 |
+| MICRO-02 | Matched small-model baselines | CLI prepares no-RAG/naive/spans/oracle BM25 traces and can use local checkpoint; Hybrid/actual model measurements remain OPEN | PARTIAL — INSTRUMENTATION | MICRO-01 and R0-01 |
+| MICRO-03 | Query-aware exact-source evidence packing | Implemented original offsets, source excerpts and matched budget; no measured quality win or heldout ablation | PARTIAL — CODE ONLY | MICRO-02 |
+| MICRO-04 | Extractive quote vs generation vs abstention | Quote-only route separated from draft generation and abstention; no semantic calibration or conditional reranking evidence | PARTIAL — CODE ONLY | MICRO-03 and M2 labels |
+| MICRO-05 | Independently assessed heldout Pareto study | Two-reviewer consensus scorer implemented; frozen real-world holdout, annotations, paired CIs, p95/RAM study still OPEN | PARTIAL — SCORING TOOL ONLY | MICRO-04 |
 | MICRO-06 | Micro-efficiency observatory | Experiment trace/size/budget, side-by-side baseline vs optimized real artifacts, provenance and known failures | OPEN | MICRO-05, WEB-01 |
 
 **First action:** MICRO-00/MICRO-01 protocols, then **the first 135M baseline measurement**. Do not run arbitrary ten-model sweeps, promise dramatic improvements, or tune/test against previously exposed cohorts. Current fixed retrieval baseline and all archived NO-GO results remain unchanged. Generation quality remains scientifically blocked until independently measured.
@@ -54,10 +61,10 @@ This document is the **single operational status** for current gates, next actio
 
 | Phase / ID | Deliverable and status | Concrete acceptance gate | Dependencies | Priority |
 | --- | --- | --- | --- | --- |
-| **P0 / CTRL-01** | Operational control, evidence log, canonical status — **IN PROGRESS** | This file + execution log under reviewable docs PR, linked from ROADMAP, then adopted in research integration workflow | None | P0 |
+| **P0 / CTRL-01** | Operational control, evidence log, canonical status — **PASS / ADOPTED** | This file + execution log under reviewable docs PR, linked from ROADMAP, then adopted in research integration workflow | None | P0 |
 | **P1 / R0-01** | Reproducible engineering baseline — **PARTIAL** | External clean checkout on Windows and Linux; pinned reproducible installs; full deterministic pytest/CLI/wheel + Node build; source/license/security review; no undocumented downloads; evidence recorded | CTRL-01 | P0 |
-| **P1 / PR-02** | Review oversized research PR — **OPEN** | Classify 229 files (code, generated, license, data), verify source attribution and unexpected material; decide safe merge/decomposition, review integration diff and rerun exact-head CI | CTRL-01 | P0 |
-| **P2 / WEB-01** | Honest interactive observatory — **PARTIAL** | `npm ci` / typecheck / unit / build / Chromium plus keyboard/mobile a11y/perf and visual acceptance; only audited manifests; verified public Pages URL; capture reviewed real screenshots | R0-01; validated public data | P1 |
+| **P1 / PR-02** | Research PR #2 integrated into main — **MERGED / VERIFIED CI** | Classify 229 files (code, generated, license, data), verify source attribution and unexpected material; decide safe merge/decomposition, review integration diff and rerun exact-head CI | CTRL-01 | P0 |
+| **P2 / WEB-01** | React observatory code/CI — **PASS**; public Pages **BLOCKED (SITE NOT ENABLED)** | `npm ci` / typecheck / unit / build / Chromium plus keyboard/mobile a11y/perf and visual acceptance; only audited manifests; verified public Pages URL; capture reviewed real screenshots | R0-01; validated public data | P1 |
 | **P3 / M2-01** | Source-supported generation + abstention evaluation — **BLOCKED SCIENCE** | Independently labelled natural-language development/calibration/holdout material, document/entity partition, claim support/contradiction/insufficiency labels, predeclared acceptance and risk-coverage metrics with uncertainty; real pinned model run; report false rejection/acceptance and limitations | R0-01; no reuse of exposed TEST/DEV controls as independent holdout | P0 scientific |
 | **P3 / GRF-02** | GraphRAG evidence and multi-hop benchmark — **PARTIAL** | Verifiable extraction/index provenance + stable entity/relation IDs; same-corpus, same-query matched graph/text comparison; multi-hop evidence and answer quality, construction/latency/RAM cost; defensible GO/NO-GO | R0-01; M2 quality metrics for answer-level claims | P1 |
 | **P4 / MOD-10** | Ten additional model evaluations — **OPEN** | Verify each hub ID/revision/license/role and memory feasibility; run sequential CPU evaluations or explicit `skipped_with_reason`; role-specific comparable datasets, artifacts and uncertainty; no cross-role leaderboard | R0-01; M2 for generation/NLI criteria | P1 |

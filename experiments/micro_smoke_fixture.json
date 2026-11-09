@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "dataset_id": "micro-smoke-fixture-v1",
+  "fixture_only": true,
+  "documents": [
+    {
+      "id": "doc-mars",
+      "title": "Mars distance",
+      "text": "Mars is the fourth planet from the Sun. It has two small moons, Phobos and Deimos. This demonstration document is synthetic and is not a scientific reference."
+    },
+    {
+      "id": "doc-earth",
+      "title": "Earth orbital facts",
+      "text": "Earth is the third planet from the Sun. Earth's natural satellite is the Moon. Astronomical measurements require independent source verification."
+    },
+    {
+      "id": "doc-garden",
+      "title": "Garden",
+      "text": "A small garden has red roses in the morning. The garden is next to a library. This is a fictional example for checking exact citation offsets."
+    },
+    {
+      "id": "doc-other",
+      "title": "The river",
+      "text": "The river crosses a small valley. No details about its age or depth are provided. This is a synthetic document."
+    }
+  ],
+  "cases": [
+    {
+      "id": "dev-mars",
+      "question": "Which planet is fourth from the Sun?",
+      "group_id": "astronomy-mars",
+      "split": "dev",
+      "oracle_doc_ids": ["doc-mars"]
+    },
+    {
+      "id": "dev-garden",
+      "question": "Which flowers grow in the garden?",
+      "group_id": "fictional-garden",
+      "split": "dev",
+      "oracle_doc_ids": ["doc-garden"]
+    },
+    {
+      "id": "dev-unknown",
+      "question": "How old is the river?",
+      "group_id": "fictional-river",
+      "split": "dev",
+      "oracle_doc_ids": []
+    }
+  ]
+}
