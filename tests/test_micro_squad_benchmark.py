@@ -86,7 +86,7 @@ def test_reject_tampered_data_and_forbidden_splits(tmp_path):
 
 
 def test_short_answer_metrics_do_not_treat_citations_as_entailment():
-    yes = score_prediction("The blue [S1]", ["blue"], generation_status="draft_unverified")
+    yes = score_prediction("The bright blue [S1]", ["blue"], generation_status="draft_unverified")
     assert yes["reference_em"] == 0.0  # extra words cannot be silently ignored
     exact = score_prediction("Blue. [S3]", ["blue"], generation_status="draft_unverified")
     assert exact["reference_em"] == 1.0
