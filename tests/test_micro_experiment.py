@@ -45,6 +45,21 @@ def test_preparation_has_four_matched_modes_and_no_generated_answers():
         for x in result["cases"]
     )
     assert all(x["oracle_used"] == (x["mode"] == "oracle") for x in result["cases"])
+    assert all(
+        not x["retrieved_ids"] and x["timing_ms"]["retrieval"] == 0
+        for x in result["cases"] if x["mode"] == "no_retrieval"
+    )
+    for case in data.cases:
+        oracle = next(
+            x for x in result["cases"] if x["case_id"] == case.case_id
+            and x["mode"] == "oracle"
+        )
+        assert oracle["retrieved_ids"] == list(case.oracle_doc_ids)
+        assert oracle["timing_ms"]["retrieval"] == 0
+    assert any(
+        x["generation_status"] == "source_quote_only_not_answer"
+        for x in result["cases"] if x["mode"] == "extractive_quote"
+    )
 
 
 class _FakeGenerator:
