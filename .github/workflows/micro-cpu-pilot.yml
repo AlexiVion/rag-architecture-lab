@@ -1,0 +1,54 @@
+name: MICRO experimental CPU smoke with real public weights
+
+on:
+  pull_request:
+    paths:
+      - "scripts/micro/hf_cpu_smoke.py"
+      - ".github/workflows/micro-cpu-pilot.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: micro-cpu-pilot-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  micro-cpu-pilot:
+    name: Run one real 14M-model CPU inference (not a benchmark)
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      TOKENIZERS_PARALLELISM: "false"
+    steps:
+      - name: Checkout the exact research commit
+        uses: actions/checkout@v7
+      - name: Python 3.11
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install CPU research runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e ".[generation]"
+          python -m pip install "huggingface-hub>=0.29,<2"
+      - name: Resolve reviewed public model revision, download safe weights, run tiny real inference
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/micro/hf_cpu_smoke.py --model-id pythia-14m --output-dir runs/micro-cpu-pilot/pythia-14m
+      - name: Upload source-hashed unreviewed draft evidence only (never weights)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: micro-real-14m-diagnostic
+          path: |
+            runs/micro-cpu-pilot/pythia-14m/manifest.json
+            runs/micro-cpu-pilot/pythia-14m/per_case_drafts.json
+            runs/micro-cpu-pilot/pythia-14m/one-case-dev.json
+          if-no-files-found: warn
+          retention-days: 30
