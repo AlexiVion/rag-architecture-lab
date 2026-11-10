@@ -15,6 +15,7 @@ from pathlib import Path
 from raglab.core import Document
 from raglab.micro_v02.pipeline import MicroRAG
 from raglab.micro_v02.readers import LocalExtractiveReader, StructuredFactReader
+from raglab.micro_v02.verifier import LocalNLIConflictVerifier
 from raglab.micro_v02.evaluation import evaluate_cases, write_json
 
 
@@ -51,6 +52,7 @@ def main() -> None:
         p.add_argument("--max-entity-sweep", type=int, default=25)
         p.add_argument("--reader", choices=("structured", "extractive"), default="structured")
         p.add_argument("--model-directory", default=None)
+        p.add_argument("--verifier-directory", default=None)
     ask.add_argument("--question", required=True)
     ask.add_argument("--output", default=None)
     ev.add_argument("--cases", required=True)
@@ -62,8 +64,12 @@ def main() -> None:
         StructuredFactReader() if args.reader == "structured"
         else LocalExtractiveReader(args.model_directory)
     )
+    verifier = (
+        LocalNLIConflictVerifier(args.verifier_directory)
+        if args.verifier_directory else None
+    )
     pipeline = MicroRAG(
-        load_documents(args.documents), reader=reader,
+        load_documents(args.documents), reader=reader, verifier=verifier,
         top_k=args.top_k, max_entity_sweep=args.max_entity_sweep,
     )
     if args.command == "ask":
