@@ -6,3 +6,6 @@ coverage/
 artifacts/
 test-results/
 playwright-report/
+
+# Local dependency analysis, not a research artifact
+npm-audit-report.json
