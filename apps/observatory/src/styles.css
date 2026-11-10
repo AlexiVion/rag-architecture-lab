@@ -372,3 +372,45 @@ button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px soli
   .ap-xray-movement {width:100%;margin-left:0;}
   .ap-rank-select {padding:8px 7px;}
 }
+
+
+/* Real-retrieval trace: paper-like comparison of executed Python rankings. */
+.rr-section {margin-top:56px;padding:59px 0 40px;border-top:1px solid var(--line);}
+.rr-workspace {border:1px solid var(--line);border-radius:14px;background:var(--paper);overflow:hidden;}
+.rr-chooser {padding:24px 28px;background:var(--background);border-bottom:1px solid var(--line);}
+.rr-chooser label {display:block;font-size:11px;color:var(--accent);letter-spacing:.05em;font-weight:800;margin-bottom:10px;}
+.rr-chooser select {display:block;width:100%;max-width:700px;padding:12px 15px;border:1px solid var(--line-strong);color:var(--ink);border-radius:8px;background:var(--paper);font-size:14px;}
+.rr-chooser p {color:var(--ink-muted);font-size:12px;margin:12px 0 0;}
+.rr-chooser p strong {color:var(--ink);}
+.rr-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
+.rr-lane {padding:25px 25px 24px;min-width:0;}
+.rr-lane:first-child {border-right:1px solid var(--line);}
+.rr-lane-head {min-height:75px;}
+.rr-lane-head h4 {font:750 20px "Manrope",sans-serif;letter-spacing:-.035em;margin:0 0 4px;}
+.rr-lane-head p {font-size:12px;color:var(--ink-muted);margin:0;}
+.rr-ranked {margin:0;padding:0;list-style:none;display:grid;gap:8px;}
+.rr-entry {width:100%;display:flex;align-items:center;gap:11px;padding:12px 11px;min-height:66px;text-align:left;color:var(--ink);border:1px solid var(--line);border-radius:8px;background:var(--background);}
+.rr-entry:hover,.rr-entry.selected {border-color:var(--accent);background:var(--accent-soft);}
+.rr-rank {flex:none;font:750 15px "Manrope",sans-serif;color:var(--accent);}
+.rr-entry-name {flex:1;min-width:0;}
+.rr-entry-name strong {display:block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:12px;}
+.rr-entry-name small {display:block;color:var(--ink-muted);font-size:10px;line-height:1.5;margin-top:4px;}
+.rr-score {font:750 12px "Manrope",sans-serif;color:var(--ink-muted);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.rr-detail {border-top:1px solid var(--line);padding:22px 27px;display:flex;gap:18px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;background:var(--accent-soft);}
+.rr-detail h4 {margin:5px 0 7px;font:750 19px "Manrope",sans-serif;}
+.rr-detail code {display:block;max-width:100%;overflow-wrap:anywhere;font-size:11px;color:var(--ink-muted);}
+.rr-detail a,.rr-detail button {font-size:12px;color:var(--accent);font-weight:800;}
+.rr-detail button {border:1px solid var(--line-strong);background:var(--paper);border-radius:6px;padding:7px 11px;}
+.rr-notice {border-top:1px solid var(--line);padding:20px 27px;color:var(--ink-muted);font-size:12px;line-height:1.8;}
+.rr-notice strong {color:var(--ink);}
+.rr-notice p {margin:7px 0;}
+.rr-notice a {font-weight:800;}
+@media(max-width:650px){
+  .rr-section {margin-top:42px;padding-top:49px;}
+  .rr-chooser {padding:18px 15px;}
+  .rr-grid {grid-template-columns:1fr;}
+  .rr-lane {padding:19px 15px;}
+  .rr-lane:first-child {border-right:0;border-bottom:1px solid var(--line);}
+  .rr-lane-head {min-height:0;margin-bottom:17px;}
+  .rr-detail,.rr-notice {padding:17px 15px;}
+}

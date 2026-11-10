@@ -15,3 +15,7 @@ The output, experiments/repo_retrieval_replay.json, contains original document I
 The source selection and questions are predefined. Re-run and review the artifact after modifying any tracked source file. Experimental and academic conclusions require separate labelled, matched studies under docs/EXPERIMENT_PROTOCOL.md.
 
 Actual individual SciFact rankings cannot be reconstructed from published V0/V1 aggregate numbers. A separate import tool should only accept archived real raw benchmark JSON with compatible query IDs and dataset identity.
+
+## Observatory integration
+
+The Experiments section now offers a dedicated read-only comparison of the authentic saved Python top-five rank lists, preserving original document identities, stable source hashes and source links. It does not re-label these unannotated repository queries as the measured SciFact benchmark; the original V0/V1 benchmark reports remain separate.

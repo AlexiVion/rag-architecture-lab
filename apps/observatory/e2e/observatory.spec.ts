@@ -210,3 +210,35 @@ test("Document X-Ray remains usable on a narrow dark-mode viewport",async ({page
   await mkdir("artifacts/screens",{recursive:true});
   await page.getByRole("region",{name:"Document X-Ray"}).screenshot({path:"artifacts/screens/07-document-xray-mobile.png"});
 });
+
+
+test("actual Python retrieval replay is distinct from unlabeled example and links genuine sources",async({page})=>{
+  await page.getByRole("navigation",{name:"Research sections"}).getByRole("button",{name:"Experiments"}).click();
+  const section=page.locator("#real-retrieval-replay");
+  await expect(section.getByRole("heading",{name:"Real documents. Real retrieval."})).toBeVisible();
+  await expect(section.getByText("3/5")).toHaveCount(0);
+  await expect(section.locator(".rr-lane")).toHaveCount(2);
+  await expect(section.getByText(/No invented fallback/)).toHaveCount(0);
+  await expect(section.getByText(/Actual code execution/)).toBeVisible();
+  await section.getByLabel("Choose a recorded question").selectOption("q02");
+  await expect(section.locator(".rr-lane").first().getByText("V1 RESULTS")).toBeVisible();
+  await expect(section.getByText(/no human qrels/i)).toBeVisible();
+  await section.locator(".rr-lane").first().getByRole("button").first().click();
+  await expect(section.getByRole("region",{name:"Original document provenance"})).toBeVisible();
+  await expect(section.getByText(/SHA256: [a-f0-9]{64}/)).toBeVisible();
+  await expect(section.getByRole("link",{name:/Read original source/})).toHaveAttribute("href",/benchmarks\/V1_RESULTS\.md$/);
+  await section.getByRole("button",{name:"Close inspection"}).click();
+  await expect(section.getByRole("region",{name:"Original document provenance"})).toHaveCount(0);
+});
+
+test("real retrieval is usable in mobile dark theme without horizontal clipping",async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.getByRole("button",{name:"Use dark theme"}).click();
+  await page.getByRole("navigation",{name:"Research sections"}).getByRole("button",{name:"Experiments"}).click();
+  const section=page.locator("#real-retrieval-replay");
+  await section.getByLabel("Choose a recorded question").selectOption("q03");
+  await section.locator(".rr-lane").last().getByRole("button").first().click();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+3)).toBe(false);
+  await mkdir("artifacts/screens",{recursive:true});
+  await section.screenshot({path:"artifacts/screens/08-real-retrieval-mobile.png"});
+});
