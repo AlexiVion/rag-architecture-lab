@@ -66,6 +66,7 @@ class EvidenceResult:
     read_calls: int
     documents_total: int
     source_sweep_complete: bool
+    verifier_traces: tuple[dict, ...] = ()
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -95,6 +96,12 @@ class EvidenceResult:
             claim.citation.validate(source)
             if claim.citation.quote != claim.text:
                 raise ValueError("Claim text does not match its exact original span")
+        for observation in self.verifier_traces:
+            if not isinstance(observation, dict) or (
+                observation.get("left_doc_id") not in documents
+                or observation.get("right_doc_id") not in documents
+            ):
+                raise ValueError("Verifier trace references an unknown source")
         for citation in self.citations:
             doc = documents.get(citation.doc_id)
             if doc is None:
