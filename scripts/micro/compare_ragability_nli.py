@@ -155,7 +155,6 @@ def compare_results(
     rows_a, rows_b, groups = _validate_results(result_a, result_b)
     cases_a = list(rows_a.values())
     cases_b = list(rows_b.values())
-    metric = lambda rows: _metrics(rows)["balanced_accuracy"]
     paired = {}
     for name, fn in (
         ("accuracy", lambda rows: _metrics(rows)["accuracy"]),
