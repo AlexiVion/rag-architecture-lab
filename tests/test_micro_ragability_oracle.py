@@ -4,7 +4,7 @@ from __future__ import annotations
 import pytest
 
 from raglab.evaluation.ragability_conflict import read_ragability_tsv
-from ragability_oracle_ablation_cpu import (
+from raglab.evaluation.ragability_oracle import (
     ANSWER_COLUMNS, CONDITIONS, EXTERNAL_DATASET_SHA,
     compute_recall_delta_ci, evaluate_oracle, paired_conditions,
 )
