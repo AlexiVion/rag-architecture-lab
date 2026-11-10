@@ -45,6 +45,14 @@ A 108-case synthetic, author-generated, structured-literal **zero-neural-model**
 
 **Outcome:** CI results and artifact links only AFTER verification; do not copy development-fixture percentages into the scientific results section.
 
+## 5.1. Exploratory transfer diagnostic on public ConfRAG web answers (real CPU; not a heldout result)
+
+We implemented an explicitly non-confirmatory study using **16 public ConfRAG question groups, 240 correlated pairs** of website answers **already extracted by the dataset authors**. Each pair was labeled only as same vs different **author-annotated answer-viewpoint cluster**, never as an independently verified logical contradiction. A fixed zero-neural-model answer-token Jaccard threshold 0.5 obtained **164/240 (68.33%)** pair accuracy, with all 130 different-cluster pairs detected but 76 false positives. Frozen DeBERTa-v3-xsmall NLI (70.8M parameters) reached **124/240 (51.67%)**, with 16/130 different-cluster detection and only two false positives; frozen MiniLM2 NLI (82.1M) reached **120/240 (50.00%)**, detecting 20/130 with ten false positives. Both NLI models achieved only one correct label in three simple generic inference controls.
+
+These observations show a **task-transfer and precision–recall trade-off** for our imperfect NLI contradiction-as-viewpoint proxy. They do not show that lexical matching solves semantic contradiction, and they do not evaluate end-to-end RAG: no automatic 33M answer extractor or evidence-sufficiency verification was used. Data are public and order-biased; MiniLM2 was added post-result; only 16 source-question groups exist. Post-result descriptive question-group bootstrap intervals span zero for each model-versus-control accuracy difference. The [audited results report](../../docs/PAPER_01_CONFRAG_DEV_RESULTS.md) includes exact dataset/model hashes, both model confusion tables, reproducible artifact IDs, CPU scope and explicit limitations.
+
+**Research decision:** do not promote generic NLI to a reliable arbitrator of viewpoints. Next test actual source-conditioned, automatically extracted claims with fair task-matched controls and human-reviewed labels before making any paper-level scientific claim.
+
 ## 6. Independent experimental results
 
 **PENDING — intentionally blank.** Required plots:
