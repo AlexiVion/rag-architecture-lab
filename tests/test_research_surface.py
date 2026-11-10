@@ -58,7 +58,7 @@ def test_internal_markdown_document_references_resolve():
         ["git", "ls-files", "-z"], cwd=ROOT, check=True, stdout=subprocess.PIPE
     )
     broken = []
-    for raw in proc.stdout.split(b"\\0"):
+    for raw in proc.stdout.split(b"\0"):
         if not raw:
             continue
         path = Path(raw.decode("utf-8"))
@@ -66,8 +66,8 @@ def test_internal_markdown_document_references_resolve():
             continue
         content = (ROOT / path).read_text(encoding="utf-8", errors="replace")
         # Ignore code fences: they can contain deliberately nonexistent examples.
-        content = re.sub(r"(?ms)^\\s*```[^\\n]*\\n.*?^\\s*```\\s*$", "", content)
-        for match in re.finditer(r"(?<![!])\\[[^\\]]+\\]\\(([^)]+)\\)", content):
+        content = re.sub(r"(?ms)^\s*```[^\n]*\n.*?^\s*```\s*$", "", content)
+        for match in re.finditer(r"(?<![!])\[[^\]]+\]\(([^)]+)\)", content):
             target = match.group(1).strip().split(" ", 1)[0]
             if target.startswith(("http:", "https:", "mailto:", "#", "data:")):
                 continue
