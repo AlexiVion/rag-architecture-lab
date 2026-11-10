@@ -134,7 +134,7 @@ test("quality and query latency are scoped to one measurement environment", asyn
   await expect(page.locator(".ap-study-points").getByText("7.52 ms", {exact:true})).toBeVisible();
   await expect(page.locator(".ap-study-points").getByText("51.86 ms", {exact:true})).toBeVisible();
   await expect(page.getByText("GitHub Actions · Ubuntu 24.04 · same V0 run")).toBeVisible();
-  await page.getByRole("button", { name: "Select measurement Dense" }).click();
+  await page.locator(".ap-study-points").getByRole("button", { name: /Dense/ }).click();
   await expect(page.getByText(/Selected: Dense/)).toBeVisible();
   await page.getByLabel("Recorded study").selectOption("v1");
   await expect(page.locator(".ap-study-points").getByText("34.53 ms", {exact:true})).toBeVisible();
