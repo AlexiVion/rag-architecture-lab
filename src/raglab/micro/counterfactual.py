@@ -234,12 +234,27 @@ def verify_counterfactual_corpus(parts: dict[Split, CFPartition]) -> None:
             elif case.kind == "conflict":
                 if case.correct_answer is not None or len(case.evidence_document_ids) != 2:
                     raise ValueError("Incorrect conflict annotation")
-                texts = [by_id[x].text.lower() for x in case.evidence_document_ids]
-                # Every contradicted fact is explicitly carried in both docs.
-                if not all("storage seal" in t for t in texts):
-                    raise ValueError("Conflicting sources lack property statement")
-            else:
+            elif case.kind != "answer":
                 raise ValueError("Unknown case type")
+
+            if case.case_id.endswith("-seal"):
+                # Independent check from actual rendered source text, not from
+                # internal chosen generator arguments or label metadata.
+                found = []
+                for doc_id in case.evidence_document_ids:
+                    present = [v for v in SEALS if v in by_id[doc_id].text]
+                    if len(present) != 1:
+                        raise ValueError("Seal source contains zero or multiple values")
+                    found.append(present[0])
+                if len(found) != 2:
+                    raise ValueError("Seal requires two original source records")
+                if case.kind == "conflict" and found[0] == found[1]:
+                    raise ValueError("Conflict label has no actual source disagreement")
+                if case.kind == "answer" and (
+                    found[0] != found[1] or found[0] != case.correct_answer
+                ):
+                    raise ValueError("Agreeing source label contradicts actual texts")
+
         if sha(json.dumps(_manifest_payload(part), sort_keys=True, separators=(",", ":"))) != part.sha256:
             raise ValueError("Partition SHA256 drift")
     if len(all_entities) != 36 or len(all_ids) != 72:
