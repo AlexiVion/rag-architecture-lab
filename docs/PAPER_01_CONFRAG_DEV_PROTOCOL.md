@@ -1,6 +1,6 @@
 # PAPER-01 / P2: real ConfRAG viewpoint-cluster CPU diagnostic — frozen before execution
 
-**Date:** 2026-11-10. **Status:** PUBLIC-DEVELOPMENT EXPERIMENT, not external independently double-human-certified validation. **Results:** PENDING until exact-head model execution and artifact inspection.
+**Date:** 2026-11-10. **Status:** PUBLIC-DEVELOPMENT EXPERIMENT, not external independently double-human-certified validation. **Initial DeBERTa result independently audited:** exact-head [CPU #42858534499](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42858534499), artifact 13784212373. **Post-result extension:** second small NLI comparator pending.
 
 ## Scientific motivation and label validity
 
@@ -12,7 +12,7 @@ The source annotations include LLM-based extraction and human-in-the-loop cluste
 
 ## Frozen development selection
 
-- On execution, resolve the Hugging Face dataset to its complete commit SHA and validate license `cc-by-4.0`, then **stream only the prefix** of recommended file at that exact SHA, reading at most **128 source JSONL rows**, 8 MB per line and 110 MB total. Do not download all 599 MB or upload copyrighted web content.
+- First execution resolved the dataset to complete commit SHA `529e760a78a58791d0387fe469e0732377a6d94d`. **All subsequent model comparisons pin that exact SHA**, plus source-prefix SHA256 `24c62a4b4df17e8d80a15338d27b05624201fd3fc67862b64e44bc8a2e9dadd6` and paired-input SHA256 `acd2012c7371c408d46987424db876b04efc7ba06b726823215fa9c0d817c8d7`. Validate license `cc-by-4.0`, **stream only the prefix** at the pinned revision, at most **128 source JSONL rows**, 8 MB per line and 110 MB total. Do not download all 599 MB or upload copyrighted web content.
 - From source order choose the first 8 eligible `contradicts=true` and first 8 `false`, so **16 source-question groups**. Group selection is *order-biased*, not randomized, and source labels are public. All pairs in the same question belong to one group.
 - Use at most six sites per group, first ordered by source index. Only sites with nonempty author-provided answer string (length 4–500) and unique membership in exactly one published answer cluster qualify. Exclude ambiguous and duplicated indexed sources. Record exact IDs, raw row SHA256, content-derived pair hashes and dataset revision. The whole-file SHA256 is **not computed**, as the stream stops early.
 - Pairs of qualifying sites have label **same/different annotated viewpoint cluster** based on equality of the cluster ID; pair sample sizes vary by group.
@@ -40,3 +40,13 @@ python scripts/micro/confrag_viewpoint_nli_cpu.py --output-dir runs/paper01/conf
 Requires first-time download of public dataset *prefix* and a pinned open-weight NLI model; then runs model on CPU with two threads. Artifacts contain numeric metrics, per-pair predictions and hashes only, not full web text or weights. Cite the dataset authors and model license. No paid API keys.
 
 **Paper submission gate:** NONE OF THIS on its own constitutes independent evidence of reliable RAG or a unique discovery. Remain research OPEN.
+
+## Chronological results and explicitly post-hoc extension — 2026-11-10
+
+**First real CPU observation (DeBERTa, independently checked from raw Actions artifact 13784212373):** 16 public question groups, 18 JSONL records scanned, 240 author-answer website pairs, 130 distinct-viewpoint and 110 same-viewpoint labels. Jaccard cutoff 0.5: 164/240 correct (68.33%), 130/130 different-viewpoint recall (100%), 76 false positives. Frozen DeBERTa-v3-xsmall 70,831,107 parameters: 124/240 correct (51.67%), 16/130 different-viewpoint recall (12.31%), two false positives; 114 false negatives. The NLI flagged only 18/240 pairs as contradiction. The two systems have different precision-recall tradeoffs and **different tasks**: NLI logical contradiction is not equivalent to viewpoint membership. It would be invalid to call this proof of lexical superiority, generally bad NLI or true contradiction detection.
+
+CPU diagnostic: 480 bidirectional inputs, 20 batches, summed tokenize + forward + softmax wall time 22.014 seconds in one GitHub runner process, **not whole-RAG latency**. Two of three generic sanity controls failed in this run; separately note the NLI model is not broadly trustworthy merely by its model card. See [first-run exact-head proof](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42858534499).
+
+An **exploratory second verifier** was added ONLY after observing this result: pinned `cross-encoder/nli-MiniLM2-L6-H768`, SHA `b95119ce93d3e065de6214e38cd4a97b0f2f2c6d`, approximately 82M parameters, same exact 240 pair inputs, same bidirectional decision rule and the same Jaccard control. This is **post-hoc model exploration**, not an independently preregistered model-win test. Do not tune thresholds or data selection after these results. A repeated DeBERTa run on the frozen SHA is also part of the parity check.
+
+For the first run, a descriptive 10,000-resample **question-group** bootstrap (16 groups ×15 correlated pairs, fixed seed 20261110) gave DeBERTa-minus-Jaccard accuracy difference -16.67 percentage points, approximately [-35.42, +1.67] pp percentile interval. This was calculated **after seeing the result** and is descriptive, not a confirmatory uncertainty guarantee. Public data and one selected prefix prohibit claims of robust general superiority or novelty.
