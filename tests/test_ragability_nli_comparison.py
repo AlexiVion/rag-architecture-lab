@@ -108,5 +108,5 @@ def test_comparison_requires_group_resampling_not_individual_rows():
     a = result("a", True)
     b = result("b", False)
     a["dataset"]["unique_conflict_groups"] = 42
-    with pytest.raises(ValueError, match="43"):
+    with pytest.raises(ValueError, match="conflict group count"):
         compare_results(a, b, repetitions=1000)
