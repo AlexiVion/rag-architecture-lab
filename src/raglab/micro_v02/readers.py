@@ -68,14 +68,25 @@ def parse_question(question: str) -> QuestionSpec | None:
 def _records(document: Document) -> dict[str, tuple[str, int, int]] | None:
     """Reject malformed, duplicate and ambiguous key fields, fail closed."""
     result: dict[str, tuple[str, int, int]] = {}
-    for match in _LINE_RE.finditer(document.text):
+    offset = 0
+    for raw_line in document.text.splitlines(keepends=True):
+        line = raw_line.rstrip("\r\n")
+        if not line.strip():
+            offset += len(raw_line)
+            continue
+        # Every nonempty source line must be a valid key:value record.
+        # Skipping an invalid second value could make a wrong answer look safe.
+        match = _LINE_RE.fullmatch(line)
+        if match is None:
+            return None
         key = match.group(1).casefold()
         value = match.group(2).strip()
         if key in result or not value or len(value) > 160:
             return None
-        start = match.start(2) + len(match.group(2)) - len(match.group(2).lstrip())
+        start = offset + match.start(2) + len(match.group(2)) - len(match.group(2).lstrip())
         end = start + len(value)
         result[key] = (value, start, end)
+        offset += len(raw_line)
     if "entity" not in result:
         return None
     return result
