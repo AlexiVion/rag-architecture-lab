@@ -174,6 +174,8 @@ test("Document X-Ray inspects the selected card with exact RRF arithmetic and fo
   await page.getByRole("button",{name:"Step",exact:true}).click();
   await expect(inspector.getByText(/Left: #2/)).toBeVisible();
   await expect(inspector.getByText(/Right: #1/)).toBeVisible();
+  await mkdir("artifacts/screens",{recursive:true});
+  await inspector.screenshot({path:"artifacts/screens/06-document-xray-desktop.png"});
   await expect(left.getByRole("button",{name:/Inspect Plant roots/})).toHaveAttribute("aria-pressed","true");
   await expect(right.getByRole("button",{name:/Inspect Plant roots/})).toHaveAttribute("aria-pressed","true");
   await inspector.getByRole("button",{name:"Close inspection"}).click();
@@ -205,4 +207,6 @@ test("Document X-Ray remains usable on a narrow dark-mode viewport",async ({page
   await page.getByRole("region",{name:"Left ranking"}).getByRole("button",{name:/Inspect Plant roots/}).click();
   await expect(page.getByRole("region",{name:"Document X-Ray"})).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+3)).toBe(false);
+  await mkdir("artifacts/screens",{recursive:true});
+  await page.getByRole("region",{name:"Document X-Ray"}).screenshot({path:"artifacts/screens/07-document-xray-mobile.png"});
 });
