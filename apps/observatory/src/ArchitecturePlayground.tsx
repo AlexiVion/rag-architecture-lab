@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import DocumentXRay from "./DocumentXRay";
+import type { Explanation } from "./DocumentXRay";
 import type { CSSProperties } from "react";
 import {
   loadPlayground, rankingAtStep, PLAYGROUND_STUDIES,
@@ -7,7 +9,6 @@ import type {
   ArchitectureId, PlaygroundArtifact, PlaygroundDoc, Scenario, Study,
 } from "./playgroundData";
 
-type Explanation = "simple" | "technical" | "scientific";
 const ARCHITECTURES: { id: ArchitectureId; name: string; note: string }[] = [
   { id: "bm25", name: "BM25", note: "Word matching" },
   { id: "hybrid", name: "Hybrid RRF", note: "Words + meaning" },
@@ -46,8 +47,8 @@ function fmt(v:number):string {
   return v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
-function RankLane({ scene, method, step, side }: {
-  scene:Scenario; method:ArchitectureId; step:number; side:"Left"|"Right";
+function RankLane({ scene, method, step, side, selectedDocId, onInspect }: {
+  scene:Scenario; method:ArchitectureId; step:number; side:"Left"|"Right"; selectedDocId:string|null; onInspect:(id:string)=>void;
 }) {
   const order=rankingAtStep(scene,method,step);
   const index=new Map(order.map((id,i)=>[id,i]));
@@ -71,12 +72,16 @@ function RankLane({ scene, method, step, side }: {
             const position=index.get(doc.id)!;
             const difference=baseline.get(doc.id)!-position;
             const change=step<2 || difference===0 ? "—" : difference>0 ? "↑ "+difference : "↓ "+Math.abs(difference);
-            return <div key={doc.id} className={"ap-rank-card"+(doc.relevant?" is-relevant":"")}
+            return <div key={doc.id} className={"ap-rank-card"+(doc.relevant?" is-relevant":"")+(selectedDocId===doc.id?" is-selected":"")}
               role="listitem" aria-label={"Rank "+(position+1)+": "+doc.title+(doc.relevant?", illustrative relevant document":"")}
               style={{top:(position*69)+"px"} as CSSProperties}>
-              <span className="ap-rank-number">{String(position+1).padStart(2,"0")}</span>
-              <div className="ap-rank-text"><strong>{doc.title}</strong><small>{doc.summary}</small></div>
-              <span className={"ap-rank-shift"+(difference>0&&step>=2?" positive":"")} title="Movement from the BM25 baseline">{change}</span>
+              <button type="button" className="ap-rank-select" aria-label={"Inspect "+doc.title+" in Document X-Ray"}
+                aria-pressed={selectedDocId===doc.id} onClick={()=>onInspect(doc.id)}>
+                <span className="ap-rank-number">{String(position+1).padStart(2,"0")}</span>
+                <span className="ap-rank-text"><strong>{doc.title}</strong><small>{doc.summary}</small></span>
+                <span className={"ap-rank-shift"+(difference>0&&step>=2?" positive":"")} title="Movement from the BM25 baseline">{change}</span>
+                <span className="ap-rank-open" aria-hidden="true">↗</span>
+              </button>
             </div>;
           })}
         </div>
@@ -139,6 +144,7 @@ export default function ArchitecturePlayground() {
   const [playing,setPlaying]=useState(false);
   const [explanation,setExplanation]=useState<Explanation>("simple");
   const [studyId,setStudyId]=useState<Study["id"]>("v0");
+  const [selectedDocId,setSelectedDocId]=useState<string|null>(null);
 
   useEffect(()=>{
     let alive=true;
@@ -156,7 +162,7 @@ export default function ArchitecturePlayground() {
 
   const scenario=corpus?.scenarios.find(s=>s.id===scenarioId)??corpus?.scenarios[0];
   const study=PLAYGROUND_STUDIES.find(s=>s.id===studyId)!;
-  function reset(){setPlaying(false);setStep(0);}
+  function reset(){setPlaying(false);setStep(0);setSelectedDocId(null);}
   function changeLeft(value:ArchitectureId){
     if(value===right)setRight(left);
     setLeft(value);reset();
@@ -210,13 +216,17 @@ export default function ArchitecturePlayground() {
           </div>
         </div>
         <div className="ap-lanes">
-          <RankLane scene={scenario} method={left} step={step} side="Left"/>
-          <RankLane scene={scenario} method={right} step={step} side="Right"/>
+          <RankLane scene={scenario} method={left} step={step} side="Left" selectedDocId={selectedDocId} onInspect={setSelectedDocId}/>
+          <RankLane scene={scenario} method={right} step={step} side="Right" selectedDocId={selectedDocId} onInspect={setSelectedDocId}/>
         </div>
         <div className="ap-legend">
           <span><i className="ap-legend-square" aria-hidden="true"/> Helpful for the teaching question</span>
           <span>↑ / ↓ = change from the BM25 example ranking</span>
+          <span className="ap-legend-inspect">Select a document to inspect its journey ↗</span>
         </div>
+        {selectedDocId && <DocumentXRay scene={scenario} docId={selectedDocId}
+          left={left} right={right} step={step} explanation={explanation}
+          onClose={()=>setSelectedDocId(null)}/>}
       </div>
       <p className="ap-disclosure"><strong>Illustrative rankings, not SciFact outputs.</strong> These are fictional teaching documents with authored word-search, dense-search and scripted reranker orders. Hybrid RRF is computed from those two example lists using k=60. No live models are running.</p>
       <div className="ap-explanation">
