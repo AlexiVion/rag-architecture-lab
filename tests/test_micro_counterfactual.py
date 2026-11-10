@@ -121,7 +121,7 @@ def test_calibration_can_choose_threshold_without_leaking_audit():
     # incorrect accepted text with a low margin that calibration must reject.
     for case in cases:
         if case.kind == "answer":
-            predictions.append(pred(case.correct_answer, margin=15))
+            predictions.append(replace(pred(case.correct_answer, margin=15), doc_id=case.evidence_document_ids[0]))
         else:
             predictions.append(pred("the wrong fact", margin=0.7))
     decision = calibrate(cases, predictions)
