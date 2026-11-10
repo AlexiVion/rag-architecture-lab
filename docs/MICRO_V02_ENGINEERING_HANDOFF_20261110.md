@@ -1,6 +1,6 @@
-# MICRO-RAG v0.2 — audited engineering handoff / portfolio candidate
+# MICRO-RAG v0.2 — audited structured-source software validation
 
-**Date:** 2026-11-10. **Scope:** public, CPU-first experimental RAG software, not independently validated semantic factual QA. **Engineering verdict:** source-integrity and synthetic four-state pipeline PASS. **Scientific verdict:** reliable free-text RAG NOT ESTABLISHED. **Publication:** repository is public; GitHub Pages, release tag and LinkedIn post remain unverified/unpublished.
+**Date:** 2026-11-10. **Scope:** public, CPU-first experimental RAG software, not independently validated semantic factual QA. **Engineering verdict:** source-integrity and synthetic four-state pipeline PASS. **Scientific verdict:** reliable free-text RAG NOT ESTABLISHED. **Reproducibility:** repository and exact-head CI records are public; independent natural-language reliability remains unverified.
 
 ## What demonstrably works
 
@@ -37,28 +37,8 @@ The first-run demo requires no API key or paid service. A full browser build nee
 
 ## Explicit unfinished research
 
-**Do not call this a reliable general-purpose RAG or a completed scientific result.** The project has no independently authenticated, untouched, multi-domain human-reviewed evaluation for the complete natural-language pipeline; free-text extraction lacks calibrated semantic support and source-authority/time resolution. The [scientific acceptance gates](MICRO_RAG_V02_SPEC.md) require at least 300 human-labeled evaluation questions over two or more domains, adjudication, risk/coverage confidence bounds, conflict detection, and full-stack CPU p95/RSS testing. [Issue #28](https://github.com/AlexiVion/rag-architecture-lab/issues/28) therefore **stays OPEN**. The [legacy WOW v1.0 issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9) also stays open.
+**Do not call this a reliable general-purpose RAG or a completed scientific result.** The project has no independently authenticated, untouched, multi-domain human-reviewed evaluation for the complete natural-language pipeline; free-text extraction lacks calibrated semantic support and source-authority/time resolution. The [scientific acceptance gates](MICRO_RAG_V02_SPEC.md) require at least 300 human-labeled evaluation questions over two or more domains, adjudication, risk/coverage confidence bounds, conflict detection, and full-stack CPU p95/RSS testing. [Issue #28](https://github.com/AlexiVion/rag-architecture-lab/issues/28) therefore **stays OPEN**.
 
-## Publication handoff — choose accuracy over exaggerated claims
+## Reporting status
 
-1. **Already shareable:** [public repository](https://github.com/AlexiVion/rag-architecture-lab), this report, explicit tests, negative studies and the documented observatory code. Call it *experimental evidence-grounded RAG engineering*, not a reliability breakthrough.
-2. **Still blocked:** the GitHub Pages deployment has not been independently verified and the v0.1.0/v0.2.0 GitHub Release has not been created. The repository owner must enable **Settings → Pages → Source: GitHub Actions**, then a deployment run and actual public URL must be checked. Do not invent a demo link.
-3. **Social posting:** prepare a post but do not publish it on the owner's account without a separate explicit posting action.
-
-### Suggested LinkedIn copy (Spanish; share repository even if Pages is unavailable)
-
-> ¿Qué pasa cuando intentamos construir un sistema RAG útil con modelos realmente pequeños y una CPU común?
->
-> En RAG Architecture Lab probé dos generadores (14M y 135M parámetros), un lector extractivo de 33M y verificadores NLI de 71–82M. Las pruebas tuvieron resultados positivos **y negativos**: los modelos generativos no acertaron ninguna de las 16 respuestas positivas exactas bajo el protocolo probado; el lector extractivo especializado obtuvo 24/32 coincidencias exactas en SQuAD2 DEV, una tarea para la cual había sido entrenado.
->
-> El problema más interesante fue otro: con información contradictoria, encontrar el documento no basta para decidir si responder. Por eso construí un pipeline experimental que separa recuperación, extracción, comprobación de fuentes y decisiones ANSWER / CONFLICT / INSUFFICIENT / REVIEW, con citas verificables hasta el texto original y pruebas de fallos.
->
-> También evalué una versión ONNX INT8 de DeBERTa en CPU. En un benchmark externo pequeño registró 269/318 clasificaciones correctas frente a 261/318 del FP32. Es una señal experimental, no una prueba de superioridad general ni de fiabilidad de extremo a extremo.
->
-> El código, las pruebas y los resultados están abiertos. La validación científica independiente del RAG completo sigue pendiente, y ese límite es parte importante del proyecto.
->
-> Código y evidencia: https://github.com/AlexiVion/rag-architecture-lab
->
-> #RAG #SmallLanguageModels #MachineLearning #OpenSource #AIEngineering
-
-**Final classification:** ENGINEERING SOFTWARE RELEASE-CANDIDATE; SCIENTIFIC RELIABILITY NO-GO; LIVE PAGES/RELEASE NOT VERIFIED. Do not collapse these three independent states.
+The completed software and pilot studies provide an auditable engineering baseline. The natural-language source-support research and independent evaluation remain open. Reproduction should use the cited experiment IDs, model revisions and original data manifests; successful structured tests must not be interpreted as general factual reliability.
