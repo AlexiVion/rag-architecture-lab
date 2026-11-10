@@ -69,8 +69,8 @@ def test_scan_budget_fails_closed():
 def test_duplicate_keys_in_source_refuse():
     corrupt = Document("x", "entity: Station Aurora\nstart_year: 2012\nstart_year: 2015\n")
     result = MicroRAG([corrupt]).answer("What is the start year for Station Aurora?")
-    assert result.status == "INSUFFICIENT"
-    assert source_entity(corrupt) is None
+    assert result.status == "REVIEW"
+    assert source_entity(corrupt) == "station aurora"
 
 def test_questions_require_single_named_entity_and_field():
     rag = MicroRAG([A, C])
