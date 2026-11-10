@@ -40,6 +40,8 @@ jobs:
         run: |
           raglab --help
           python -m build --no-isolation
+      - name: Verify committed replay against actual corpus and retrievers
+        run: python scripts/observatory/export_repo_retrieval_replay.py --check
       - name: Generate authentic repository-document retrieval replay
         run: python scripts/observatory/export_repo_retrieval_replay.py
       - name: Archive actual Python retrieval trace

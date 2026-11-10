@@ -44,3 +44,10 @@ def test_replay_rejects_forged_ranks_labels_and_source_hashes():
 
 def test_replay_deterministic_without_neural_dependencies():
     assert module.build_replay() == module.build_replay()
+
+
+def test_committed_replay_fingerprint_and_rankings_match_current_repo():
+    import json
+    path = ROOT / "experiments/repo_retrieval_replay.json"
+    stored = json.loads(path.read_text(encoding="utf-8"))
+    module.validate_replay(stored)
