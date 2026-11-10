@@ -224,7 +224,7 @@ function Models({data}:{data:ObservatoryData}){
 }
 function Methodology({data}:{data:ObservatoryData}){
   const links=[["Experiment protocol","docs/EXPERIMENT_PROTOCOL.md"],
-    ["WOW v1.0 blueprint","docs/RELEASE_WOW_BLUEPRINT.md"],
+    ["Research status and limitations","docs/RESEARCH_STATUS.md"],
     ["Release gate matrix","docs/RELEASE_EXECUTION_MATRIX.md"],
     ["Measured graph benchmark","docs/GRF_01_HYBRID_RRF_PROTOCOL.md"],
     ["Ten-model registry","experiments/model_matrix_10_proposed.json"]];
@@ -306,7 +306,7 @@ export default function App(){
             {page==="models"&&<Models data={data}/>}
             {page==="methodology"&&<Methodology data={data}/>}
           </>}
-      </main><footer>RAG Architecture Lab · Portfolio research preview <span>·</span> Evidence-first retrieval · No model server</footer>
+      </main><footer>RAG Architecture Lab · Experimental research software <span>·</span> Evidence-first retrieval · No model server</footer>
     </div>
   </div>;
 }

@@ -26,7 +26,7 @@ REQUIRED_FILES = (
     "CITATION.cff",
     "pyproject.toml",
     "docs/EXPERIMENT_PROTOCOL.md",
-    "docs/RELEASE_WOW_BLUEPRINT.md",
+    "docs/PAPER_01_MICRO_CPU_FRONTIER_PROTOCOL.md",
     "apps/explorer/index.html",
     "apps/explorer/app.js",
     "apps/explorer/styles.css",
@@ -81,7 +81,7 @@ def check_repository(root: Path = PROJECT_ROOT) -> dict:
         "missing": missing,
     }
     if missing:
-        failures.append("Required R0 release files missing: " + ", ".join(missing))
+        failures.append("Required research files missing: " + ", ".join(missing))
 
     try:
         metadata = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
@@ -173,14 +173,14 @@ def check_repository(root: Path = PROJECT_ROOT) -> dict:
 
     observed["status"] = "ENGINEERING_PASS" if not failures else "ENGINEERING_FAIL"
     observed["scientific_release_verified"] = False
-    observed["wow_v1_complete"] = False
+    observed["independent_validation_complete"] = False
     observed["model_calls"] = 0
     observed["external_publications"] = 0
     return observed
 
 
 def main() -> int:
-    cli = argparse.ArgumentParser(description="Offline engineering prerequisites for WOW v1")
+    cli = argparse.ArgumentParser(description="Offline integrity checks for the research repository")
     cli.add_argument("--root", type=Path, default=PROJECT_ROOT)
     cli.add_argument("--json-output", type=Path, default=None)
     args = cli.parse_args()
@@ -188,7 +188,7 @@ def main() -> int:
     for name, data in result["checks"].items():
         print("R0_CHECK=" + name + " STATUS=" + data["status"])
     print("R0_ENGINEERING_STATUS=" + result["status"])
-    print("WOW_V1_SCIENTIFIC_GATES=NOT_VERIFIED")
+    print("INDEPENDENT_SCIENTIFIC_VALIDATION=NOT_VERIFIED")
     if args.json_output:
         args.json_output.parent.mkdir(parents=True, exist_ok=True)
         args.json_output.write_text(
