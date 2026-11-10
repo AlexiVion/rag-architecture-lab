@@ -48,3 +48,33 @@ def test_tracked_research_surface_has_no_promotional_markers():
             if pat.search(name) or pat.search(content):
                 failures.append((path.as_posix(), term))
     assert not failures, "Non-academic tracked material: " + str(failures[:100])
+
+
+def test_internal_markdown_document_references_resolve():
+    """Check scholarly documents do not refer to withdrawn or missing .md files."""
+    import urllib.parse
+
+    proc = subprocess.run(
+        ["git", "ls-files", "-z"], cwd=ROOT, check=True, stdout=subprocess.PIPE
+    )
+    broken = []
+    for raw in proc.stdout.split(b"\\0"):
+        if not raw:
+            continue
+        path = Path(raw.decode("utf-8"))
+        if path.suffix.lower() != ".md" or not (ROOT / path).is_file():
+            continue
+        content = (ROOT / path).read_text(encoding="utf-8", errors="replace")
+        # Ignore code fences: they can contain deliberately nonexistent examples.
+        content = re.sub(r"(?ms)^\\s*```[^\\n]*\\n.*?^\\s*```\\s*$", "", content)
+        for match in re.finditer(r"(?<![!])\\[[^\\]]+\\]\\(([^)]+)\\)", content):
+            target = match.group(1).strip().split(" ", 1)[0]
+            if target.startswith(("http:", "https:", "mailto:", "#", "data:")):
+                continue
+            target = urllib.parse.unquote(target.split("#", 1)[0].split("?", 1)[0])
+            if not target or not target.lower().endswith(".md"):
+                continue
+            local = ((ROOT / path.parent) / target).resolve()
+            if not local.is_relative_to(ROOT.resolve()) or not local.is_file():
+                broken.append((path.as_posix(), target))
+    assert not broken, "Broken local research document links: " + str(broken[:100])
