@@ -308,11 +308,19 @@ def score_model_rows(
             (float(forward[i]) + float(reverse[i])) / 2
             for i in range(3)
         ]
-        fwd_label = NLI_LABELS[max(range(3), key=lambda i: forward[i])]
-        rev_label = NLI_LABELS[max(range(3), key=lambda i: reverse[i])]
-        symmetric_label = NLI_LABELS[max(range(3), key=lambda i: symmetric[i])]
+        fwd_nli_label = NLI_LABELS[max(range(3), key=lambda i: forward[i])]
+        rev_nli_label = NLI_LABELS[max(range(3), key=lambda i: reverse[i])]
+        symmetric_nli_label = NLI_LABELS[max(range(3), key=lambda i: symmetric[i])]
+        fwd_label = CONFLICT if fwd_nli_label == CONFLICT else NON_CONFLICT
+        rev_label = CONFLICT if rev_nli_label == CONFLICT else NON_CONFLICT
+        symmetric_label = (
+            CONFLICT if symmetric_nli_label == CONFLICT else NON_CONFLICT
+        )
         rows.append({
             **pair.public_dict(),
+            "forward_nli_label": fwd_nli_label,
+            "reverse_nli_label": rev_nli_label,
+            "symmetric_nli_label": symmetric_nli_label,
             "forward_prediction": fwd_label,
             "reverse_prediction": rev_label,
             "symmetric_prediction": symmetric_label,
@@ -331,13 +339,23 @@ def score_model_rows(
     symmetric = [row["symmetric_prediction"] for row in rows]
     forward = [row["forward_prediction"] for row in rows]
     reverse = [row["reverse_prediction"] for row in rows]
-    by_type = {
-        pair_type: _class_metrics(
-            [r["expected"] for r in rows if r["pair_type"] == pair_type],
-            [r["symmetric_prediction"] for r in rows if r["pair_type"] == pair_type],
-        )
-        for pair_type, _, _, _ in PAIR_SPECS
-    }
+    by_type = {}
+    for pair_type, _, _, _ in PAIR_SPECS:
+        selected = [r for r in rows if r["pair_type"] == pair_type]
+        expected_labels = {r["expected"] for r in selected}
+        if len(expected_labels) != 1:
+            raise ValueError("Pair type unexpectedly mixes gold conflict labels")
+        by_type[pair_type] = {
+            "n": len(selected),
+            "expected_label": next(iter(expected_labels)),
+            "correct": sum(r["expected"] == r["symmetric_prediction"] for r in selected),
+            "accuracy": mean(
+                r["expected"] == r["symmetric_prediction"] for r in selected
+            ),
+            "predicted_contradictions": sum(
+                r["symmetric_prediction"] == CONFLICT for r in selected
+            ),
+        }
     by_reasoning_type = {}
     for reasoning_type in sorted({row["reasoning_type"] for row in rows}):
         selected = [row for row in rows if row["reasoning_type"] == reasoning_type]
