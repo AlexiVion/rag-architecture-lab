@@ -153,3 +153,56 @@ test("the comparison remains usable at mobile width and in dark mode", async ({ 
   await mkdir("artifacts/screens", { recursive: true });
   await page.screenshot({ path: "artifacts/screens/04-playground-mobile.png", fullPage: true });
 });
+
+
+test("Document X-Ray inspects the selected card with exact RRF arithmetic and follows timeline", async ({page})=>{
+  await page.getByRole("button",{name:"Step",exact:true}).click();
+  const left=page.getByRole("region",{name:"Left ranking"});
+  const right=page.getByRole("region",{name:"Right ranking"});
+  await left.getByRole("button",{name:/Inspect Plant roots/}).click();
+  const inspector=page.getByRole("region",{name:"Document X-Ray"});
+  await expect(inspector.getByRole("heading",{name:"Plant roots"})).toBeVisible();
+  await expect(inspector.getByText("BM25",{exact:true})).toBeVisible();
+  await expect(inspector.getByText("Dense",{exact:true})).toBeVisible();
+  await expect(inspector.getByText("Hybrid RRF",{exact:true})).toBeVisible();
+  await expect(inspector.getByText("Scripted reranking",{exact:true})).toBeVisible();
+  await expect(inspector.getByText(/1 \/ \(60 \+ 2\)/)).toBeVisible();
+  await expect(inspector.getByText(/1 \/ \(60 \+ 1\)/)).toBeVisible();
+  await expect(inspector.getByText(/Author-created ranks are not SciFact measurements/)).toBeVisible();
+  await expect(inspector.getByText(/Left: #2/)).toBeVisible();
+  await expect(inspector.getByText(/Right: #2/)).toBeVisible();
+  await page.getByRole("button",{name:"Step",exact:true}).click();
+  await expect(inspector.getByText(/Left: #2/)).toBeVisible();
+  await expect(inspector.getByText(/Right: #1/)).toBeVisible();
+  await expect(left.getByRole("button",{name:/Inspect Plant roots/})).toHaveAttribute("aria-pressed","true");
+  await expect(right.getByRole("button",{name:/Inspect Plant roots/})).toHaveAttribute("aria-pressed","true");
+  await inspector.getByRole("button",{name:"Close inspection"}).click();
+  await expect(inspector).toHaveCount(0);
+});
+
+test("Document X-Ray respects explanation mode, reset and question switching",async ({page})=>{
+  await page.getByRole("button",{name:"Step",exact:true}).click();
+  await page.getByRole("region",{name:"Right ranking"}).getByRole("button",{name:/Inspect Rain gardens/}).focus();
+  await page.keyboard.press("Enter");
+  const inspector=page.getByRole("region",{name:"Document X-Ray"});
+  await expect(inspector.getByRole("heading",{name:"Rain gardens"})).toBeVisible();
+  await page.getByRole("radio",{name:"Technical"}).check();
+  await expect(inspector.getByText(/RRF combines two position-based terms/)).toBeVisible();
+  await page.getByRole("radio",{name:"Scientific"}).check();
+  await expect(inspector.getByText(/No BM25 term weights, embedding similarity or cross-encoder scores were measured/)).toBeVisible();
+  await page.getByLabel("Teaching question").selectOption("penguins");
+  await expect(inspector).toHaveCount(0);
+  await page.getByRole("button",{name:"Step",exact:true}).click();
+  await page.getByRole("region",{name:"Left ranking"}).getByRole("button",{name:/Inspect Penguin movement/}).click();
+  await expect(inspector).toBeVisible();
+  await page.getByRole("button",{name:"Reset",exact:true}).click();
+  await expect(inspector).toHaveCount(0);
+});
+test("Document X-Ray remains usable on a narrow dark-mode viewport",async ({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.getByRole("button",{name:"Use dark theme"}).click();
+  await page.getByRole("button",{name:"Step",exact:true}).click();
+  await page.getByRole("region",{name:"Left ranking"}).getByRole("button",{name:/Inspect Plant roots/}).click();
+  await expect(page.getByRole("region",{name:"Document X-Ray"})).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+3)).toBe(false);
+});
