@@ -125,16 +125,16 @@ test("Simple, technical and scientific explanations never promote illustrative d
 
 test("quality and query latency are scoped to one measurement environment", async ({ page }) => {
   await page.getByLabel("Recorded study").selectOption("v0");
-  await expect(page.getByText("7.52 ms")).toBeVisible();
-  await expect(page.getByText("51.86 ms")).toBeVisible();
+  await expect(page.locator(".ap-study-points").getByText("7.52 ms", {exact:true})).toBeVisible();
+  await expect(page.locator(".ap-study-points").getByText("51.86 ms", {exact:true})).toBeVisible();
   await expect(page.getByText("GitHub Actions · Ubuntu 24.04 · same V0 run")).toBeVisible();
   await page.getByRole("button", { name: "Select measurement Dense" }).click();
   await expect(page.getByText(/Selected: Dense/)).toBeVisible();
   await page.getByLabel("Recorded study").selectOption("v1");
-  await expect(page.getByText("34.53 ms")).toBeVisible();
-  await expect(page.getByText("3,706.43 ms")).toBeVisible();
+  await expect(page.locator(".ap-study-points").getByText("34.53 ms", {exact:true})).toBeVisible();
+  await expect(page.locator(".ap-study-points").getByText("3,706.43 ms", {exact:true})).toBeVisible();
   await expect(page.getByText("Windows 11 · AMD Ryzen 7 5700U · same V1 run")).toBeVisible();
-  await expect(page.getByText("7.52 ms")).toHaveCount(0);
+  await expect(page.locator(".ap-study-points").getByText("7.52 ms", {exact:true})).toHaveCount(0);
 });
 
 test("the comparison remains usable at mobile width and in dark mode", async ({ page }) => {
