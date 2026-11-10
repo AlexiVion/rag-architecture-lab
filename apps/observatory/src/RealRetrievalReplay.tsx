@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SavedBenchmarkReplay from "./SavedBenchmarkReplay";
 import { loadRepoReplay } from "./repoReplay";
 import type { RepoReplay, ReplayQuery, ReplayDoc, ReplayRank } from "./repoReplay";
 
@@ -74,5 +75,6 @@ export default function RealRetrievalReplay(){
         <a href="https://github.com/AlexiVion/rag-architecture-lab/blob/main/docs/REPOSITORY_RETRIEVAL_REPLAY.md" target="_blank" rel="noreferrer">Reproduce the Python trace ↗</a>
       </div>
     </div>}
+    <SavedBenchmarkReplay />
   </section>;
 }

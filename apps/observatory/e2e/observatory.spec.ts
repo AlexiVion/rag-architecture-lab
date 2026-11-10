@@ -242,3 +242,34 @@ test("real retrieval is usable in mobile dark theme without horizontal clipping"
   await mkdir("artifacts/screens",{recursive:true});
   await section.screenshot({path:"artifacts/screens/08-real-retrieval-mobile.png"});
 });
+
+
+test("an existing saved benchmark can be inspected locally without submitting data",async({page})=>{
+  await page.getByRole("navigation",{name:"Research sections"}).getByRole("button",{name:"Experiments"}).click();
+  const section=page.locator("#real-retrieval-replay");
+  await section.locator("summary").filter({hasText:"Inspect your own saved benchmark trace"}).click();
+  const data={
+    schema_version:1,kind:"saved_benchmark_query_replay",
+    status:"archived_original_per_query_not_independently_revalidated",
+    dataset:"beir/scifact/test",source_archive_sha256:"a".repeat(64),document_count:5183,
+    pipeline_names:["bm25","hybrid"],query_selection:"first_N_original_order_without_qrel_selection",
+    source_environment:{python:"3.11",platform:"local"},
+    queries:[{id:"1",text:"An archived SciFact question",rankings:{
+      bm25:[{doc_id:"123",rank:1,score:2.41}],
+      hybrid:[{doc_id:"456",rank:1,score:.032}],
+    }}],limitations:["Original archive, not rerun","No additional model execution","No independent validation"],
+  };
+  await section.locator("#rr-saved-file").setInputFiles({
+    name:"local-query-replay.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(data))
+  });
+  const box=section.getByRole("region",{name:"Locally imported original benchmark ranks"});
+  await expect(box.getByText("An archived SciFact question")).toBeVisible();
+  await expect(box.getByText("123",{exact:true})).toBeVisible();
+  await expect(box.getByText("456",{exact:true})).toBeVisible();
+  await expect(box.getByText(/not independently verified by this browser/i)).toBeVisible();
+  await section.locator("#rr-saved-file").setInputFiles({
+    name:"forged.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify({...data,status:"verified_scientific_benchmark"}))
+  });
+  await expect(section.getByRole("alert")).toBeVisible();
+  await expect(box).toHaveCount(0);
+});
