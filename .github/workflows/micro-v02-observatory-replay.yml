@@ -1,0 +1,42 @@
+name: MICRO v0.2 observatory replay from actual local Python pipeline
+
+on:
+  pull_request:
+    paths:
+      - "scripts/micro/export_micro_v02_observatory.py"
+      - "tests/test_micro_v02_replay.py"
+      - ".github/workflows/micro-v02-observatory-replay.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: micro-v02-replay-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-execution:
+    name: Export fictional four-state decisions and verify source offsets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install minimal Python software test dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Verify pipeline replay source accuracy and determinism
+        run: python -m pytest -q tests/test_micro_v02_replay.py
+      - name: Export actual Python engine replay (the input is fictional)
+        run: |
+          python scripts/micro/export_micro_v02_observatory.py \
+            --documents examples/micro-v02/documents.json \
+            --output runs/micro-v02/replay.json --print-json
+      - name: Upload generated public-safe replay
+        uses: actions/upload-artifact@v4
+        with:
+          name: micro-v02-observatory-replay
+          path: runs/micro-v02/replay.json
+          retention-days: 30
