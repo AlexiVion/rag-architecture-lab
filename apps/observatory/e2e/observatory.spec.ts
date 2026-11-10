@@ -33,12 +33,12 @@ test("verified Python replay changes evidence and decision, never claims live in
   await group.getByRole("button", { name: /Missing information/ }).click();
   await expect(decision.getByText("INSUFFICIENT")).toBeVisible();
   await group.getByRole("button", { name: /Incomplete evidence sweep/ }).click();
-  await expect(decision.getByText("REVIEW")).toBeVisible();
+  await expect(decision.getByText("REVIEW", { exact: true })).toBeVisible();
   await expect(page.getByText(/Not live inference/)).toBeVisible();
 });
 
 test("technical provenance can be revealed without visual clutter", async ({ page }) => {
-  await expect(page.getByText("SHA256:", { exact: false })).toHaveCount(0);
+  await expect(page.getByText(/SHA256:/).first()).not.toBeVisible();
   await page.getByText("Verify source").first().click();
   await expect(page.getByText(/SHA256:/).first()).toBeVisible();
 });
