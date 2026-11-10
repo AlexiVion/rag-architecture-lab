@@ -1,4 +1,4 @@
-import { getDocumentXRay } from "./documentXRay";
+import { getDocumentXRay } from "./xrayRankMath";
 import { rankingAtStep } from "./playgroundData";
 import type { ArchitectureId, Scenario } from "./playgroundData";
 

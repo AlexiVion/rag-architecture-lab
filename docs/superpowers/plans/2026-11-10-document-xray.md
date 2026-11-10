@@ -27,7 +27,7 @@
 
 ### Task 1: Contract and test
 
-**Files**: Modify \`apps/observatory/src/playgroundData.test.ts\`, add \`apps/observatory/src/documentXRay.ts\`.
+**Files**: Modify \`apps/observatory/src/playgroundData.test.ts\`, add \`apps/observatory/src/xrayRankMath.ts\`.
 
 **API:** \`getDocumentXRay(scene: Scenario, docId: string): DocumentXRayData\`.
 

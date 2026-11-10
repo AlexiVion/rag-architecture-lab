@@ -55,7 +55,7 @@ describe("Architecture Playground data integrity", () => {
   });
 });
 
-import { getDocumentXRay } from "./documentXRay";
+import { getDocumentXRay } from "./xrayRankMath";
 
 describe("Document X-Ray fidelity to authored teaching rankings", () => {
   it("returns actual authored positions and deterministic RRF contributions for the roots example", () => {
