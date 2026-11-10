@@ -47,7 +47,7 @@ function Research({ navigate }: { navigate: (page: Page) => void }) {
       <h1>How small can <em>reliable RAG</em> be?</h1>
       <p className="hero-lead">An open-source investigation into evidence-grounded question answering with small models and limited CPU resources.</p>
       <div className="hero-actions">
-        <a className="primary-action" href="#demonstration">Explore the evidence example <span aria-hidden="true">↗</span></a>
+        <a className="primary-action" href="#architecture-playground">Compare architectures <span aria-hidden="true">↗</span></a>
         <button type="button" className="text-action" onClick={() => navigate("experiments")}>View measured results <span aria-hidden="true">→</span></button>
       </div>
       <p className="project-status"><span className="status-circle" /> Research in progress <span aria-hidden="true">·</span> ≤135M active neural parameters is a proposed full-pipeline research constraint, not an achieved validated system.</p>
