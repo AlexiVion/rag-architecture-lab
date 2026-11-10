@@ -14,11 +14,16 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import platform
-import resource
 import statistics
+import sys
 import time
+try:
+    import resource
+except ImportError:  # Windows local execution has no resource module.
+    resource = None
 from pathlib import Path
 from typing import Any
 
@@ -296,7 +301,7 @@ def _predict_bidirectional(
     directional_inputs = len(pairs) * 2
     ordered = sorted(batch_wall_ms)
     p50 = statistics.median(ordered) if ordered else 0.0
-    p95 = ordered[min(len(ordered) - 1, int(0.95 * len(ordered)))] if ordered else 0.0
+    p95 = ordered[max(0, math.ceil(0.95 * len(ordered)) - 1)] if ordered else 0.0
     return forward_all, reverse_all, {
         "pair_cases": len(pairs),
         "directional_pair_inputs": directional_inputs,
@@ -356,13 +361,22 @@ def run_experiment(
     os.environ.setdefault("MKL_NUM_THREADS", "2")
 
     import torch
-    from huggingface_hub import hf_hub_download
+    from huggingface_hub import HfApi, hf_hub_download
 
     torch.set_num_threads(2)
     try:
         torch.set_num_interop_threads(1)
     except RuntimeError:
         pass
+
+    dataset_info = HfApi().dataset_info(
+        DATASET_ID, revision=DATASET_REVISION
+    )
+    dataset_license = _license_from_info(dataset_info)
+    if dataset_license != DATASET_LICENSE:
+        raise ValueError(
+            f"Dataset license changed or is unavailable: {dataset_license!r}"
+        )
 
     dataset_cache = output_dir / ".dataset-cache"
     dataset_started = time.perf_counter()
@@ -378,6 +392,7 @@ def run_experiment(
     rows = read_ragability_tsv(dataset_path)
     pairs = build_conflict_pairs(rows)
     manifest = dataset_manifest(rows, pairs, source_sha256=source_sha)
+    manifest["dataset_card_license_verified"] = dataset_license
     write_json(output_dir / "dataset_manifest.json", manifest)
 
     weights_path = output_dir / "model"
@@ -413,6 +428,15 @@ def run_experiment(
     cost["model_download_seconds"] = model_download_seconds
     cost["model_load_seconds"] = model_load_seconds
 
+    peak_rss_native = (
+        resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        if resource is not None else None
+    )
+    peak_rss_bytes = (
+        peak_rss_native if sys.platform == "darwin"
+        else peak_rss_native * 1024 if peak_rss_native is not None
+        else None
+    )
     final = {
         "experiment_id": "MICRO-RAGABILITY-01",
         "status": "REAL_CPU_EXTERNAL_PUBLIC_BENCHMARK_PAIRWISE_NLI_ONLY",
@@ -426,8 +450,9 @@ def run_experiment(
             "pytorch": torch.__version__,
             "platform": platform.platform(),
             "cpu_threads": torch.get_num_threads(),
-            "peak_rss_kib": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
-            "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024,
+            "peak_rss_native": peak_rss_native,
+            "peak_rss_native_unit": "bytes" if sys.platform == "darwin" else "KiB",
+            "peak_rss_bytes": peak_rss_bytes,
             "github_sha": os.environ.get("GITHUB_SHA"),
             "hardware": "GitHub-hosted Ubuntu CPU; exact CPU SKU not guaranteed by runner",
         },
