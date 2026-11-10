@@ -72,24 +72,43 @@ class MicroRAG:
         scan_start = time.perf_counter()
         warnings: list[str] = []
         source_sweep_complete = True
-        if isinstance(self.reader, StructuredFactReader) and spec is not None:
-            # Deterministic exact-entity sweep prevents the top-1 retrieval
-            # shortcut from concealing contradictions in nearby records.
-            all_related = sorted(
-                d.id for d in self.documents if source_entity(d) == spec.entity
-            )
-            if len(all_related) > self.max_entity_sweep:
+        if isinstance(self.reader, StructuredFactReader):
+            if spec is None:
+                # Unsupported questions are not proof that a fact is absent.
+                inspect_ids = ()
                 source_sweep_complete = False
-                warnings.append("Related source group exceeds bounded scan budget")
-            inspect_ids = tuple(all_related[:self.max_entity_sweep])
-            if not inspect_ids:
-                warnings.append("No documents contain a matching structured entity")
+                warnings.append("Unsupported or ambiguous entity/property question")
+            else:
+                # An ambiguous/malformed source may refer to the target entity.
+                # Never silently omit it because source_entity() returned None.
+                related = {
+                    d.id for d in self.documents if source_entity(d) == spec.entity
+                }
+                unattributed = {
+                    d.id for d in self.documents
+                    if source_entity(d) is None and structured_source_invalid(d)
+                }
+                if unattributed:
+                    source_sweep_complete = False
+                    warnings.append(
+                        "Unattributed malformed sources prevent a complete entity scan"
+                    )
+                inspect_candidates = sorted(related | unattributed)
+                if len(inspect_candidates) > self.max_entity_sweep:
+                    source_sweep_complete = False
+                    warnings.append("Related/unknown source group exceeds scan budget")
+                inspect_ids = tuple(inspect_candidates[:self.max_entity_sweep])
+                if not inspect_ids:
+                    warnings.append("No documents contain a matching structured entity")
         else:
-            # Arbitrary-language QA is only an unverified REVIEW candidate.
-            # We cannot claim that top-k searched the entire relevant corpus.
+            # Top-k is never proof of global absence, including when the
+            # neural reader extracted no span from the retrieved documents.
             inspect_ids = ranked_ids
-            if not isinstance(self.reader, StructuredFactReader):
-                warnings.append("Extractive reader has no independent semantic verification")
+            source_sweep_complete = False
+            warnings.append(
+                "Partial retrieval cannot establish corpus-wide absence; human review required"
+            )
+            warnings.append("Extractive reader has no independent semantic verification")
         scan_ms = (time.perf_counter() - scan_start) * 1000
 
         read_start = time.perf_counter()
