@@ -182,7 +182,7 @@ def calibrate(
     if not cases or len(cases) != len(predictions):
         raise ValueError("Missing or misaligned calibration cases")
     if any(c.split != "calibration" for c in cases):
-        raise ValueError("Never tune thresholds using DEV or audit labels")
+        raise ValueError("CALIBRATION ONLY: never tune thresholds using DEV or audit labels")
     if not (0 <= max_wrong_accept_rate <= 1) or minimum_accepted < 1:
         raise ValueError("Invalid calibration guardrails")
     decisions = []
