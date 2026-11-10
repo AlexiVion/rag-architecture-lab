@@ -71,6 +71,7 @@ test("record screenshots for editorial interface review", async ({ page }) => {
   await page.screenshot({ path: "artifacts/screens/03-methodology.png", fullPage: true });
   await page.getByRole("navigation", { name: "Research sections" }).getByRole("button", { name: "Research" }).click();
   for (let i=0;i<3;i++) await page.getByRole("button", { name: "Step", exact: true }).click();
+  await page.waitForTimeout(650);
   await page.screenshot({ path: "artifacts/screens/05-playground-ranking.png", fullPage: true });
 });
 
@@ -93,6 +94,11 @@ test("Architecture Playground compares two distinct methods and advances through
   await expect(page.getByText("Stage 4 of 5")).toBeVisible();
   await page.getByRole("button", { name: "Step", exact: true }).click();
   await expect(page.getByText("Stage 5 of 5")).toBeVisible();
+  // Wait for the positional transition and verify the final stacked ranking is not overlapping.
+  await page.waitForTimeout(650);
+  const topPositions=await page.getByRole("region", { name: "Right ranking" }).locator(".ap-rank-card").evaluateAll(cards =>
+    cards.map(card => Math.round(card.getBoundingClientRect().top)));
+  expect(new Set(topPositions).size).toBe(5);
   await expect(page.getByText(/Illustrative rankings, not SciFact outputs/)).toBeVisible();
   await page.getByRole("button", { name: "Reset", exact: true }).click();
   await expect(page.getByText("Stage 1 of 5")).toBeVisible();
