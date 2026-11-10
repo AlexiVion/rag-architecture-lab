@@ -2,6 +2,18 @@
 
 **Open-source · CPU-first · from-first-principles retrieval research.** BM25, local dense embeddings, Hybrid RRF and reranking; inspect source provenance, honest negative studies and an eight-section React/TypeScript observatory.
 
+## Start here — public research portfolio preview 0.1
+
+**Build:** From-first-principles Python retrieval (BM25, dense, Hybrid RRF, reranking), source-provenance and fail-closed evidence checks, real tiny-model CPU experiments, and an inspectable React/TypeScript research observatory.
+
+**Measure:** On public SciFact retrieval (5,183 documents, 300 queries), Hybrid RRF reached MRR@10 **0.6484** vs BM25 **0.6328**. CPU reranking improved MRR@10 to **0.6615**, but raised measured mean retrieval latency from **34.53ms to 3706.43ms** at 50 candidates. On published ConfRAG DEV, we evaluated 240 correlated author-answer pairs from 16 questions, with transparent negative results for two small NLI models. **These are different tasks, not full-system QA accuracy.**
+
+**Explore the work:** [1-page technical showcase](docs/PORTFOLIO_SHOWCASE_V0_1.md) · [Real CPU results](docs/PAPER_01_CONFRAG_DEV_RESULTS.md) · [Model and data protocol](docs/PAPER_01_MICRO_CPU_FRONTIER_PROTOCOL.md) · [React/TypeScript observatory source](apps/observatory) · [Scientific paper draft](papers/micro-cpu-frontier/WORKING_MANUSCRIPT.md)
+
+**Current limits:** This repository and its CI-backed evidence are public. A **formal GitHub Release and hosted live demonstration are not yet verified**; this is an open-source portfolio preview, not an independently certified reliable RAG or accepted research paper. The [release readiness checklist](docs/PORTFOLIO_RELEASE.md) and [scientific issue #39](https://github.com/AlexiVion/rag-architecture-lab/issues/39) remain open.
+
+
+
 > **MICRO-RAG v0.2 engineering handoff (2026-11-10):** The fail-closed source-coverage repair in [PR #36](https://github.com/AlexiVion/rag-architecture-lab/pull/36) is integrated and exact-head software CI passed. Six adversarial regressions prevent malformed source records, unsupported questions and incomplete neural retrieval from being silently treated as verified answers/absence. [Audited handoff, reproducibility and LinkedIn-safe launch copy](docs/MICRO_V02_ENGINEERING_HANDOFF_20261110.md). **Independent natural-language reliability NO-GO; public Pages/release not verified.**
 
 
