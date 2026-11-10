@@ -20,12 +20,13 @@ import platform
 import statistics
 import sys
 import time
+from pathlib import Path
+from typing import Any
+
 try:
     import resource
 except ImportError:  # Windows local execution has no resource module.
     resource = None
-from pathlib import Path
-from typing import Any
 
 from raglab.evaluation.ragability_conflict import (
     DATASET_FILE,
