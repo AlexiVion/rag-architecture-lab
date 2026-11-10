@@ -5,7 +5,7 @@
 
 ## Context
 
-The repository already contains from-first-principles BM25, dense, RRF, reranking, evaluation and a V2 local answer pipeline. Its goal is a defensible open-source engineering portfolio focused on RAG architectures, rather than a deployable customer application.
+The repository already contains from-first-principles BM25, dense, RRF, reranking, evaluation and a V2 local answer pipeline. Its goal is an openly reproducible research implementation focused on RAG architectures, rather than a deployable customer application.
 
 ## Decision
 
@@ -13,7 +13,7 @@ Keep one repository with a small `Retriever` contract and compositional architec
 
 ## Consequences
 
-**Positive:** reuse, inspectable trade-offs, less framework coupling, auditable claims and a consistent portfolio narrative.
+**Positive:** reuse, inspectable trade-offs, less framework coupling, auditable claims and transparent study provenance.
 
 **Costs:** more discipline around manifests, tests and negative results; not a production multi-tenant service; some architectures need additional adapters and test data before meaningful conclusions.
 

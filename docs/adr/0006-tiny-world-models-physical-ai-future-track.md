@@ -5,7 +5,7 @@
 - Owner intent: explore physical AI and world models after discussing plant-mediated control, low-neuron biological circuits and minimal intelligence.
 - Track: [PHY issue #12](https://github.com/AlexiVion/rag-architecture-lab/issues/12)
 - Scientific home: bio-inspired minimal intelligence, model-based reinforcement learning, dynamical systems and physical AI
-- Release boundary: **NOT part of RAG WOW v1.0** unless explicitly accepted through a future scope-change decision
+- Research boundary: a separate, currently unimplemented research topic; not part of the active evidence-grounded QA study
 
 ## Thesis
 

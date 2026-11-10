@@ -3,11 +3,11 @@
 - **Date:** 2026-11-08
 - **Status:** Proposed pivot, recorded for review; no benchmark success implied.
 - **Owners:** Repository maintainer / research operator
-- **Related:** [Project control](../PROJECT_CONTROL.md) · [Experiment protocol](../EXPERIMENT_PROTOCOL.md) · [Original v1.0 blueprint](../RELEASE_WOW_BLUEPRINT.md) · [Master issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9)
+- **Related:** [Research status](../RESEARCH_STATUS.md) · [Experiment protocol](../EXPERIMENT_PROTOCOL.md) · [CPU-frontier protocol](../PAPER_01_MICRO_CPU_FRONTIER_PROTOCOL.md) · [Scientific study issue #39](https://github.com/AlexiVion/rag-architecture-lab/issues/39)
 
 ## Context
 
-The previous portfolio scope emphasized a general catalog of RAG approaches, a ten-model matrix, GraphRAG and an observatory. That scope is broad but not a research claim of novelty. The owner explicitly requests a sharper problem: **optimize RAG systems that use extremely small, permissively-licensed open-weight language models**, rather than relying on frontier-scale generation.
+The earlier exploratory scope emphasized a general catalog of RAG approaches, a ten-model matrix, GraphRAG and an observatory. That scope is broad but not a research claim of novelty. The owner explicitly requests a sharper problem: **optimize RAG systems that use extremely small, permissively-licensed open-weight language models**, rather than relying on frontier-scale generation.
 
 Historical evidence supports the need: the local Qwen2.5-0.5B citation/synthetic experiments show inadequate reliable generation and abstention, while earlier retrieval ablations show that indiscriminate reranking significantly increases CPU latency for small ranking improvements. Do not erase either the negative generation findings or the retrieval baseline.
 
@@ -68,11 +68,11 @@ For each generator class, first compare the exact same model/revision/precision/
 
 **Success condition (pre-register before holdout):** a statistically defensible **Pareto improvement** over a matched same-model RAG baseline: higher supported-answer quality/coverage at no worse unsupported-answer rate and comparable or lower end-to-end CPU cost, or the same quality at materially lower cost. Report uncertainty and the entire risk-coverage curve. If the technique fails, record `NO_GO` and preserve the finding.
 
-## Release scope change and backwards compatibility
+## Study scope and research compatibility
 
-The previous **exactly ten additional models** comparison is not the primary objective of the new research direction: it becomes an optional separate catalog/research extension unless the owner later explicitly requires it. The new *proposed* v1.0 acceptance contract is a reproducible **tiny-model optimization study**, one compelling interactive experiment explorer and independently audited outcomes.
+The broad ten-model registry and graph observatory remain separate exploratory instruments. The current principal hypothesis is the CPU-constrained, evidence-grounded QA frontier, with active neural parameters accounted for across the entire pipeline. Negative results and original benchmark protocols are preserved without recasting exposed development data as an independent holdout.
 
-The original [blueprint](../RELEASE_WOW_BLUEPRINT.md), model registry and benchmarks remain unchanged as historical material. The [master issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9) and release gates must be reconciled through a reviewed scope amendment **before any old gate is called closed or new v1.0 is released**. No retroactive rewriting of prior experiments. Existing `main` and `RAGPipeline` defaults remain untouched.
+The [research status](../RESEARCH_STATUS.md), existing model registry and [PAPER-01 protocol](../PAPER_01_MICRO_CPU_FRONTIER_PROTOCOL.md) document the current experiment boundaries. No previously measured result is altered by this research-direction change.
 
 ## Immediate work plan
 
