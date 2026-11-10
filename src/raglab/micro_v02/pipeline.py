@@ -16,6 +16,7 @@ from raglab.micro_v02.contracts import EvidenceClaim, EvidenceResult
 from raglab.micro_v02.policy import adjudicate
 from raglab.micro_v02.readers import (
     EvidenceReader, StructuredFactReader, parse_question, source_entity,
+    structured_source_invalid,
 )
 
 
@@ -96,6 +97,8 @@ class MicroRAG:
             calls += 1
             doc = self.sources[doc_id]
             try:
+                if isinstance(self.reader, StructuredFactReader) and structured_source_invalid(doc):
+                    raise ValueError("Malformed structured source; cannot prove consistency")
                 claim = self.reader.extract(question, doc, spec)
                 if claim is not None:
                     if claim.citation.doc_id != doc_id:
