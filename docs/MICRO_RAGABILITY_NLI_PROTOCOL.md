@@ -90,7 +90,7 @@ Primary:
 
 Secondary:
 - per-pair-type accuracy;
-- per-reasoning_required_c1c2 category metrics;
+- per-reasoning_required_c1c2 category conflict-detection rate on the original c1/c2 pair only (the tag does not describe the other five pair types);
 - source-group cluster-bootstrap 95% percentile interval for balanced accuracy.
 
 Bootstrap protocol: 2,000 deterministic resamples, seed 20261109, sampling **43 contradiction_ID groups with replacement** and retaining every derived row/pair belonging to each sampled group. The 318 pairs are not treated as independent observations.
