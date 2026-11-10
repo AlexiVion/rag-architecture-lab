@@ -1,0 +1,69 @@
+name: MICRO fictional corpus-wide QA and abstention on CPU
+
+on:
+  pull_request:
+    paths:
+      - "src/raglab/micro/counterfactual.py"
+      - "src/raglab/micro/cf_evaluation.py"
+      - "scripts/micro/counterfactual_cpu_pilot.py"
+      - "tests/test_micro_counterfactual.py"
+      - ".github/workflows/micro-counterfactual-cpu.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: micro-counterfactual-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  counterfactual-cpu:
+    name: Pinned 33M reader under synthetic corpus-wide source truth
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      OMP_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+    steps:
+      - name: Exact commit
+        uses: actions/checkout@v7
+      - name: Python 3.11
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install CPU model research dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e ".[generation]"
+          python -m pip install "huggingface-hub>=0.29,<2"
+      - name: Unit tests for corpus-wide labels and calibration isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest -q tests/test_micro_counterfactual.py
+      - name: Run pinned off-task model against novel generated source facts and conflicts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/micro/counterfactual_cpu_pilot.py \
+            --output-dir runs/micro-counterfactual/mini-33m
+      - name: Upload exact source and calibration traces, never model weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: micro-counterfactual-33m-cpu-diagnostic
+          path: |
+            runs/micro-counterfactual/mini-33m/corpus_manifest.json
+            runs/micro-counterfactual/mini-33m/dev_generated.json
+            runs/micro-counterfactual/mini-33m/calibration_generated.json
+            runs/micro-counterfactual/mini-33m/audit_generated.json
+            runs/micro-counterfactual/mini-33m/frozen_calibration.json
+            runs/micro-counterfactual/mini-33m/policy_results.json
+            runs/micro-counterfactual/mini-33m/integrity_manifest.json
+          retention-days: 30
+          if-no-files-found: warn
