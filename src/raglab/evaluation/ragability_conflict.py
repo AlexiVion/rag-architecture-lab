@@ -102,11 +102,19 @@ def read_ragability_tsv(path: Path) -> list[dict[str, str]]:
         raise ValueError(
             f"Expected {CONTRADICTION_GROUPS} nonempty source-conflict groups, got {len(groups)}"
         )
+    required_values = tuple(
+        field for field in REQUIRED_COLUMNS if field != "WikiContradict_ID"
+    )
     for index, row in enumerate(rows, start=1):
-        for field in REQUIRED_COLUMNS:
+        for field in required_values:
             value = row.get(field)
             if not isinstance(value, str) or not value.strip():
                 raise ValueError(f"Published row {index} has an empty {field}")
+        # WikiContradict_ID is an optional provenance cross-reference in the
+        # published file; preserve blanks rather than fabricating an ID.
+        wiki_id = row.get("WikiContradict_ID", "")
+        if not isinstance(wiki_id, str):
+            raise ValueError(f"Invalid WikiContradict_ID field in row {index}")
         # Keep source identifiers literal; no accidental float normalization.
         if not row["contradiction_ID"].strip().isdigit():
             raise ValueError(f"Invalid contradiction_ID in row {index}")
@@ -180,6 +188,9 @@ def dataset_manifest(
         "reasoning_type_counts": dict(Counter(
             row["reasoning_required_c1c2"].strip() for row in rows
         )),
+        "rows_without_wiki_contradict_cross_reference": sum(
+            not row.get("WikiContradict_ID", "").strip() for row in rows
+        ),
         "group_ids_sha256": _sha("\n".join(groups)),
         "pair_label_policy": {
             "contradiction": ["c1_c2", "c2_c3"],
