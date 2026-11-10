@@ -1,6 +1,8 @@
 # RAG Architecture Lab
 
-**Open-source · CPU-first · from-first-principles retrieval research.** Build and compare BM25, local dense embeddings, Hybrid RRF and reranking; inspect source provenance, honest negative GraphRAG experiments and a seven-section React/TypeScript observatory.
+**Open-source · CPU-first · from-first-principles retrieval research.** BM25, local dense embeddings, Hybrid RRF and reranking; inspect source provenance, honest negative studies and an eight-section React/TypeScript observatory.
+
+> **MICRO-RAG v0.2 engineering handoff (2026-11-10):** The fail-closed source-coverage repair in [PR #36](https://github.com/AlexiVion/rag-architecture-lab/pull/36) is integrated and exact-head software CI passed. Six adversarial regressions prevent malformed source records, unsupported questions and incomplete neural retrieval from being silently treated as verified answers/absence. [Audited handoff, reproducibility and LinkedIn-safe launch copy](docs/MICRO_V02_ENGINEERING_HANDOFF_20261110.md). **Independent natural-language reliability NO-GO; public Pages/release not verified.**
 
 
 > **M5 quantization result (2026-11-10, CPU-only verifier):** Pinned DeBERTa-v3-xsmall ONNX AVX2 INT8 scored **269/318 (84.59%)** pair classifications versus FP32 **261/318 (82.08%)** on the same public Ragability cohort, with measured batch wall time **15.08s vs 24.37s** and weights **87.38MB vs 283.35MB** in one sequential CPU run. **This is not end-to-end RAG, a memory-RSS comparison, or independent reliability evidence.** [Results and limitations](docs/MICRO_V02_ONNX_RESULTS.md) · [Exact CPU execution](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42834352753) · [Phase-2 tracker #28](https://github.com/AlexiVion/rag-architecture-lab/issues/28).

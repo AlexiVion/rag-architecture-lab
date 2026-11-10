@@ -1,7 +1,7 @@
 # RAG Architecture Lab — Project control (single operational status)
 
 > **Updated:** 2026-11-10 (America/Argentina/Buenos_Aires)  
-> **Current main engineering/research baseline:** 2026-11-10 SHA **34004081dfb9c49725463507771ef211423a0e48** (merged MICRO-RAG v0.2 source-trace E2E, oracle ablation, provisional NLI adapter, reviewed evaluation harness and quantized ONNX CPU study); **scientific reliability still NOT validated**. Prior external Ragability NLI result remains in historical section.  
+> **Current main engineering/research baseline:** 2026-11-10 SHA **3c3b8a261e1dfa196c22a34a6373b53ada7b5338** (PR #36 merged, correcting malformed-source omission and false absence from partial retrieval); **software integrity CI PASS; independent scientific reliability still NOT validated**. See the [audited handoff](MICRO_V02_ENGINEERING_HANDOFF_20261110.md).  
 > **Program:** v0.1 portfolio source integrated and CI PASS; **public Pages deployment still blocked** by repository admin configuration. Full scientific WOW v1.0 **NOT APPROVED**.  
 > **Tracker:** [master issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9) · [merged research PR #2](https://github.com/AlexiVion/rag-architecture-lab/pull/2) · [append-only execution log](EXECUTION_LOG.md)
 
@@ -11,7 +11,15 @@
 
 > **UPDATED USER PRIORITY (2026-11-10):** Complete MICRO-RAG v0.2 evidence-grounded CPU research system for the *LinkedIn release* before publishing a simple v0.1 portfolio. PR #29–#33 engineering/research integrations are merged, but the independent scientific holdout, query-aware semantic claim support, full-stack CPU measurement and public Pages deployment remain OPEN. [MICRO-RAG v0.2 spec](MICRO_RAG_V02_SPEC.md) · [Tracker #28](https://github.com/AlexiVion/rag-architecture-lab/issues/28).
 
-> **ACTIVE SHIP DIRECTIVE (2026-11-09):** [REL-PORTFOLIO-01 #13](https://github.com/AlexiVion/rag-architecture-lab/issues/13) is the current P0 priority: publish the *scoped v0.1.0 retrieval research portfolio*, with real Pages/CI verification, provenance and honest negative studies. The previous full scientific WOW v1.0 gates are **not waived or completed**; they remain tracked in issue #9. Proposed MICRO and PHY/BIO research remain future, explicitly not blockers for v0.1.0. [Portfolio scope](PORTFOLIO_RELEASE.md) · [LinkedIn package](LINKEDIN_LAUNCH.md).
+> **HISTORICAL SHIP DIRECTIVE (2026-11-09; superseded by 2026-11-10 MICRO v0.2 priority):** [REL-PORTFOLIO-01 #13](https://github.com/AlexiVion/rag-architecture-lab/issues/13) is the current P0 priority: publish the *scoped v0.1.0 retrieval research portfolio*, with real Pages/CI verification, provenance and honest negative studies. The previous full scientific WOW v1.0 gates are **not waived or completed**; they remain tracked in issue #9. Proposed MICRO and PHY/BIO research remain future, explicitly not blockers for v0.1.0. [Portfolio scope](PORTFOLIO_RELEASE.md) · [LinkedIn package](LINKEDIN_LAUNCH.md).
+
+## MICRO v0.2 security-audit closure checkpoint — 2026-11-10
+
+- [PR #36](https://github.com/AlexiVion/rag-architecture-lab/pull/36) merged to `main` as `3c3b8a261e1dfa196c22a34a6373b53ada7b5338`. Malformed/ambiguous entities are not silently excluded from source coverage; invalid nonempty structured lines fail closed. Unsupported fields and top-k neural no-answer cases now return REVIEW instead of false INSUFFICIENT claims.
+- [MICRO software E2E #42838904398](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42838904398) and [full Python/TypeScript/Chromium CI #42838904462](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42838904462) both SUCCESS at exact PR head `2d11c06230135ffa188b6af3fb1934d85d52b4d4`. Six new adversarial regression cases, original nine synthetic demo cases.
+- **Engineering gate:** PASS for bounded strict structured source reader only; live model-extractive semantic support **still REVIEW-only**.
+- **Scientific and external release gates:** independent human-reviewed heldout, realistic document claim normalization, calibrated risk/coverage, full-stack CPU profiling and verified GitHub Pages/GitHub Release remain OPEN. Do not close issue #28 or advertise reliable free-text RAG.
+- Read [the dedicated audited handoff](MICRO_V02_ENGINEERING_HANDOFF_20261110.md) before preparing a public post.
 
 ## Operating contract: how to keep this project truthful
 
