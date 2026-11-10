@@ -10,7 +10,7 @@ from raglab.micro.counterfactual import (
 )
 from raglab.micro.cf_evaluation import (
     Prediction, calibrate, format_outcome, gate_prediction, locked_threshold,
-    summarize, template_rule,
+    summarize, template_rule, detects_source_conflict,
 )
 
 
@@ -153,3 +153,33 @@ def test_calibration_cannot_claim_unsafe_risk_guarantee():
             [pred()] * 36,
             max_wrong_accept_rate=-1,
         )
+
+
+def test_template_conflict_guard_uses_retrieved_text_not_gold_oracle():
+    part = build_counterfactual_corpus()["audit"]
+    docs = {doc.id: doc for doc in part.documents}
+    for case in part.cases:
+        retrieved = [docs[doc_id] for doc_id in case.eligible_document_ids]
+        seen = detects_source_conflict(case.question, case.entity, retrieved)
+        assert seen == (case.kind == "conflict")
+        if case.kind == "conflict":
+            # One paragraph alone cannot demonstrate a contradiction.
+            assert detects_source_conflict(
+                case.question, case.entity, retrieved[:1]
+            ) is False
+        rule = template_rule(case.question, case.entity, retrieved)
+        assert rule.candidates_read == 0  # This is not a model forward.
+
+
+def test_answer_from_wrong_entity_is_not_counted_as_source_grounded():
+    case = next(
+        case for case in build_counterfactual_corpus()["dev"].cases
+        if case.kind == "answer"
+    )
+    matching_text_from_wrong_source = replace(
+        pred(case.correct_answer, margin=5), doc_id="other-station"
+    )
+    result = format_outcome(case, matching_text_from_wrong_source)
+    assert result["correct_programmatic_label"] is False
+    assert result["wrong_accept"] is True
+    assert result["source_document_eligible"] is False
