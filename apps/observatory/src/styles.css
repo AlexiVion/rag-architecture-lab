@@ -61,8 +61,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px soli
 .primary-action:hover { filter: brightness(.93); }
 .text-action { border: none; background: none; color: var(--accent); font-size: 13px; font-weight: 800; padding: 10px 0; }
 .text-action:hover, .source-link:hover { text-decoration: underline; }
-.project-status { margin-top: 42px; max-width: 780px; font-size: 12px; line-height: 1.8; color: var(--ink-muted); display: flex; align-items: baseline; gap: 7px; }
-.status-circle { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; flex: none; }
+.project-status { margin-top: 42px; max-width: 780px; font-size: 12px; line-height: 1.8; color: var(--ink-muted); display: block; }
+.status-circle { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; vertical-align: middle; margin-right: 6px; }
 .demonstration, .process-section { border-top: 1px solid var(--line); padding: 76px 0 0; }
 .section-intro { max-width: 730px; margin-bottom: 34px; }
 .section-intro h2, .study h2, .method-block h2 { font: 750 clamp(29px,3.5vw,43px)/1.22 "Manrope",sans-serif; letter-spacing: -.05em; margin: 0 0 16px; }
