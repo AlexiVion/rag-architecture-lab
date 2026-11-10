@@ -45,6 +45,22 @@ class Prediction:
     candidates_read: int
 
 
+def detects_source_conflict(question: str, entity: str, docs: list[Document]) -> bool:
+    """A *template-specific* non-ML guard using only retrieved source text.
+
+    Detects two distinct storage seal values for the SAME named station.
+    This rule is NOT a general NLI/contradiction engine.
+    """
+    if "storage seal" not in question.lower():
+        return False
+    values = {
+        match.group(1).casefold()
+        for doc in docs if entity in doc.text
+        for match in _SEAL.finditer(doc.text)
+    }
+    return len(values) > 1
+
+
 def template_rule(question: str, entity: str, docs: list[Document]) -> Prediction:
     """No gold labels, model, hidden metadata or external lookup at inference.
 
@@ -65,12 +81,12 @@ def template_rule(question: str, entity: str, docs: list[Document]) -> Predictio
     if len(unique) != 1:
         return Prediction(
             "INSUFFICIENT_EVIDENCE", None, None, None, None,
-            0, 0.0, False, len(docs),
+            0, 0.0, False, 0,
         )
     value, source, start, end = next(m for m in matches if m[0] == unique[0])
     return Prediction(
         value, source.id, start, end, None, 0, 0.0,
-        source.text[start:end] == value, len(docs),
+        source.text[start:end] == value, 0,
     )
 
 
@@ -105,7 +121,7 @@ def format_outcome(case: CFCase, prediction: Prediction) -> dict[str, Any]:
         "source_exact": prediction.source_exact,
         "raw_null_margin": prediction.margin,
         "model_input_tokens": prediction.tokens,
-        "model_cpu_forward_ms": prediction.cpu_ms,
+        "reader_call_wall_ms": prediction.cpu_ms,
         "candidate_reader_forwards": prediction.candidates_read,
         "source_document_eligible": (
             prediction.doc_id in case.eligible_document_ids
@@ -140,7 +156,7 @@ def summarize(rows: list[dict]) -> dict:
         ),
         "false_refusals_on_answerable": sum(x["false_refusal"] for x in positives),
         "total_reader_forwards": sum(x["candidate_reader_forwards"] for x in rows),
-        "total_model_cpu_forward_ms": sum(x["model_cpu_forward_ms"] for x in rows),
+        "total_reader_call_wall_ms": sum(x["reader_call_wall_ms"] for x in rows),
         "total_model_input_tokens": sum(x["model_input_tokens"] for x in rows),
         "nonrefusal_provenance": sum(x["source_exact"] for x in accepted),
         "wrong_entity_source_accepts": sum(
