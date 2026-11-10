@@ -1,0 +1,168 @@
+{
+  "cases": [
+    {
+      "answer": null,
+      "citations": [
+        {
+          "doc_id": "aurora-operations",
+          "document_sha256": "81d6d2525d2928a4fdb4766af76448218cb0bc2aa66c4e09dc9b9a50bb11c7d1",
+          "end": 39,
+          "quote": "2015",
+          "start": 35
+        },
+        {
+          "doc_id": "aurora-registry",
+          "document_sha256": "abe77b88e1ccb5d6e834ad29237204cb35d8ec36063830c511ee5e29e988295b",
+          "end": 39,
+          "quote": "2012",
+          "start": 35
+        }
+      ],
+      "id": "conflict",
+      "inspected_doc_ids": [
+        "aurora-operations",
+        "aurora-registry"
+      ],
+      "label": "Conflicting records",
+      "question": "What is the start year for Station Aurora?",
+      "read_calls": 2,
+      "retrieved_doc_ids": [
+        "aurora-registry"
+      ],
+      "scan_budget": 25,
+      "source_sweep_complete": true,
+      "status": "CONFLICT",
+      "warnings": [
+        "Different literal values for one field across distinct sources; no authority resolution"
+      ]
+    },
+    {
+      "answer": "2019",
+      "citations": [
+        {
+          "doc_id": "boreal-operations",
+          "document_sha256": "4f32cad98ac07fe668e3af72d2bc375dde00eac86f6d2a3b5a2b687c75862a19",
+          "end": 39,
+          "quote": "2019",
+          "start": 35
+        },
+        {
+          "doc_id": "boreal-registry",
+          "document_sha256": "4f32cad98ac07fe668e3af72d2bc375dde00eac86f6d2a3b5a2b687c75862a19",
+          "end": 39,
+          "quote": "2019",
+          "start": 35
+        }
+      ],
+      "id": "answer",
+      "inspected_doc_ids": [
+        "boreal-operations",
+        "boreal-registry"
+      ],
+      "label": "Compatible records",
+      "question": "What is the start year for Station Boreal?",
+      "read_calls": 2,
+      "retrieved_doc_ids": [
+        "boreal-operations"
+      ],
+      "scan_budget": 25,
+      "source_sweep_complete": true,
+      "status": "ANSWER",
+      "warnings": []
+    },
+    {
+      "answer": null,
+      "citations": [],
+      "id": "insufficient",
+      "inspected_doc_ids": [
+        "cosmos-registry"
+      ],
+      "label": "Missing information",
+      "question": "What is the start year for Station Cosmos?",
+      "read_calls": 1,
+      "retrieved_doc_ids": [
+        "cosmos-registry"
+      ],
+      "scan_budget": 25,
+      "source_sweep_complete": true,
+      "status": "INSUFFICIENT",
+      "warnings": [
+        "No supported answer candidate"
+      ]
+    },
+    {
+      "answer": null,
+      "citations": [
+        {
+          "doc_id": "aurora-operations",
+          "document_sha256": "81d6d2525d2928a4fdb4766af76448218cb0bc2aa66c4e09dc9b9a50bb11c7d1",
+          "end": 39,
+          "quote": "2015",
+          "start": 35
+        }
+      ],
+      "id": "review",
+      "inspected_doc_ids": [
+        "aurora-operations"
+      ],
+      "label": "Incomplete evidence sweep",
+      "question": "What is the start year for Station Aurora?",
+      "read_calls": 1,
+      "retrieved_doc_ids": [
+        "aurora-registry"
+      ],
+      "scan_budget": 1,
+      "source_sweep_complete": false,
+      "status": "REVIEW",
+      "warnings": [
+        "Related source group exceeds bounded scan budget",
+        "Source coverage exceeded scan budget; no answer may be published"
+      ]
+    }
+  ],
+  "generated_by": "scripts/micro/export_micro_v02_observatory.py",
+  "kind": "micro_v02_engine_execution_replay",
+  "limitations": [
+    "Documents are entirely fictional, created to test software invariants.",
+    "This is prerecorded execution of the real Python pipeline, not interactive model inference.",
+    "Answers are literal structured field values, not free-text semantic reasoning.",
+    "CPU timings are omitted because they would be specific to the CI runner.",
+    "No independent human-reviewed factual reliability or cross-domain support has been demonstrated."
+  ],
+  "method": "Executed MicroRAG structured-literal reader against invented records. BM25 top_k=1; source-group scan is complete except the intentionally constrained REVIEW case. Static replay only.",
+  "schema_version": 1,
+  "source_fixture": "examples/micro-v02/documents.json",
+  "sources": [
+    {
+      "id": "aurora-registry",
+      "sha256": "abe77b88e1ccb5d6e834ad29237204cb35d8ec36063830c511ee5e29e988295b",
+      "text": "entity: Station Aurora\nstart_year: 2012\nmanager: Camille\ncapacity: 8\n",
+      "title": "Station Aurora registry"
+    },
+    {
+      "id": "aurora-operations",
+      "sha256": "81d6d2525d2928a4fdb4766af76448218cb0bc2aa66c4e09dc9b9a50bb11c7d1",
+      "text": "entity: Station Aurora\nstart_year: 2015\nmanager: Camille\ncapacity: 8\n",
+      "title": "Station Aurora operations"
+    },
+    {
+      "id": "boreal-registry",
+      "sha256": "4f32cad98ac07fe668e3af72d2bc375dde00eac86f6d2a3b5a2b687c75862a19",
+      "text": "entity: Station Boreal\nstart_year: 2019\nmanager: Dana\ncapacity: 4\n",
+      "title": "Station Boreal registry"
+    },
+    {
+      "id": "boreal-operations",
+      "sha256": "4f32cad98ac07fe668e3af72d2bc375dde00eac86f6d2a3b5a2b687c75862a19",
+      "text": "entity: Station Boreal\nstart_year: 2019\nmanager: Dana\ncapacity: 4\n",
+      "title": "Station Boreal operations"
+    },
+    {
+      "id": "cosmos-registry",
+      "sha256": "e87656da04b61c6c27a0249c494da4fb0559697df2353ca2a1b730e298ac96a2",
+      "text": "entity: Station Cosmos\nmanager: Eli\n",
+      "title": "Station Cosmos registry"
+    }
+  ],
+  "status": "FICTIONAL_STRUCTURED_CPU_SOFTWARE_REPLAY_NOT_LIVE_AI"
+}
