@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { loadObservatory } from "./contracts";
 import type { GRF00, GRF01, ObservatoryData } from "./contracts";
 import ResearchDemo from "./ResearchDemo";
+import ArchitecturePlayground from "./ArchitecturePlayground";
 
 type Page = "research" | "experiments" | "methodology";
 const PAGES: { id: Page; label: string }[] = [
@@ -51,9 +52,10 @@ function Research({ navigate }: { navigate: (page: Page) => void }) {
       </div>
       <p className="project-status"><span className="status-circle" /> Research in progress <span aria-hidden="true">·</span> ≤135M active neural parameters is a proposed full-pipeline research constraint, not an achieved validated system.</p>
     </section>
+    <ArchitecturePlayground />
     <ResearchDemo />
     <section className="process-section" aria-labelledby="how-title">
-      <SectionTitle index="02 / THE RESEARCH APPROACH" title="Four steps. One question of trust." intro="Retrieving a document and producing a supported answer are different tasks. The laboratory measures where that chain succeeds and fails." />
+      <SectionTitle index="03 / THE RESEARCH APPROACH" title="Four steps. One question of trust." intro="Retrieving a document and producing a supported answer are different tasks. The laboratory measures where that chain succeeds and fails." />
       <div className="process-list" id="how-title">
         {[
           ["01", "Retrieve", "Find candidate sources using lexical, dense or hybrid search."],

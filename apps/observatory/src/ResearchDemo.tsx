@@ -43,7 +43,7 @@ export default function ResearchDemo() {
   return (
     <section className="demonstration" id="demonstration" aria-labelledby="demo-title">
       <div className="section-intro">
-        <p className="overline">01 / A reproducible software example</p>
+        <p className="overline">02 / A reproducible software example</p>
         <h2 id="demo-title">What happens when evidence disagrees?</h2>
         <p>Explore the actual decisions of the experimental Python pipeline using four small, fictional sets of structured source records.</p>
       </div>
