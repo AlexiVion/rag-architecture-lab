@@ -67,6 +67,9 @@ test("screenshots for the public technical walkthrough", async ({page}) => {
   await page.screenshot({path:screenshots+"/02-experiments.png",fullPage:true});
   await page.getByRole("navigation",{name:"Research sections"}).getByRole("button",{name:"Knowledge graph"}).click();
   await page.screenshot({path:screenshots+"/03-graph.png",fullPage:true});
+  await page.getByRole("navigation",{name:"Research sections"}).getByRole("button",{name:"MICRO-RAG v0.2"}).click();
+  await expect(page.getByText("Verifying original document SHA256 and citations…")).toHaveCount(0);
+  await page.screenshot({path:screenshots+"/04-micro-rag.png",fullPage:true});
 });
 
 test("MICRO v0.2 replay verifies four outcomes and source offsets", async ({page}) => {
@@ -78,8 +81,8 @@ test("MICRO v0.2 replay verifies four outcomes and source offsets", async ({page
   const result=page.getByRole("region",{name:"Micro RAG decision"});
   const citations=page.getByRole("region",{name:"Original cited sources"});
   await expect(result.getByText("No answer published.")).toBeVisible();
-  await expect(citations.getByText("2012")).toBeVisible();
-  await expect(citations.getByText("2015")).toBeVisible();
+  await expect(citations.getByText("2012",{exact:true})).toBeVisible();
+  await expect(citations.getByText("2015",{exact:true})).toBeVisible();
   await picker.getByRole("button",{name:/Compatible records/}).click();
   await expect(result.getByText("Verified literal value:")).toBeVisible();
   await expect(result.getByText("2019")).toBeVisible();
