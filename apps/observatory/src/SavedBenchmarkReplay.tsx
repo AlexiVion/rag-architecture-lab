@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { validateSavedReplay } from "./savedBenchmarkReplay";
-import type { SavedReplay } from "./savedBenchmarkReplay";
+import { validateSavedReplay } from "./savedBenchmarkContract";
+import type { SavedReplay } from "./savedBenchmarkContract";
 
 export default function SavedBenchmarkReplay(){
   const [data,setData]=useState<SavedReplay|null>(null);

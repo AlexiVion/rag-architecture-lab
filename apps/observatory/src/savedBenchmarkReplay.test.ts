@@ -1,5 +1,5 @@
 import {describe,expect,it} from "vitest";
-import {validateSavedReplay} from "./savedBenchmarkReplay";
+import {validateSavedReplay} from "./savedBenchmarkContract";
 const base={
   schema_version:1,kind:"saved_benchmark_query_replay",status:"archived_original_per_query_not_independently_revalidated",
   dataset:"beir/scifact/test",source_archive_sha256:"a".repeat(64),document_count:5183,
