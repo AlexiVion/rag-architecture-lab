@@ -10,7 +10,7 @@ Make RAG Architecture Lab readable to a new engineer or researcher in the first 
 
 Three top-level destinations:
 
-1. **Research**: an immediate question and answer, followed by a four-state static replay of actual Python MICRO-RAG v0.2 outputs on fictional structured records. Evidence details are disclosed on demand.
+1. **Research**: the central RAG research question, an educational Architecture Playground comparing BM25/Hybrid/Reranking on three explicitly fictional questions, measured V0/V1 quality-latency comparisons in separate experimental environments, and a four-state static replay of actual Python MICRO-RAG v0.2 outputs on fictional structured records. Evidence details are disclosed on demand.
 2. **Experiments**: primary real studies; each section states the evaluated task, data, measurements, interpretation, limitation and source report. No rankings across unmatched cohorts.
 3. **Methodology**: what was measured, what remains unverified, provenance principles, reproduction instructions and links to the working manuscript.
 
@@ -23,6 +23,7 @@ Editorial scientific reading experience: light background, restrained teal accen
 ## Interaction design
 
 - Three accessible navigation controls, hash-addressable.
+- Architecture Playground uses two distinct methods, five manual/automatic stages, rank movement, simple/technical/scientific explanations, and within-study source-linked aggregate metrics. Its fictional document orders are not scientific measurements; see [the module's specification](ARCHITECTURE_PLAYGROUND_SPEC.md).
 - In the main demonstration, four selectable cases retain exact SHA256-verified source quotes, original offsets and actual decision outcomes.
 - A result only appears after the existing public replay contract and browser hash checks succeed; errors fail closed.
 - Original evidence passages and technical metadata are available through native disclosure controls.

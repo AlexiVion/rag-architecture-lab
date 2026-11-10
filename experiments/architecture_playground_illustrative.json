@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "status": "FICTIONAL_RANKINGS_NOT_MEASURED",
+  "description": "Three fictional educational question/document groups. BM25, dense, and reranker orders are authored to illustrate distinct operations; Hybrid is recomputed by RRF k=60. Neither the authored relevance labels nor the document positions are BEIR SciFact observations or measured cross-encoder results.",
+  "scenarios": [
+    {
+      "id": "plants",
+      "label": "Plants and water",
+      "question": "How do plants get water from the ground?",
+      "documents": [
+        {
+          "id": "p1",
+          "title": "Plant roots",
+          "summary": "Roots take up water from soil and move it into the plant.",
+          "relevant": true
+        },
+        {
+          "id": "p2",
+          "title": "Rain gardens",
+          "summary": "Rain gardens store water above and below the ground.",
+          "relevant": false
+        },
+        {
+          "id": "p3",
+          "title": "Leaves and sunlight",
+          "summary": "Leaves use sunlight to make sugars.",
+          "relevant": false
+        },
+        {
+          "id": "p4",
+          "title": "Water through stems",
+          "summary": "Water travels inside a plant after its roots absorb it.",
+          "relevant": true
+        },
+        {
+          "id": "p5",
+          "title": "Flower colors",
+          "summary": "Pigments help give flowers their many colors.",
+          "relevant": false
+        }
+      ],
+      "rankings": {
+        "bm25": [
+          "p2",
+          "p1",
+          "p3",
+          "p4",
+          "p5"
+        ],
+        "dense": [
+          "p1",
+          "p4",
+          "p2",
+          "p3",
+          "p5"
+        ],
+        "rerank": [
+          "p1",
+          "p4",
+          "p2",
+          "p3",
+          "p5"
+        ]
+      }
+    },
+    {
+      "id": "penguins",
+      "label": "Penguin flight",
+      "question": "Can penguins fly?",
+      "documents": [
+        {
+          "id": "q1",
+          "title": "Penguin movement",
+          "summary": "Penguins cannot fly in the air, even though they are birds.",
+          "relevant": true
+        },
+        {
+          "id": "q2",
+          "title": "How birds fly",
+          "summary": "Many bird species can fly by beating their wings.",
+          "relevant": false
+        },
+        {
+          "id": "q3",
+          "title": "Swimming penguins",
+          "summary": "Penguins use their wings as flippers to move underwater rather than flying.",
+          "relevant": true
+        },
+        {
+          "id": "q4",
+          "title": "Flying fish",
+          "summary": "Flying fish can glide above the sea for short distances.",
+          "relevant": false
+        },
+        {
+          "id": "q5",
+          "title": "Penguin nesting",
+          "summary": "Penguins build nests and protect their eggs.",
+          "relevant": false
+        }
+      ],
+      "rankings": {
+        "bm25": [
+          "q2",
+          "q1",
+          "q4",
+          "q5",
+          "q3"
+        ],
+        "dense": [
+          "q1",
+          "q3",
+          "q2",
+          "q4",
+          "q5"
+        ],
+        "rerank": [
+          "q1",
+          "q3",
+          "q2",
+          "q4",
+          "q5"
+        ]
+      }
+    },
+    {
+      "id": "moon",
+      "label": "Moon phases",
+      "question": "Why does the Moon seem to change shape?",
+      "documents": [
+        {
+          "id": "m1",
+          "title": "The phases of the Moon",
+          "summary": "The Moon's apparent shape changes because we see different amounts of its sunlit half.",
+          "relevant": true
+        },
+        {
+          "id": "m2",
+          "title": "How big is the Moon?",
+          "summary": "The Moon is Earth's natural satellite and its size changes very little.",
+          "relevant": false
+        },
+        {
+          "id": "m3",
+          "title": "Moonlight and orbit",
+          "summary": "As the Moon travels around Earth, our view of its illuminated side changes.",
+          "relevant": true
+        },
+        {
+          "id": "m4",
+          "title": "Shapes in a telescope",
+          "summary": "Telescopes show the shapes of distant stars and objects.",
+          "relevant": false
+        },
+        {
+          "id": "m5",
+          "title": "Solar and lunar eclipses",
+          "summary": "An eclipse occurs when celestial bodies block sunlight or cast a shadow.",
+          "relevant": false
+        }
+      ],
+      "rankings": {
+        "bm25": [
+          "m2",
+          "m5",
+          "m1",
+          "m4",
+          "m3"
+        ],
+        "dense": [
+          "m1",
+          "m3",
+          "m5",
+          "m2",
+          "m4"
+        ],
+        "rerank": [
+          "m1",
+          "m3",
+          "m5",
+          "m2",
+          "m4"
+        ]
+      }
+    }
+  ]
+}

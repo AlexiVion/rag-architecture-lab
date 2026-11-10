@@ -186,3 +186,127 @@ button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px soli
   .site-footer {padding-bottom:35px;}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+
+/* Architecture Playground: academic comparison reader, no separate dashboard theme. */
+.ap-section { border-top: 1px solid var(--line); padding: 76px 0 92px; }
+.ap-frame { background: var(--paper); border: 1px solid var(--line-strong); border-radius: 15px; overflow: hidden; }
+.ap-controls { padding: 25px 28px 22px; display:grid; grid-template-columns: 1fr 1.15fr; gap:26px; align-items:end; border-bottom:1px solid var(--line); }
+.ap-form-control { display:flex; flex-direction:column; gap:8px; font-size:11px; font-weight:750; color:var(--ink-muted); letter-spacing:.02em; min-width:0; }
+.ap-form-control select { width:100%; min-width:0; max-width:100%; padding:11px 33px 11px 12px; background:var(--background); border:1px solid var(--line-strong); border-radius:8px; color:var(--ink); font-size:13px; font-weight:650; text-overflow:ellipsis; }
+.ap-form-control select:focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+.ap-method-controls { display:grid; grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr); gap:10px; align-items:end; }
+.ap-versus { font-size:12px; color:var(--ink-muted); font-weight:750; align-self:end; padding-bottom:13px; text-align:center; }
+.ap-selected-question {display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 20px;background:var(--accent-soft);border-bottom:1px solid var(--line);padding:13px 28px;margin:0;}
+.ap-selected-question span {font-size:10px;letter-spacing:.06em;font-weight:800;color:var(--accent);}
+.ap-selected-question strong {font:750 14px "Manrope",sans-serif;color:var(--ink);}
+.ap-transport { padding:22px 28px; border-bottom:1px solid var(--line); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:18px; }
+.ap-step-status { font-size:13px; font-weight:800; margin:0 0 8px; color:var(--ink); }
+.ap-step-status span { color:var(--ink-muted); font-weight:500; }
+.ap-progress { display:flex; align-items:center; gap:5px; }
+.ap-progress span { display:block; width:33px; height:4px; border-radius:10px; background:var(--line); transition:background .3s ease; }
+.ap-progress .current { background:var(--accent); }
+.ap-actions { display:flex; align-items:center; gap:7px; }
+.ap-actions button { background:var(--paper); color:var(--ink); font-size:12px; font-weight:750; border:1px solid var(--line-strong); border-radius:7px; min-width:59px; padding:9px 13px; }
+.ap-actions button.ap-play { background:var(--accent); border-color:var(--accent); color:var(--background); }
+.ap-actions button:hover:not(:disabled) { background:var(--accent-soft); color:var(--ink); }
+.ap-actions button:disabled { opacity:.4; cursor:not-allowed; }
+.ap-lanes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+.ap-lane { padding:25px 27px 24px; min-width:0; }
+.ap-lane:first-child { border-right:1px solid var(--line); }
+.ap-lane-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; min-height:72px; }
+.ap-small, .ap-list-caption { font-size:10px; font-weight:800; letter-spacing:.08em; color:var(--accent); }
+.ap-lane-top h3 { font:750 20px/1.3 "Manrope",sans-serif; letter-spacing:-.045em; margin:5px 0 1px; }
+.ap-lane-top p { color:var(--ink-muted); font-size:12px; margin:0; }
+.ap-lane-method { color:var(--ink-muted); font-size:11px; border:1px solid var(--line); border-radius:50px; padding:5px 10px; }
+.ap-stage-note { min-height:60px; margin:8px 0 14px; color:var(--ink-muted); font-size:12px; line-height:1.75; }
+.ap-doc-area { min-height:400px; }
+.ap-list-caption { margin:0 0 10px; }
+.ap-rank-list { position:relative; height:345px; }
+.ap-rank-card { position:absolute; left:0;right:0; height:61px; display:flex; align-items:center; gap:9px; background:var(--background); border:1px solid var(--line); border-radius:9px; padding:8px 10px; transition: top .52s cubic-bezier(.22,1,.36,1), background .22s ease, border-color .22s ease; overflow:hidden; }
+.ap-rank-card.is-relevant { border-color:var(--line-strong); background:var(--accent-soft); }
+.ap-rank-number { font:750 14px "Manrope",sans-serif; color:var(--ink-muted); flex:0 0 25px; }
+.ap-rank-text { min-width:0;flex:1; }
+.ap-rank-text strong { display:block; font-size:12px; font-weight:800; line-height:1.25; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.ap-rank-text small { display:-webkit-box; font-size:10px; color:var(--ink-muted); line-height:1.35; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.ap-rank-shift { width:25px;flex:none;color:var(--ink-muted); font-size:11px; font-weight:700; text-align:right; }
+.ap-rank-shift.positive { color:var(--accent); }
+.ap-top-document { min-height:28px; margin:6px 0 0; font-size:11px; color:var(--ink-muted); }
+.ap-top-document strong { color:var(--ink); }
+.ap-await { height:378px; background:var(--background); border:1px dashed var(--line-strong); border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; text-align:center; color:var(--ink-muted); }
+.ap-await-mark { display:flex; align-items:center; justify-content:center; border:2px solid var(--line-strong); border-radius:50%; width:56px; height:56px; color:var(--accent); font:750 26px "Manrope",sans-serif; }
+.ap-await p { font-weight:750; color:var(--ink); max-width:200px; margin:17px 0 6px; }
+.ap-await span:last-child { font-size:11px; max-width:230px; }
+.ap-legend { border-top:1px solid var(--line);padding:14px 27px; display:flex; flex-wrap:wrap; align-items:center; gap:17px; font-size:11px; color:var(--ink-muted); }
+.ap-legend-square { display:inline-block; width:11px;height:11px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:3px;vertical-align:middle;margin-right:5px; }
+.ap-disclosure { color:var(--ink-muted); font-size:12px; line-height:1.85; margin:17px 0 24px; }
+.ap-disclosure strong { color:var(--ink); }
+.ap-explanation { display:grid; grid-template-columns:260px minmax(0,1fr); align-items:start; gap:20px; border:1px solid var(--line); border-radius:11px; padding:20px 23px; }
+.ap-levels { display:flex; flex-wrap:wrap; border:0; margin:0;padding:0;gap:4px; min-width:0; }
+.ap-levels legend { font-size:10px; font-weight:800; color:var(--accent); letter-spacing:.09em; margin-bottom:9px; }
+.ap-levels label { position:relative; padding:7px 10px; color:var(--ink-muted); font-size:11px; cursor:pointer; border:1px solid var(--line);border-radius:7px; }
+.ap-levels label.selected { background:var(--accent-soft); color:var(--accent); border-color:var(--line-strong); font-weight:800; }
+.ap-levels input { position:absolute; opacity:0; width:1px; height:1px; }
+.ap-levels label:has(input:focus-visible) { outline:3px solid var(--accent); outline-offset:3px; }
+.ap-level-text { color:var(--ink-muted); font-size:13px;line-height:1.8;margin:0; }
+.ap-measured { margin-top:78px; border-top:1px solid var(--line); padding-top:70px; }
+.ap-measured .section-intro h3 { font:750 clamp(29px,3.2vw,38px)/1.24 "Manrope",sans-serif;letter-spacing:-.05em;margin:0 0 15px; }
+.ap-study-select {max-width:330px;margin:25px 0;}
+.ap-study-env {display:flex;flex-wrap:wrap;justify-content:space-between;gap:9px;color:var(--ink-muted);font-size:12px;border-bottom:1px solid var(--line);padding-bottom:16px;}
+.ap-study-env strong {color:var(--ink);}
+.ap-study { display:grid;grid-template-columns:1.4fr .85fr; gap:30px; margin-top:25px; }
+.ap-study-chart {min-width:0;}
+.ap-study-chart svg {display:block;width:100%;height:auto;}
+.ap-axis {stroke:var(--line-strong);stroke-width:1.2;}
+.ap-grid-line {stroke:var(--line);stroke-width:1;stroke-dasharray:3 5;}
+.ap-axis-title {fill:var(--ink-muted);font:700 12px "DM Sans",sans-serif;}
+.ap-axis-tick {fill:var(--ink-muted);font:11px "DM Sans",sans-serif;}
+.ap-point-label {fill:var(--ink);font:700 12px "DM Sans",sans-serif;}
+.ap-plot-point {fill:#9aafad; stroke:var(--paper);stroke-width:3;transition:fill .2s ease,r .2s ease;}
+.ap-plot-point.chosen {fill:var(--accent);}
+.ap-chart-note {font-size:11px;color:var(--ink-muted);line-height:1.7;margin:0;}
+.ap-study-points { display:grid;gap:9px;align-content:start;}
+.ap-study-point {display:grid; grid-template-columns:minmax(0,1fr) auto; gap:3px 10px;align-items:center;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--ink);}
+.ap-study-point.active {border-color:var(--accent);background:var(--accent-soft);}
+.ap-study-point span {font-size:12px;font-weight:800;grid-column:1 / -1;}
+.ap-study-point strong {font:750 15px "Manrope",sans-serif;}
+.ap-study-point small {font-size:12px;color:var(--ink-muted);}
+.ap-study-description {font-size:11px;color:var(--ink-muted);margin:2px 0 0;}
+.ap-study-footer {margin:22px 0 0;color:var(--ink-muted);font-size:12px;line-height:1.8;}
+.ap-study-footer a {font-weight:750;white-space:nowrap;}
+@media(max-width:880px) {
+  .ap-controls {grid-template-columns:1fr;gap:16px;}
+  .ap-lane {padding:20px 15px;}
+  .ap-rank-card {padding:8px 7px;gap:5px;}
+  .ap-rank-number {flex-basis:20px;}
+  .ap-study {grid-template-columns:1fr;}
+  .ap-study-points {grid-template-columns:repeat(3,minmax(0,1fr));}
+  .ap-study-description {grid-column:1 / -1;}
+}
+@media(max-width:650px) {
+  .ap-section {padding:55px 0 67px;}
+  .ap-controls,.ap-transport {padding:18px 15px;}
+  .ap-selected-question {padding:13px 15px;}
+  .ap-method-controls {gap:5px;}
+  .ap-versus {font-size:11px;padding-bottom:13px;}
+  .ap-lanes {grid-template-columns:1fr;}
+  .ap-lane:first-child {border-right:0;border-bottom:1px solid var(--line);}
+  .ap-lane {padding:21px 15px;}
+  .ap-lane-top {min-height:60px;}
+  .ap-stage-note {min-height:0;margin:11px 0 18px;}
+  .ap-rank-card {padding:8px 10px;gap:9px;}
+  .ap-legend {padding:13px 15px;}
+  .ap-explanation {grid-template-columns:1fr;padding:18px 15px;gap:16px;}
+  .ap-measured {margin-top:60px;padding-top:55px;}
+  .ap-study-points {grid-template-columns:1fr;}
+  .ap-study-env {display:block;}
+  .ap-study-env strong,.ap-study-env span {display:block;}
+  .ap-study-chart svg {min-width:0;}
+  .ap-point-label {font-size:10px;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .ap-rank-card,.ap-progress span,.ap-plot-point {transition:none!important;}
+}
+
+.ap-svg-point {cursor:pointer;}
+.ap-study-point:focus-visible {outline:3px solid var(--accent);outline-offset:2px;}

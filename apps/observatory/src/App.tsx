@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { loadObservatory } from "./contracts";
 import type { GRF00, GRF01, ObservatoryData } from "./contracts";
 import ResearchDemo from "./ResearchDemo";
+import ArchitecturePlayground from "./ArchitecturePlayground";
 
 type Page = "research" | "experiments" | "methodology";
 const PAGES: { id: Page; label: string }[] = [
@@ -46,14 +47,15 @@ function Research({ navigate }: { navigate: (page: Page) => void }) {
       <h1>How small can <em>reliable RAG</em> be?</h1>
       <p className="hero-lead">An open-source investigation into evidence-grounded question answering with small models and limited CPU resources.</p>
       <div className="hero-actions">
-        <a className="primary-action" href="#demonstration">Explore the evidence example <span aria-hidden="true">↗</span></a>
+        <a className="primary-action" href="#architecture-playground">Compare architectures <span aria-hidden="true">↗</span></a>
         <button type="button" className="text-action" onClick={() => navigate("experiments")}>View measured results <span aria-hidden="true">→</span></button>
       </div>
       <p className="project-status"><span className="status-circle" /> Research in progress <span aria-hidden="true">·</span> ≤135M active neural parameters is a proposed full-pipeline research constraint, not an achieved validated system.</p>
     </section>
+    <ArchitecturePlayground />
     <ResearchDemo />
     <section className="process-section" aria-labelledby="how-title">
-      <SectionTitle index="02 / THE RESEARCH APPROACH" title="Four steps. One question of trust." intro="Retrieving a document and producing a supported answer are different tasks. The laboratory measures where that chain succeeds and fails." />
+      <SectionTitle index="03 / THE RESEARCH APPROACH" title="Four steps. One question of trust." intro="Retrieving a document and producing a supported answer are different tasks. The laboratory measures where that chain succeeds and fails." />
       <div className="process-list" id="how-title">
         {[
           ["01", "Retrieve", "Find candidate sources using lexical, dense or hybrid search."],
