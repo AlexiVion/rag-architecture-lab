@@ -36,6 +36,9 @@ DATASET_ID = "OracleY/ConfRAG"
 DATASET_FILE = "ConfRAGsuggested.jsonl"
 DATASET_LICENSE = "cc-by-4.0"
 DATASET_REVISION = "529e760a78a58791d0387fe469e0732377a6d94d"
+# Frozen from exact-head first CPU run #42858534499 before the second model.
+EXPECTED_PREFIX_SHA256 = "24c62a4b4df17e8d80a15338d27b05624201fd3fc67862b64e44bc8a2e9dadd6"
+EXPECTED_INPUTS_SHA256 = "acd2012c7371c408d46987424db876b04efc7ba06b726823215fa9c0d817c8d7"
 MODEL_REVISIONS = {
     "deberta_xsmall": "a150876415327c80daeff35ca6f68f5ed8cf5c24",
     "minilm": "b95119ce93d3e065de6214e38cd4a97b0f2f2c6d",
@@ -148,6 +151,10 @@ def main() -> None:
     source["download_seconds"] = time.perf_counter() - source_started
     selected_hashes = fingerprints(pairs)
     source["inputs_sha256"] = selected_hashes["selected_pairs_sha256"]
+    if source["read_prefix_sha256"] != EXPECTED_PREFIX_SHA256:
+        raise ValueError("ConfRAG frozen source-prefix SHA mismatch")
+    if source["inputs_sha256"] != EXPECTED_INPUTS_SHA256:
+        raise ValueError("ConfRAG frozen selected answer-pair inputs changed")
     source["selected_pair_sha256"] = selected_hashes["pair_sha256"]
 
     spec = dict(MODEL_SPECS[args.model_key], revision=MODEL_REVISIONS[args.model_key])
