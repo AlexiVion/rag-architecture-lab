@@ -307,3 +307,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px soli
 @media(prefers-reduced-motion:reduce) {
   .ap-rank-card,.ap-progress span,.ap-plot-point {transition:none!important;}
 }
+
+.ap-study-chart g[role="button"] {cursor:pointer;}
+.ap-study-chart g[role="button"]:focus-visible .ap-plot-point {stroke:var(--accent);stroke-width:5;}
