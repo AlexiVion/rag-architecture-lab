@@ -94,7 +94,7 @@ def read_bounded_public_prefix(*, revision: str, per_stratum: int = 8,
     return selected, {
         "download_scope": "bounded_prefix_stream_not_whole_dataset",
         "dataset_revision": revision, "dataset_filename": DATASET_FILE,
-        "selection_rule": "first_eligible_8_true_and_8_false_in_source_order",
+        "selection_rule": f"first_eligible_{per_stratum}_per_boolean_flag_in_source_order",
         "source_rows_scanned": rows_seen, "selected_question_groups": per_stratum * 2,
         "selected_group_balance": dict(totals),
         "prefix_bytes_read": bytes_seen,
