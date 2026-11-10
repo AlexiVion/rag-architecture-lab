@@ -26,7 +26,7 @@ from raglab.core import Document
 from raglab.retrieval import BM25Retriever
 from raglab.micro.cf_evaluation import (
     Prediction, calibrate, format_outcome, gate_prediction, is_refusal,
-    locked_threshold, summarize, template_rule, file_fingerprint,
+    locked_threshold, summarize, template_rule, detects_source_conflict,
 )
 from raglab.micro.counterfactual import (
     build_counterfactual_corpus, protocol_manifest,
@@ -80,7 +80,8 @@ def extract_split(reader: SmallExtractiveReader, partition) -> dict:
     retrieval = BM25Retriever()
     retrieval.index(partition.documents)
     outputs: dict[str, list[Prediction]] = {
-        "top1": [], "top3": [], "template_rule_top3": [], "refuse_all": [],
+        "top1": [], "top3": [], "top1_conflict_guard": [],
+        "top3_conflict_guard": [], "template_rule_top3": [], "refuse_all": [],
     }
     rows_cases = []
     per_case_search_ms = []
@@ -99,8 +100,26 @@ def extract_split(reader: SmallExtractiveReader, partition) -> dict:
                 if doc.text[pred.start:pred.end] != pred.text:
                     raise ValueError("Reader span is not exact original source text")
             candidates.append((doc.id, pred, tokens, ms))
-        outputs["top1"].append(_picked(candidates, take=1, docs=docs))
-        outputs["top3"].append(_picked(candidates, take=3, docs=docs))
+        top1 = _picked(candidates, take=1, docs=docs)
+        top3 = _picked(candidates, take=3, docs=docs)
+        outputs["top1"].append(top1)
+        outputs["top3"].append(top3)
+        # This guard is hand-engineered from exposed synthetic templates:
+        # it is cheap but NOT an open-domain contradiction resolver.
+        conflict_seen = detects_source_conflict(
+            case.question, case.entity, [docs[x.doc_id] for x in ranked]
+        )
+        for policy, base in (
+            ("top1_conflict_guard", top1), ("top3_conflict_guard", top3)
+        ):
+            guarded = (
+                replace(
+                    base,
+                    text="INSUFFICIENT_EVIDENCE",
+                    doc_id=None, start=None, end=None, source_exact=False,
+                ) if conflict_seen else base
+            )
+            outputs[policy].append(guarded)
         start = time.perf_counter()
         rule = template_rule(
             case.question, case.entity,
@@ -120,6 +139,7 @@ def extract_split(reader: SmallExtractiveReader, partition) -> dict:
                 set(r.doc_id for r in ranked) & set(case.eligible_document_ids)
             ),
             "retrieval_ms": per_case_search_ms[-1],
+            "synthetic_template_conflict_seen": conflict_seen,
             "rule_wall_ms": per_case_rule_ms[-1],
         })
     return {
@@ -245,7 +265,8 @@ def run_experiment(out: Path, *, seed: int = 20261109) -> dict:
             "model": "deepset/minilm-uncased-squad2",
             "model_training": "SQuAD2 task-specific QA; fictional corpus is distribution shift",
             "policies": (
-                "top1", "top3", "top1_calibrated", "top3_calibrated",
+                "top1", "top3", "top1_conflict_guard", "top3_conflict_guard",
+                "top1_calibrated", "top3_calibrated",
                 "template_rule_top3", "refuse_all",
             ),
             "partition_usage": "DEV measured, CALIBRATION optimizes threshold, AUDIT evaluated after frozen calibration",
@@ -293,7 +314,7 @@ def run_experiment(out: Path, *, seed: int = 20261109) -> dict:
                 "answerable_correct": r["summary"]["answerable_correct"],
                 "conflict_correct_refusals": r["summary"]["conflict_correct_refusals"],
                 "total_reader_forwards": r["summary"]["total_reader_forwards"],
-                "model_cpu_forward_ms": r["summary"]["total_model_cpu_forward_ms"],
+                "reader_call_wall_ms": r["summary"]["total_reader_call_wall_ms"],
             } for mode, r in per_split["audit"]["policies"].items()
         },
     }, sort_keys=True))
