@@ -367,13 +367,27 @@ def score_model_rows(
                 r["symmetric_prediction"] == CONFLICT for r in selected
             ),
         }
+    # reasoning_required_c1c2 describes only the original implicit
+    # conflict pair, so do not pool the other five derived pair types here.
     by_reasoning_type = {}
     for reasoning_type in sorted({row["reasoning_type"] for row in rows}):
-        selected = [row for row in rows if row["reasoning_type"] == reasoning_type]
-        by_reasoning_type[reasoning_type] = _class_metrics(
-            [r["expected"] for r in selected],
-            [r["symmetric_prediction"] for r in selected],
+        selected = [
+            row for row in rows
+            if row["reasoning_type"] == reasoning_type
+            and row["pair_type"] == "c1_c2"
+        ]
+        if not selected:
+            continue
+        correct = sum(
+            row["expected"] == row["symmetric_prediction"] for row in selected
         )
+        by_reasoning_type[reasoning_type] = {
+            "n": len(selected),
+            "gold_label": CONFLICT,
+            "correct_conflict_detections": correct,
+            "missed_conflicts": len(selected) - correct,
+            "conflict_detection_rate": correct / len(selected),
+        }
     metrics = _class_metrics(expected, symmetric)
     metrics["directional_forward"] = _class_metrics(expected, forward)
     metrics["directional_reverse"] = _class_metrics(expected, reverse)
