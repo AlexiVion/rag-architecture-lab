@@ -28,6 +28,8 @@ The paper describes 253 human-annotated WikiContradict instances, 92 requiring i
 - Expected distinct source-conflict groups: **43**
 - Context fields: context_1, context_2, context_3_nc1_c2, context_4_nc1_nc2_nc3
 
+The official TSV has one row with a blank optional WikiContradict_ID cross-reference. The parser preserves that row and records the missing cross-reference count; it does not infer or fabricate an original ID. The required contradiction_ID remains present and is used for group-level provenance.
+
 The published design specifies:
 - context_1 and context_2 are conflicting.
 - context_3 is a reformulation that is no longer contradictory to context_1, but is explicitly contradictory to context_2.
