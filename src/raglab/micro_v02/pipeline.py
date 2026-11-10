@@ -14,6 +14,7 @@ from raglab.core import Document
 from raglab.retrieval import BM25Retriever
 from raglab.micro_v02.contracts import EvidenceClaim, EvidenceResult
 from raglab.micro_v02.policy import adjudicate
+from raglab.micro_v02.verifier import EvidenceVerifier
 from raglab.micro_v02.readers import (
     EvidenceReader, StructuredFactReader, parse_question, source_entity,
     structured_source_invalid,
@@ -26,6 +27,7 @@ class MicroRAG:
         documents: Sequence[Document],
         *,
         reader: EvidenceReader | None = None,
+        verifier: EvidenceVerifier | None = None,
         top_k: int = 3,
         max_entity_sweep: int = 25,
     ) -> None:
@@ -45,6 +47,7 @@ class MicroRAG:
         self.top_k = top_k
         self.max_entity_sweep = max_entity_sweep
         self.reader = reader or StructuredFactReader()
+        self.verifier = verifier
         self.retriever = BM25Retriever()
         self.retriever.index(self.documents)
 
@@ -114,6 +117,26 @@ class MicroRAG:
                 )
         reader_ms = (time.perf_counter() - read_start) * 1000
 
+        verify_start = time.perf_counter()
+        observations: tuple[dict, ...] = ()
+        if self.verifier is not None and len(claims) >= 2 and not reader_error:
+            try:
+                # NLI is an *unverified diagnostic*, not an independent
+                # factual gate; the policy still REQUIRES REVIEW.
+                checked = self.verifier.inspect(question, tuple(claims))
+                observations = tuple(x.to_dict() for x in checked)
+                if any(x.get("predicted_relation") == "contradiction"
+                       for x in observations):
+                    warnings.append(
+                        "Provisional NLI conflict detected; requires independent review"
+                    )
+            except Exception as exc:
+                reader_error = True
+                warnings.append(
+                    f"NLI verifier failed closed: {type(exc).__name__}"
+                )
+        verifier_ms = (time.perf_counter() - verify_start) * 1000
+
         decide_start = time.perf_counter()
         policy = adjudicate(
             tuple(claims),
@@ -124,6 +147,7 @@ class MicroRAG:
             "retrieval": retrieval_ms,
             "source_scan": scan_ms,
             "reader": reader_ms,
+            "verifier": verifier_ms,
             "decision": decision_ms,
             "total": (time.perf_counter() - started) * 1000,
         }
@@ -140,6 +164,7 @@ class MicroRAG:
             read_calls=calls,
             documents_total=len(self.documents),
             source_sweep_complete=source_sweep_complete and not reader_error,
+            verifier_traces=observations,
         )
         outcome.validate(self.sources)
         return outcome
