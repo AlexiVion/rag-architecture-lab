@@ -34,7 +34,8 @@ def sample_rows():
         group = i + 1 if i < 43 else i - 42
         rows.append({
             "contradiction_ID": str(group),
-            "WikiContradict_ID": str(group + 100),
+            # The published corpus contains a row with no WikiContradict ID.
+            "WikiContradict_ID": "" if i == 41 else str(group + 100),
             "reasoning_required_c1c2": (
                 "temporal.numerical" if i % 2 else "categorical"
             ),
@@ -84,6 +85,7 @@ def test_dataset_manifest_preserves_license_and_group_not_row_independence(tmp_p
     assert manifest["unique_conflict_groups"] == 43
     assert manifest["pair_count"] == 318
     assert manifest["license"] == "cc-by-sa-4.0"
+    assert manifest["rows_without_wiki_contradict_cross_reference"] == 1
     assert "public exposed benchmark" in " ".join(manifest["limitations"])
 
 
