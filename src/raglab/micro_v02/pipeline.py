@@ -119,7 +119,9 @@ class MicroRAG:
 
         verify_start = time.perf_counter()
         observations: tuple[dict, ...] = ()
-        if self.verifier is not None and len(claims) >= 2 and not reader_error:
+        if (self.verifier is not None and len(claims) >= 2
+                and not reader_error
+                and any(claim.method == "extractive_unverified" for claim in claims)):
             try:
                 # NLI is an *unverified diagnostic*, not an independent
                 # factual gate; the policy still REQUIRES REVIEW.
