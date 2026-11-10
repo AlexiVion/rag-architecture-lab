@@ -1,13 +1,8 @@
 name: Publish static RAG evidence observatory
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "apps/explorer/**"
-      - "apps/observatory/**"
-      - "experiments/model_matrix_10_proposed.json"
-      - ".github/workflows/pages.yml"
+  # Optional static replication interface; run manually after Pages is configured.
+  # A successful source/CI build does not prove public deployment.
   workflow_dispatch:
 
 permissions:
