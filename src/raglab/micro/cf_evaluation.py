@@ -78,7 +78,8 @@ def format_outcome(case: CFCase, prediction: Prediction) -> dict[str, Any]:
     refused = is_refusal(prediction.text)
     correct = (
         refused if case.kind != "answer" else (
-            not refused and normalize_answer(prediction.text)
+            not refused and prediction.doc_id in case.evidence_document_ids
+            and normalize_answer(prediction.text)
             == normalize_answer(case.correct_answer or "")
         )
     )
