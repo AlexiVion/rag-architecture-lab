@@ -32,7 +32,7 @@ The fixed lexical control identifies all 130 different-cluster pairs in this sam
 | Model | Directional NLI inputs | Forward batches | Inference-batch wall ms | Weight bytes |
 | --- | ---: | ---: | ---: | ---: |
 | DeBERTa | 480 | 20 | 26,293.08 | 283,353,172 |
-| MiniLM2 | 480 | 20 | 31,767.11 | Check original artifact's model weight manifest |
+| MiniLM2 | 480 | 20 | 31,767.11 | 328,499,560 |
 
 These are **separate, potentially heterogeneous shared GitHub runners**, with different concurrent jobs and cached conditions. They include tokenization + model forward + softmax only; they exclude source search, webpage extraction, question answering, indexing, model loading and power consumption. The initial DeBERTa run had 22,014.38 ms vs 26,293.08 ms on a separate run: variation alone precludes a general causal speed ranking. Both NLI models are below 100M parameters **individually**, but this experiment includes **no 33M QA reader** and is not the proposed 104–115M combined RAG.
 
