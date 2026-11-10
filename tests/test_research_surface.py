@@ -18,7 +18,7 @@ FORBIDDEN = (
     "linked" + "in",
     "port" + "folio",
     "show" + "case",
-    "tech" + "nical-portfolio",
+    "tech" + "nical-" + "port" + "folio",
     "capability-" + "proof",
     "personal " + "brand",
     "cold " + "call",

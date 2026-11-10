@@ -24,7 +24,7 @@ npm run build
 npm run dev
 ```
 
-Open localhost:4874. A static build is produced in `dist`; `base: "./"` supports GitHub Pages project paths. The backend Python fixture still validates separately through `scripts/verify-wow-r0-local.ps1`.
+Open localhost:4874. A static build is produced in `dist`; `base: "./"` supports GitHub Pages project paths. The backend Python fixture still validates separately through `python -m raglab.release_readiness`.
 
 The single `.github/workflows/offline-tests.yml` job performs Python tests and source checks, then Node 22 frontend typecheck/unit tests/build, and verifies output files. `.github/workflows/pages.yml` rebuilds from authoritative JSON and uploads **only the static dist folder** after merge to main and GitHub Pages configuration.
 

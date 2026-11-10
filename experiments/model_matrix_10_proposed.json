@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "registry_id": "MOD-10-WOW-v1-TEN-ADDITIONAL",
+  "registry_id": "MOD-10-ROLE-BASED-CANDIDATES",
   "created_at": "2026-11-04",
   "status": "proposed_ten_additional_models_not_run_and_not_in_existing_baselines",
   "strict_policy": {

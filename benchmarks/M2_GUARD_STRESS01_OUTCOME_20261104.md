@@ -43,4 +43,4 @@ The current exact-pattern guard has demonstrable utility as a *bounded pre-gener
 - This file records the user's **actual terminal result**, not results inferred from source code or a rerun.
 - The existing original report is local and was not read into GitHub; no new raw model data are published here.
 - No new model evaluation or dataset download happened as part of this report.
-- The other retrieval/GraphRAG decisions and the draft WOW v1.0 release gates remain unchanged.
+- The other retrieval and graph-study decisions remain unchanged; their scientific evaluation is outside this diagnostic.
