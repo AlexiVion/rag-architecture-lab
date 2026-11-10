@@ -69,6 +69,9 @@ test("record screenshots for editorial interface review", async ({ page }) => {
   await page.screenshot({ path: "artifacts/screens/02-experiments.png", fullPage: true });
   await page.getByRole("navigation", { name: "Research sections" }).getByRole("button", { name: "Methodology" }).click();
   await page.screenshot({ path: "artifacts/screens/03-methodology.png", fullPage: true });
+  await page.getByRole("navigation", { name: "Research sections" }).getByRole("button", { name: "Research" }).click();
+  for (let i=0;i<3;i++) await page.getByRole("button", { name: "Step", exact: true }).click();
+  await page.screenshot({ path: "artifacts/screens/05-playground-ranking.png", fullPage: true });
 });
 
 
@@ -85,7 +88,7 @@ test("Architecture Playground compares two distinct methods and advances through
   await expect(page.getByText("Stage 2 of 5")).toBeVisible();
   await page.getByRole("button", { name: "Step", exact: true }).click();
   await expect(page.getByText("Stage 3 of 5")).toBeVisible();
-  await expect(page.getByRole("region", { name: "Right ranking" }).getByText(/Plant roots/)).toBeVisible();
+  await expect(page.getByRole("region", { name: "Right ranking" }).getByRole("listitem", {name: /Rank 1: Plant roots/})).toBeVisible();
   await page.getByRole("button", { name: "Step", exact: true }).click();
   await expect(page.getByText("Stage 4 of 5")).toBeVisible();
   await page.getByRole("button", { name: "Step", exact: true }).click();
@@ -107,7 +110,7 @@ test("Play/Pause and scenario changes update architecture comparison without liv
   await expect(page.getByRole("button", { name: "Play", exact: true })).toBeVisible();
   await page.getByLabel("Teaching question").selectOption("penguins");
   await expect(page.getByText("Stage 1 of 5")).toBeVisible();
-  await expect(page.getByText("Can penguins fly?")).toBeVisible();
+  await expect(page.locator(".ap-selected-question strong")).toHaveText("Can penguins fly?");
   await expect(page.getByText(/fictional teaching documents/i).first()).toBeVisible();
 });
 
@@ -125,6 +128,8 @@ test("quality and query latency are scoped to one measurement environment", asyn
   await expect(page.getByText("7.52 ms")).toBeVisible();
   await expect(page.getByText("51.86 ms")).toBeVisible();
   await expect(page.getByText("GitHub Actions · Ubuntu 24.04 · same V0 run")).toBeVisible();
+  await page.getByRole("button", { name: "Select measurement Dense" }).click();
+  await expect(page.getByText(/Selected: Dense/)).toBeVisible();
   await page.getByLabel("Recorded study").selectOption("v1");
   await expect(page.getByText("34.53 ms")).toBeVisible();
   await expect(page.getByText("3,706.43 ms")).toBeVisible();
