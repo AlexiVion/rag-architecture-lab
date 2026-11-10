@@ -147,3 +147,34 @@ footer span{color:var(--accent);padding:0 7px}
 @media(max-width:800px){.shell{display:block}.sidebar{position:static;width:100%;height:auto;padding:13px 15px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:0 3px 10px}.sidebar-label,.side-status,.side-link{display:none}.sidebar nav{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:7px;padding:0 2px 3px}.sidebar nav button{flex:0 0 auto;padding:8px 10px;font-size:12px}.topbar{padding:0 17px;height:58px}.topbar .chip{display:none}.main{padding:27px 17px 36px}.query-picker{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}footer{margin:0 17px}}
 @media(max-width:540px){.topbar a{display:none}.topbar p{font-size:11px}.stats{gap:8px}.stats>div{padding:14px 13px}.panel-body{padding:4px 15px 19px}.panel-head{padding:17px 15px 8px}.stages{grid-template-columns:1fr}.intro h1{letter-spacing:-1px}.query-picker button{font-size:11px}.provenance{display:block}.provenance dt{margin-top:14px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+
+/* MICRO v0.2: source-backed offline engine replay, four distinct decisions. */
+.micro-scenario-picker{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 22px}
+.micro-scenario-picker button{display:grid;justify-items:start;align-content:start;gap:8px;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;color:var(--text);text-align:left;padding:17px}
+.micro-scenario-picker button:hover{border-color:var(--accent)}
+.micro-scenario-picker button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-bg)}
+.micro-scenario-picker button small{color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.6px}
+.micro-scenario-picker button strong{font:600 14px "Space Grotesk",sans-serif}
+.micro-decision{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;padding:5px 10px;border:1px solid var(--line);font-weight:700;letter-spacing:.5px;font-size:10px}
+.micro-decision.answer{color:var(--accent);background:var(--accent-bg);border-color:var(--accent)}
+.micro-decision.conflict{color:var(--danger);background:rgba(193,68,51,.14);border-color:var(--danger)}
+.micro-decision.insufficient{color:var(--sub);background:var(--panel2)}
+.micro-decision.review{color:var(--orange);background:rgba(185,113,48,.13);border-color:var(--orange)}
+.micro-question{font:600 18px "Space Grotesk",sans-serif!important;color:var(--text)!important;margin:8px 0 20px}
+.micro-decision-summary{display:flex;flex-wrap:wrap;align-items:center;gap:10px;color:var(--sub);font-size:12px;line-height:1.7}
+.micro-answer{padding:12px 15px;background:var(--panel2);border-radius:9px;font-size:13px;color:var(--text)!important}
+.micro-answer strong{color:var(--accent)}
+.micro-answer.no-answer{color:var(--muted)!important}
+.micro-meta{display:flex;flex-wrap:wrap;gap:12px;margin-top:17px;color:var(--muted);font-size:11px}
+.micro-meta strong{color:var(--text)}
+.micro-source-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:12px}
+.micro-source{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.micro-source .micro{margin:0}
+.micro-source blockquote{border-left:3px solid var(--accent);padding:12px 15px;margin:16px 0;background:var(--panel);font:700 24px "Space Grotesk",sans-serif}
+.micro-source details{margin-top:14px;font-size:11px;color:var(--sub)}
+.micro-source summary{cursor:pointer;color:var(--accent)}
+.micro-source pre{white-space:pre-wrap;word-break:break-word;color:var(--text);font-size:11px;line-height:1.7}
+.micro-source code{display:block;overflow-wrap:anywhere}
+@media(max-width:1050px){.micro-scenario-picker{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.micro-scenario-picker,.micro-source-grid{grid-template-columns:1fr}}

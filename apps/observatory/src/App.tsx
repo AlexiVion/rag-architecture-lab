@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { loadObservatory, metricNames } from "./contracts";
+import MicroLab from "./MicroLab";
 import type { GraphFixture, GRF00, GRF01, ObservatoryData, QuestionTrace } from "./contracts";
 
-type Page="overview"|"experiments"|"pipeline"|"graph"|"evidence"|"models"|"methodology";
+type Page="overview"|"micro"|"experiments"|"pipeline"|"graph"|"evidence"|"models"|"methodology";
 const NAV: {id:Page;name:string;icon:string}[]=[
   {id:"overview",name:"Overview",icon:"◈"},
+  {id:"micro",name:"MICRO-RAG v0.2",icon:"◉"},
   {id:"experiments",name:"Experiments",icon:"▥"},
   {id:"pipeline",name:"Pipeline",icon:"⇄"},
   {id:"graph",name:"Knowledge graph",icon:"⌘"},
@@ -34,7 +36,8 @@ function Overview({data,go}:{data:ObservatoryData;go:(p:Page)=>void}){
   return <>
     <Intro tag="OPEN-SOURCE RESEARCH · SOURCE FIRST" title="Evidence, made visible."
       body="Compare retrieval architectures, trace original document provenance and inspect why grounded-answer experiments fail. Verified sources, visible uncertainty, no fake live inference."/>
-    <div className="hero-actions"><button className="button primary" onClick={()=>go("graph")}>Explore the evidence graph ↗</button>
+    <div className="hero-actions"><button className="button primary" onClick={()=>go("micro")}>Explore four-state MICRO-RAG ↗</button>
+      <button className="button outline" onClick={()=>go("graph")}>Explore the evidence graph ↗</button>
       <button className="button outline" onClick={()=>go("experiments")}>Inspect measured results</button></div>
     <div className="notice"><strong>Research boundary.</strong> The source graph is a three-document fictional fixture. GRF-00 and GRF-01 are audited DEV retrieval studies. M2 factual support remains NO-GO for automatic publication.</div>
     <div className="stats">
@@ -295,6 +298,7 @@ export default function App(){
             {(["graph","pipeline","evidence"] as Page[]).includes(page)&&
               <Questions fixture={data.fixture} selected={queryIndex} setSelected={setQueryIndex}/>}
             {page==="overview"&&<Overview data={data} go={go}/>}
+            {page==="micro"&&<MicroLab/>}
             {page==="experiments"&&<Experiments data={data}/>}
             {page==="pipeline"&&<Pipeline fixture={data.fixture} trace={trace}/>}
             {page==="graph"&&<Graph key={trace.id} fixture={data.fixture} trace={trace}/>}

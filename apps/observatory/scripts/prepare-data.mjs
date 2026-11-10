@@ -8,6 +8,7 @@ const files = [
   ["apps/explorer/data/grf00-summary.public.json", "apps/observatory/public/data/grf00-summary.public.json"],
   ["apps/explorer/data/grf01-summary.public.json", "apps/observatory/public/data/grf01-summary.public.json"],
   ["experiments/model_matrix_10_proposed.json", "apps/observatory/public/data/model_matrix.json"],
+  ["experiments/micro_v02_observatory_replay.json", "apps/observatory/public/data/micro-v02-replay.json"],
 ];
 for (const [src, dest] of files) {
   const content = JSON.parse(await readFile(resolve(root, src), "utf8"));

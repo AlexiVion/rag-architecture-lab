@@ -9,8 +9,9 @@ test.beforeEach(async ({page}) => {
   await expect(page.getByText("Validating public source artifacts…")).toHaveCount(0);
 });
 
-test("seven sections are reachable and real DEV metrics are visible", async ({page}) => {
+test("eight sections are reachable and real DEV metrics are visible", async ({page}) => {
   const titles = [
+    ["MICRO-RAG v0.2","A system that knows when not to answer."],
     ["Experiments","Trade-offs, not just wins."],
     ["Pipeline","Every stage has a boundary."],
     ["Knowledge graph","Trace the source of every edge."],
@@ -66,4 +67,28 @@ test("screenshots for the public technical walkthrough", async ({page}) => {
   await page.screenshot({path:screenshots+"/02-experiments.png",fullPage:true});
   await page.getByRole("navigation",{name:"Research sections"}).getByRole("button",{name:"Knowledge graph"}).click();
   await page.screenshot({path:screenshots+"/03-graph.png",fullPage:true});
+});
+
+test("MICRO v0.2 replay verifies four outcomes and source offsets", async ({page}) => {
+  await page.getByRole("navigation",{name:"Research sections"}).getByRole("button",{name:"MICRO-RAG v0.2"}).click();
+  await expect(page.getByRole("heading",{name:"A system that knows when not to answer."})).toBeVisible();
+  await expect(page.getByText("Verifying original document SHA256 and citations…")).toHaveCount(0);
+  const picker=page.getByRole("region",{name:"Select an executed RAG scenario"});
+  await expect(picker.getByRole("button")).toHaveCount(4);
+  const result=page.getByRole("region",{name:"Micro RAG decision"});
+  const citations=page.getByRole("region",{name:"Original cited sources"});
+  await expect(result.getByText("No answer published.")).toBeVisible();
+  await expect(citations.getByText("2012")).toBeVisible();
+  await expect(citations.getByText("2015")).toBeVisible();
+  await picker.getByRole("button",{name:/Compatible records/}).click();
+  await expect(result.getByText("Verified literal value:")).toBeVisible();
+  await expect(result.getByText("2019")).toBeVisible();
+  await picker.getByRole("button",{name:/Missing information/}).click();
+  await expect(result.getByText("No answer published.")).toBeVisible();
+  await expect(citations.getByText("No cited value was found")).toBeVisible();
+  await picker.getByRole("button",{name:/Incomplete evidence sweep/}).click();
+  await expect(result.getByText("No answer published.")).toBeVisible();
+  await expect(result.getByText("Full entity scan:")).toBeVisible();
+  await page.setViewportSize({width:390,height:844});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth > innerWidth + 4)).toBeFalsy();
 });
