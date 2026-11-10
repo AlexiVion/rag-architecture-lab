@@ -128,6 +128,9 @@ def test_three_way_nli_scores_become_binary_conflict_decisions():
     assert report["pair_type_metrics"]["c1_c2"]["accuracy"] == 1.0
     assert report["pair_type_metrics"]["c1_c2"]["expected_label"] == CONFLICT
     assert report["pair_type_metrics"]["c1_c3"]["expected_label"] == NON_CONFLICT
+    assert report["reasoning_type_metrics"]["categorical"]["n"] == 27
+    assert report["reasoning_type_metrics"]["temporal.numerical"]["n"] == 26
+    assert report["reasoning_type_metrics"]["categorical"]["gold_label"] == CONFLICT
     assert report["group_bootstrap"]["repetitions"] == 100
     assert len(report["group_bootstrap"]["balanced_accuracy_percentile_95_ci"]) == 2
 
