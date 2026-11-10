@@ -40,6 +40,14 @@ jobs:
         run: |
           raglab --help
           python -m build --no-isolation
+      - name: Generate authentic repository-document retrieval replay
+        run: python scripts/observatory/export_repo_retrieval_replay.py
+      - name: Archive actual Python retrieval trace
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-retrieval-execution
+          path: experiments/repo_retrieval_replay.json
+          if-no-files-found: error
       - name: Node.js 22 for typed observatory
         uses: actions/setup-node@v4
         with:
