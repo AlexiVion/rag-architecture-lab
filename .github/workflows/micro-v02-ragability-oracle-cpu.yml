@@ -1,0 +1,62 @@
+name: MICRO v0.2 Ragability author-answer oracle ablation CPU
+
+on:
+  pull_request:
+    paths:
+      - "src/raglab/evaluation/ragability_oracle.py"
+      - "scripts/micro/ragability_oracle_ablation_cpu.py"
+      - "tests/test_micro_ragability_oracle.py"
+      - ".github/workflows/micro-v02-ragability-oracle-cpu.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: micro-v02-oracle-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  author-oracle:
+    name: ${{ matrix.model_key }} — external oracle span vs raw-source CPU
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        model_key: [minilm, deberta_xsmall]
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      OMP_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+    steps:
+      - name: Exact commit
+        uses: actions/checkout@v7
+      - name: Python 3.11
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install CPU and test dependencies
+        run: |
+          python -m pip install -e ".[generation,dev]" "huggingface-hub>=0.29,<2"
+          python -m pip check
+      - name: Validate author-oracle separation and cluster bootstrap
+        run: |
+          python -m pytest -q tests/test_micro_ragability_oracle.py
+      - name: Execute real pinned NLI model on all frozen oracle conditions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/micro/ragability_oracle_ablation_cpu.py \
+            --model-key "${{ matrix.model_key }}" \
+            --output-dir "runs/micro-v02-oracle/${{ matrix.model_key }}"
+      - name: Store only source-safe scores and checkpoint hashes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: micro-v02-ragability-oracle-${{ matrix.model_key }}
+          path: runs/micro-v02-oracle/${{ matrix.model_key }}/oracle_ablation.json
+          if-no-files-found: warn
+          retention-days: 30
