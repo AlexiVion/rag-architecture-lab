@@ -1,0 +1,84 @@
+name: PAPER-01 real ConfRAG author-viewpoint NLI CPU development pilot
+
+on:
+  pull_request:
+    paths:
+      - "src/raglab/evaluation/confrag_viewpoints.py"
+      - "scripts/micro/confrag_viewpoint_nli_cpu.py"
+      - "tests/test_confrag_viewpoints.py"
+      - "tests/test_confrag_stream_loader.py"
+      - "docs/PAPER_01_CONFRAG_DEV_PROTOCOL.md"
+      - ".github/workflows/paper01-confrag-nli-cpu.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: paper01-confrag-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  public-confrag-dev:
+    name: Published viewpoints / real ${{ matrix.model_key }} CPU
+    runs-on: ubuntu-latest
+    timeout-minutes: 26
+    strategy:
+      fail-fast: false
+      matrix:
+        model_key: [deberta_xsmall, minilm]
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      OMP_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+    steps:
+      - name: Exact experiment source
+        uses: actions/checkout@v7
+      - name: Python 3.11
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install public model CPU runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e ".[generation,dev]" "huggingface-hub>=0.29,<2"
+          python -m pip check
+      - name: Verify parser avoids conflating viewpoints and contradictions
+        run: python -m pytest -q tests/test_confrag_viewpoints.py tests/test_confrag_stream_loader.py
+      - name: Run REAL frozen NLI on bounded public ConfRAG development prefix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/micro/confrag_viewpoint_nli_cpu.py \
+            --output-dir "runs/paper01/confrag-nli-dev01/${{ matrix.model_key }}" \
+            --model-key "${{ matrix.model_key }}" \
+            --per-stratum 8 --scan-limit 128
+      - name: Check provenance and output separation, never publish raw web pages
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("runs/paper01/confrag-nli-dev01/${{ matrix.model_key }}/results.json")
+          report=json.loads(p.read_text())
+          assert report["status"].endswith("NOT_SCIENTIFIC_HOLDOUT")
+          assert report["data"]["selected_question_groups"] == 16
+          assert len(report["rows"]) > 0
+          assert report["model"]["parameter_count"] < 95_000_000
+          assert report["data"]["dataset_revision"] == "529e760a78a58791d0387fe469e0732377a6d94d"
+          assert report["data"]["whole_dataset_file_sha256"] is None
+          assert all("left" not in row and "right" not in row for row in report["rows"])
+          assert all("unit" in metric for metric in report["metrics"].values())
+          print("REAL_CONFRAG_AUTHOR_VIEWPOINT_DEV_DIAGNOSTIC_PASS / NO_SCIENTIFIC_CLAIM")
+          PY
+      - name: Preserve metrics and manifests ONLY, not copyrighted full docs or model
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper01-confrag-real-nli-dev01-${{ matrix.model_key }}
+          path: runs/paper01/confrag-nli-dev01/${{ matrix.model_key }}/results.json
+          retention-days: 30
+          if-no-files-found: warn
