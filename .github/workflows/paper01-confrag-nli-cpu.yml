@@ -20,9 +20,13 @@ concurrency:
 
 jobs:
   public-confrag-dev:
-    name: Published author's viewpoint labels / real DeBERTa 71M CPU
+    name: Published viewpoints / real ${{ matrix.model_key }} CPU
     runs-on: ubuntu-latest
     timeout-minutes: 26
+    strategy:
+      fail-fast: false
+      matrix:
+        model_key: [deberta_xsmall, minilm]
     env:
       HF_HUB_DISABLE_TELEMETRY: "1"
       HF_HUB_DISABLE_PROGRESS_BARS: "1"
@@ -49,7 +53,8 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/micro/confrag_viewpoint_nli_cpu.py \
-            --output-dir runs/paper01/confrag-nli-dev01 \
+            --output-dir "runs/paper01/confrag-nli-dev01/${{ matrix.model_key }}" \
+            --model-key "${{ matrix.model_key }}" \
             --per-stratum 8 --scan-limit 128
       - name: Check provenance and output separation, never publish raw web pages
         shell: bash
@@ -57,12 +62,13 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          p=Path("runs/paper01/confrag-nli-dev01/results.json")
+          p=Path("runs/paper01/confrag-nli-dev01/${{ matrix.model_key }}/results.json")
           report=json.loads(p.read_text())
           assert report["status"].endswith("NOT_SCIENTIFIC_HOLDOUT")
           assert report["data"]["selected_question_groups"] == 16
           assert len(report["rows"]) > 0
-          assert report["model"]["parameter_count"] < 80_000_000
+          assert report["model"]["parameter_count"] < 95_000_000
+          assert report["data"]["dataset_revision"] == "529e760a78a58791d0387fe469e0732377a6d94d"
           assert report["data"]["whole_dataset_file_sha256"] is None
           assert all("left" not in row and "right" not in row for row in report["rows"])
           assert all("unit" in metric for metric in report["metrics"].values())
@@ -72,7 +78,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: paper01-confrag-real-nli-dev01
-          path: runs/paper01/confrag-nli-dev01/results.json
+          name: paper01-confrag-real-nli-dev01-${{ matrix.model_key }}
+          path: runs/paper01/confrag-nli-dev01/${{ matrix.model_key }}/results.json
           retention-days: 30
           if-no-files-found: warn
