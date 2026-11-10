@@ -54,6 +54,8 @@ jobs:
           test -f apps/observatory/dist/data/grf00-summary.public.json
           test -f apps/observatory/dist/data/grf01-summary.public.json
           test -f apps/observatory/dist/data/model_matrix.json
+      - name: Audit frontend dependency security
+        run: npm audit --prefix apps/observatory --audit-level=moderate
       - name: Install headless Chromium for WEB-01 browser QA
         run: npx --prefix apps/observatory playwright install --with-deps chromium
       - name: Test actual navigation, graph provenance, mobile layout and screenshots
