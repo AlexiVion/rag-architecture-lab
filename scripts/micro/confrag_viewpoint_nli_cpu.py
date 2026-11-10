@@ -35,7 +35,11 @@ from ragability_nli_cpu import (
 DATASET_ID = "OracleY/ConfRAG"
 DATASET_FILE = "ConfRAGsuggested.jsonl"
 DATASET_LICENSE = "cc-by-4.0"
-MODEL_REVISION = "a150876415327c80daeff35ca6f68f5ed8cf5c24"
+DATASET_REVISION = "529e760a78a58791d0387fe469e0732377a6d94d"
+MODEL_REVISIONS = {
+    "deberta_xsmall": "a150876415327c80daeff35ca6f68f5ed8cf5c24",
+    "minilm": "b95119ce93d3e065de6214e38cd4a97b0f2f2c6d",
+}
 
 
 def read_bounded_public_prefix(*, revision: str, per_stratum: int = 8,
@@ -109,6 +113,7 @@ def main() -> None:
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--per-stratum", type=int, default=8)
     parser.add_argument("--scan-limit", type=int, default=128)
+    parser.add_argument("--model-key", choices=sorted(MODEL_REVISIONS), default="deberta_xsmall")
     args = parser.parse_args()
     out = Path(args.output_dir).resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -123,9 +128,10 @@ def main() -> None:
     except RuntimeError:
         pass
 
-    # Resolve the public dataset at this execution and *record* the complete
-    # revision. This is DEV discovery, not a preregistered untouched holdout.
-    info = HfApi().dataset_info(DATASET_ID)
+    # Frozen after the first DEV discovery; both checkpoints read identical source.
+    info = HfApi().dataset_info(DATASET_ID, revision=DATASET_REVISION)
+    if str(info.sha) != DATASET_REVISION:
+        raise ValueError("ConfRAG dataset revision does not match frozen SHA")
     license_id = _license_from_info(info)
     if license_id != DATASET_LICENSE:
         raise ValueError(f"Dataset metadata license mismatch: {license_id!r}")
@@ -144,7 +150,7 @@ def main() -> None:
     source["inputs_sha256"] = selected_hashes["selected_pairs_sha256"]
     source["selected_pair_sha256"] = selected_hashes["pair_sha256"]
 
-    spec = dict(MODEL_SPECS["deberta_xsmall"], revision=MODEL_REVISION)
+    spec = dict(MODEL_SPECS[args.model_key], revision=MODEL_REVISIONS[args.model_key])
     model_started = time.perf_counter()
     model_manifest = _download_model(spec, out / ".model")
     model_manifest["download_seconds"] = time.perf_counter() - model_started
@@ -182,6 +188,7 @@ def main() -> None:
     report = {
         "status": "REAL_WEIGHTS_REAL_WEB_AUTHOR_ANSWER_CLUSTER_DEV_NOT_SCIENTIFIC_HOLDOUT",
         "experiment": "PAPER01_CONFRAG_VIEWPOINT_NLI_DEV01",
+        "model_key": args.model_key,
         "data": source, "model": model_manifest,
         "model_sanity": sanity,
         "cpu_cost": cost, "environment": {
@@ -206,6 +213,7 @@ def main() -> None:
     print(json.dumps({
         "status": report["status"],
         "dataset_revision": source["dataset_revision"],
+        "model_key": args.model_key,
         "groups": source["selected_question_groups"],
         "pairs": len(pairs),
         "metrics": metrics,
