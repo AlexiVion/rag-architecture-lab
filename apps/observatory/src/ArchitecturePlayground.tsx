@@ -109,7 +109,9 @@ function StudyPlot({ study }: {study:Study}) {
         </g>)}
         <text x="88" y="16" className="ap-axis-title">MRR@10 · higher is better ↑</text>
         <text x="350" y="253" textAnchor="middle" className="ap-axis-title">Mean query time (ms, log scale) →</text>
-        {study.points.map(p=><g key={p.id}>
+        {study.points.map(p=><g key={p.id} role="button" tabIndex={0} aria-label={"Select measurement "+p.name}
+          onClick={()=>setChosen(p.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();setChosen(p.id);}}}>
+          <title>{p.name+": MRR@10 "+p.mrr10.toFixed(4)+", mean "+fmt(p.latencyMs)+" ms"}</title>
           <circle cx={x(p.latencyMs)} cy={y(p.mrr10)} r={p.id===point.id?11:8} className={"ap-plot-point"+(p.id===point.id?" chosen":"")}/>
           <text x={x(p.latencyMs)} y={y(p.mrr10)-17} textAnchor="middle" className="ap-point-label">{p.name}</text>
         </g>)}
