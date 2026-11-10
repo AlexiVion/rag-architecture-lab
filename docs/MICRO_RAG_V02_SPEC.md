@@ -2,7 +2,7 @@
 
 **Status: engineering implementation under test, NOT reliable factual QA certified.**
 
-This milestone implements a runnable CPU-first retrieval → extraction → source-consistency → decision pipeline. It is intended to become the LinkedIn research release **only if** all scientific gates are satisfied. The current narrowly structured demonstrator is a useful software baseline, not a general RAG intelligence result.
+This milestone implements a runnable CPU-first retrieval → extraction → source-consistency → decision pipeline. The current narrowly structured demonstrator is a useful software baseline, not a general RAG intelligence result.
 
 ## Output contract
 
@@ -51,9 +51,9 @@ For optional local model inference install the generation extras, download a rev
 | M3 | Local runnable full RAG pipeline | Complete retrieval → reader → consistency → refusal, CLI and adversarial E2E tests |
 | M4 | Independent QA risk/coverage and confidence bounds | At least 300 **real human-labeled** questions over >=2 domains, two reviewers and adjudication, independent group-wise frozen test |
 | M5 | Real CPU performance and quantized parity | Full-stack p50/p95, RAM, disk, initial indexing, INT8/ONNX versus unquantized model with quality parity check |
-| M6 | Publicly reproducible LinkedIn research release | Verified repo, real demo, correct provenance, negative results, GitHub Release and verified Pages |
+| M6 | Reproducible research artifact | Accessible source, pinned experiments, source provenance, recorded negative results and external reproduction |
 
-**Verified 2026-11-10 engineering status:** M0 contract and structured M3 E2E software tests PASS (PR #29); M1 author-answer oracle CPU executed (PR #30; *not end-to-end extraction*); M2 partial NLI diagnostics integrated and fail closed (PR #31); M4 reviewer metadata/cluster-risk evaluator implemented but real human dataset OPEN (PR #32); M5 verifier-only pinned PyTorch/ONNX INT8 CPU parity PASS (PR #33; [results](MICRO_V02_ONNX_RESULTS.md)), yet repeated isolated CPU and full-stack hardware evaluation OPEN; M6 demo and release OPEN. **None of these verifies independently reliable natural-language RAG.**
+**Verified 2026-11-10 engineering status:** M0 contract and structured M3 E2E software tests PASS (PR #29); M1 author-answer oracle CPU executed (PR #30; *not end-to-end extraction*); M2 partial NLI diagnostics integrated and fail closed (PR #31); M4 reviewer metadata/cluster-risk evaluator implemented but real human dataset OPEN (PR #32); M5 verifier-only pinned PyTorch/ONNX INT8 CPU parity PASS (PR #33; [results](MICRO_V02_ONNX_RESULTS.md)), yet repeated isolated CPU and full-stack hardware evaluation OPEN; M6 independent reproduction OPEN. **None of these verifies independently reliable natural-language RAG.**
 
 ## Target scientific thresholds — hypotheses, not achievements
 
@@ -71,8 +71,8 @@ Compare the current structured rules baseline against BM25 top1/top3 + MiniLM-33
 
 Original external Ragability NLI results (both 82.08% pairwise accuracy, no clear overall winner) remain diagnostic only, and their source/test groups must not be used for tuning. ConfRAG and independent human review remain next experiments.
 
-## Shipping boundaries
+## Research scope and reporting boundaries
 
-No production deployment, proprietary client data, silent external charges or automatic publishing of unverified model claims. LinkedIn should present a real tested research system and explicit limitations, not "hallucination free" assertions. Existing GitHub Pages admin blocker remains separate.
+No production deployment or unrestricted autonomous answer publication is evaluated here. Report only tested behaviors, with explicit dataset/model limits and no unsupported claim of hallucination-free output. Public web hosting is outside the scientific acceptance criteria.
 
 References: [v0.2 GitHub issue #28](https://github.com/AlexiVion/rag-architecture-lab/issues/28), [MICRO science issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11), [prior external NLI results](MICRO_RAGABILITY_NLI_RESULTS.md).

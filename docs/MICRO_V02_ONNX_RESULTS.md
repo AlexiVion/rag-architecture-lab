@@ -51,6 +51,6 @@ The INT8 export did **not** merely preserve quality in this narrow benchmark: it
 2. Repeat CPU comparisons as independent processes (randomized AB/BA order, controlled hardware, p50/p95 end-to-end, cold starts, RSS and ideally energy) before claiming general speed or memory wins.
 3. Integrate an **actual automatically produced source-claim extractor** and verified NLI decision policy; the existing oracle ablation used answers supplied by benchmark authors. Free-text candidate outputs remain REVIEW in the local pipeline.
 4. Full pipeline risk/coverage evaluation with useful nonzero correct coverage and group-aware uncertainty; refuse-all cannot qualify as reliable QA.
-5. Research observatory / LinkedIn v0.2: public demo and release pending. The separate Pages admin setting remains blocked.
+5. Independent reuse of this diagnostic is pending, with predeclared model/data splits, source-provenance verification and full-stack CPU measurements.
 
 **Do not advertise:** hallucination-free QA, proven factual accuracy, 38% faster end-to-end RAG, 69% less runtime RAM, universal INT8 superiority, or completed scientific validation.

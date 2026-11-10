@@ -72,7 +72,7 @@ CLI / experiment runner / optional future explorer
 
 **Experimental contract:** baseline and candidate share data/hardware; raw result manifest plus error analysis and uncertainty is retained; publication includes limitations.
 
-**Portfolio contract:** runnable instructions, architecture diagram, experiment design, decisions and limitations are understandable without prior chat history.
+**Documentation contract:** reproduction instructions, architecture diagram, evaluation design, conclusions and limitations can be assessed independently of prior development discussions.
 
 ## Migration from current repository
 

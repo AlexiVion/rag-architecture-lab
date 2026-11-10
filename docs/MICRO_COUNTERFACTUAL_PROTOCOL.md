@@ -64,7 +64,7 @@ python scripts/micro/counterfactual_cpu_pilot.py --output-dir runs/micro-counter
 
 Or [run the bounded GitHub Actions workflow](../.github/workflows/micro-counterfactual-cpu.yml) (Ubuntu CPU, no private API keys). It uploads only original code-generated fictional sources/labels, calibration/metrics and integrity manifests.
 
-**Referenced prior findings:** [real SQuAD2 generator-oracle and MiniLM task-specific controls](MICRO_ORACLE_VS_EXTRACTIVE_RESULTS.md), [research status](PROJECT_CONTROL.md), [MICRO scientific issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11). This work does not touch public Pages deployment or change earlier M2/GraphRAG negative verdicts.
+**Referenced prior findings:** [real SQuAD2 generator-oracle and MiniLM task-specific controls](MICRO_ORACLE_VS_EXTRACTIVE_RESULTS.md), [research status](RESEARCH_STATUS.md), [MICRO scientific issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11). This work does not touch public Pages deployment or change earlier M2/GraphRAG negative verdicts.
 
 ## First observed AUDIT outcomes and provenance warning
 

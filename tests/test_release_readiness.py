@@ -11,7 +11,7 @@ def test_repo_distributable_fixture_and_release_metadata_are_valid():
     result = check_repository()
     assert result["status"] == "ENGINEERING_PASS", result["failures"]
     assert result["scientific_release_verified"] is False
-    assert result["wow_v1_complete"] is False
+    assert result["independent_validation_complete"] is False
     assert result["model_calls"] == 0
     assert result["external_publications"] == 0
     assert result["checks"]["offline_graph_fixture"]["traces"] == 3
@@ -55,7 +55,7 @@ def test_forged_public_graph_fails_contract_and_never_claims_research_pass(tmp_p
     assert status["status"] == "ENGINEERING_FAIL"
     assert status["checks"]["offline_graph_fixture"]["status"] == "FAIL"
     assert status["scientific_release_verified"] is False
-    assert status["wow_v1_complete"] is False
+    assert status["independent_validation_complete"] is False
 
 
 def test_model_registry_rejects_fabricated_measurements(tmp_path):

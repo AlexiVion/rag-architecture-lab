@@ -2,7 +2,7 @@
 
 ## Objective
 
-Build the smallest credible experiment that can determine whether RAG Architecture Lab deserves to expand into a larger portfolio project.
+Design a bounded, reproducible evaluation of sparse, dense and hybrid information retrieval under matched experimental conditions.
 
 The V0 research question is:
 
@@ -44,7 +44,7 @@ V0 is successful if all of the following are true:
 1. The three retrieval pipelines run against the same corpus and query set.
 2. Metrics are reproducible across repeated runs under the same configuration.
 3. The experiment exposes meaningful trade-offs or failure cases worth explaining.
-4. The implementation is understandable enough to defend in a technical interview or portfolio review.
+4. The implementation and experiment metadata are sufficiently documented for independent methodological review and reproduction.
 5. The result can be documented without pretending that one architecture is universally superior.
 
 If those conditions are not met, the project should be revised or stopped before adding UI, generation, agents, or more retrieval techniques.

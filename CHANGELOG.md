@@ -1,17 +1,18 @@
 # Changelog
 
-All notable user-facing release changes will be recorded here. Historical local experiment outputs are tracked under `benchmarks/` and research protocols; they are not automatically a software release.
+This file records changes to the research software and experimental protocols. Numerical findings are described in the corresponding versioned reports with dataset/model provenance and limitations.
 
-## Unreleased — WOW v1.0 integration
+## Unreleased
 
-- V0 sparse, dense and Hybrid RRF retrieval comparisons and V1/V1.1 rerank trade-offs retained with documented evidence.
-- GRF-00 graph-first and GRF-01 graph-hybrid studies archived as negative/inconclusive DEV results, with public provenance summaries.
-- Static read-only evidence explorer with curated three-question fixture, graph traces and source quotes.
-- M2 real local generation diagnostics, saved-output audits and fail-closed syntax-only publication control; **no validated general semantic support guarantee**.
-- Experimental citation V2 and structured adequacy guard remain opt-in and explicitly not production-publishable.
-- MOD-10 roster is a proposed ten-model comparison; candidate measurements/revisions are pending.
-- New minimal CI, source/fixture release-readiness checks, security policy, and Pages deployment workflow (requires live hosting verification).
+- Implemented sparse, dense and Hybrid RRF retrieval comparisons and cross-encoder reranking ablations.
+- Preserved graph-guided retrieval studies reporting negative or inconclusive outcomes under their respective development cohorts.
+- Added read-only provenance visualization and typed evaluation data contracts.
+- Added experimental source-consistency and abstention checks; natural-language semantic support remains unverified.
+- Added pinned small-model CPU benchmarking, NLI and extractive QA diagnostics, and independent post-run comparison tools.
+- Added protocol and working manuscript for studying selective evidence-grounded QA under a 135M active-neural-parameter budget.
+- Reorganized documentation around research questions, methods, empirical findings, limitations and reproducibility.
 
-## 0.1.0 — Development package metadata
+## 0.1.0 — Python package metadata
 
-- Python package and CLI name established. A tagged, independently verified distribution has **not** yet been asserted by this changelog.
+- Established the installable Python package and command-line interface.
+- A separately tagged, independently verified software distribution is not asserted by this entry.
