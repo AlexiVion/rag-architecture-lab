@@ -145,6 +145,14 @@ export default function ArchitecturePlayground() {
   const [explanation,setExplanation]=useState<Explanation>("simple");
   const [studyId,setStudyId]=useState<Study["id"]>("v0");
   const [selectedDocId,setSelectedDocId]=useState<string|null>(null);
+  useEffect(()=>{
+    if(!selectedDocId)return;
+    const frame=window.requestAnimationFrame(()=>{
+      const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      document.getElementById("document-xray")?.scrollIntoView({behavior:reduced?"auto":"smooth",block:"start"});
+    });
+    return()=>window.cancelAnimationFrame(frame);
+  },[selectedDocId]);
 
   useEffect(()=>{
     let alive=true;

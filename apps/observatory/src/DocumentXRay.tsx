@@ -28,7 +28,7 @@ export default function DocumentXRay({ scene, docId, left, right, step, explanat
     { name: "Hybrid RRF", rank: positions.hybrid, source: "Computed from both example lists", status: "Calculated" },
     { name: "Scripted reranking", rank: positions.rerank, source: "Authored reorder; no model ran", status: "Example" },
   ];
-  return <section className="ap-xray" role="region" aria-label="Document X-Ray">
+  return <section id="document-xray" className="ap-xray" role="region" aria-label="Document X-Ray">
     <div className="ap-xray-heading">
       <div>
         <p className="ap-small">DOCUMENT X-RAY · ILLUSTRATIVE DOCUMENT</p>
