@@ -49,7 +49,7 @@
     "id": "unrecognized-field",
     "group_id": "unknown",
     "question": "What is the budget of Station Boreal?",
-    "expected_status": "INSUFFICIENT"
+    "expected_status": "REVIEW"
   },
   {
     "id": "other-entity",
