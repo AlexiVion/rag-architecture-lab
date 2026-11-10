@@ -45,12 +45,16 @@ def test_missing_property_unknown_entity_or_unknown_field_refuses():
     for q in (
         "What is the storage seal for Station Aurora?",
         "What is the capacity of Station Horizon?",
-        "What is the budget of Station Boreal?",
     ):
         result = rag.answer(q)
         assert result.status == "INSUFFICIENT"
         assert result.answer is None
         assert not result.citations
+    # Unknown fields cannot be mistaken for a complete negative lookup.
+    unknown = rag.answer("What is the budget of Station Boreal?")
+    assert unknown.status == "REVIEW"
+    assert unknown.answer is None
+    assert not unknown.source_sweep_complete
 
 def test_sources_from_different_entities_never_mix():
     result = MicroRAG([A, B, C]).answer("What is the manager of Station Boreal?")
@@ -166,3 +170,70 @@ def test_evaluator_case_ids_must_be_unique():
          "expected_status":"ANSWER","expected_answer":"Camille"}
     with pytest.raises(ValueError, match="unique"):
         evaluate_cases(MicroRAG([A]), [row, row])
+
+
+def test_duplicate_entity_cannot_hide_contradiction_from_source_sweep():
+    duplicate = Document(
+        "ambiguous", "entity: Station Aurora\nentity: Station Aurora\nstart_year: 2015\n"
+    )
+    result = MicroRAG([A, duplicate], top_k=1).answer(
+        "What is the start year for Station Aurora?"
+    )
+    assert result.status == "REVIEW"
+    assert result.answer is None
+    assert not result.source_sweep_complete
+    assert "ambiguous" in result.inspected_doc_ids
+
+
+def test_conflicting_entity_lines_are_unattributed_not_ignored():
+    ambiguous = Document(
+        "mixed", "entity: Station Boreal\nentity: Station Aurora\nstart_year: 2015\n"
+    )
+    result = MicroRAG([A, ambiguous], top_k=1).answer(
+        "What is the start year for Station Aurora?"
+    )
+    assert result.status == "REVIEW"
+    assert result.answer is None
+    assert not result.source_sweep_complete
+
+
+def test_malformed_unattributed_document_must_not_certify_answer():
+    missing_entity = Document("unknown", "start_year: 2015\n")
+    result = MicroRAG([A, missing_entity]).answer(
+        "What is the start year for Station Aurora?"
+    )
+    assert result.status == "REVIEW"
+    assert result.answer is None
+
+
+def test_malformed_nonempty_record_line_is_rejected_not_skipped():
+    corrupt = Document(
+        "broken", "entity: Station Aurora\nstart_year 2015\nmanager: Camille\n"
+    )
+    result = MicroRAG([A, corrupt]).answer("Who is the manager of Station Aurora?")
+    assert result.status == "REVIEW"
+    assert result.answer is None
+    assert any("failed closed" in warning for warning in result.warnings)
+
+
+class NullExtractiveReader:
+    name = "no_span_unverified"
+    def extract(self, question, document, spec):
+        return None
+
+
+def test_no_neural_span_after_topk_does_not_claim_corpus_absence():
+    result = MicroRAG([A, C], reader=NullExtractiveReader(), top_k=1).answer(
+        "What is the start year for Station Aurora?"
+    )
+    assert result.status == "REVIEW"
+    assert result.answer is None
+    assert not result.source_sweep_complete
+    assert any("Partial retrieval" in warning for warning in result.warnings)
+
+
+def test_unsupported_query_is_review_not_false_absence():
+    result = MicroRAG([A]).answer("Tell me what happened at Station Aurora?")
+    assert result.status == "REVIEW"
+    assert result.answer is None
+    assert not result.source_sweep_complete
