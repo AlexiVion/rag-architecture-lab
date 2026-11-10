@@ -14,7 +14,7 @@ describe("Architecture Playground data integrity", () => {
     expect(() => validatePlayground({...input, measured:true})).toThrow();
   });
   it("rejects duplicate IDs and incomplete permutations", () => {
-    const scene = input.scenarios[0];
+    const scene = input.scenarios[0]!;
     expect(() => validatePlayground({...input, scenarios: [
       {...scene, documents:[scene.documents[0],scene.documents[0],...scene.documents.slice(2)]}, ...input.scenarios.slice(1)
     ]})).toThrow();
@@ -23,20 +23,20 @@ describe("Architecture Playground data integrity", () => {
     ]})).toThrow();
   });
   it("checks that relevance flags are illustrative booleans", () => {
-    const scene = input.scenarios[0];
+    const scene = input.scenarios[0]!;
     expect(() => validatePlayground({...input, scenarios: [
       {...scene, documents:[{...scene.documents[0],relevant:"YES"},...scene.documents.slice(1)]}, ...input.scenarios.slice(1)
     ]})).toThrow();
   });
   it("computes canonical reciprocal rank fusion without invented measurements", () => {
-    const scene = validatePlayground(input).scenarios[0];
+    const scene = validatePlayground(input).scenarios[0]!;
     const hybrid = rrfRanking(scene.rankings.bm25,scene.rankings.dense,60);
     expect(hybrid[0]).toBe("p1");
     expect([...hybrid].sort()).toEqual(scene.rankings.bm25.slice().sort());
     expect(() => rrfRanking(["d1","d1"],["d2","d1"])).toThrow();
   });
   it("preserves BM25 → hybrid → illustrative rerank stage semantics", () => {
-    const scene = validatePlayground(input).scenarios[0];
+    const scene = validatePlayground(input).scenarios[0]!;
     expect(rankingAtStep(scene,"bm25",1)).toEqual(scene.rankings.bm25);
     expect(rankingAtStep(scene,"hybrid",1)).toEqual(scene.rankings.bm25);
     expect(rankingAtStep(scene,"hybrid",2)).toEqual(rrfRanking(scene.rankings.bm25,scene.rankings.dense));
@@ -47,10 +47,10 @@ describe("Architecture Playground data integrity", () => {
   });
   it("keeps V0 and V1 performance on separate declared hardware", () => {
     expect(PLAYGROUND_STUDIES).toHaveLength(2);
-    expect(PLAYGROUND_STUDIES[0].id).toBe("v0");
-    expect(PLAYGROUND_STUDIES[1].id).toBe("v1");
-    expect(PLAYGROUND_STUDIES[0].points.find((p) => p.id==="bm25")?.mrr10).toBe(.6328);
-    expect(PLAYGROUND_STUDIES[1].points.find((p) => p.id==="rerank")?.latencyMs).toBe(3706.43);
+    expect(PLAYGROUND_STUDIES[0]!.id).toBe("v0");
+    expect(PLAYGROUND_STUDIES[1]!.id).toBe("v1");
+    expect(PLAYGROUND_STUDIES[0]!.points.find((p) => p.id==="bm25")?.mrr10).toBe(.6328);
+    expect(PLAYGROUND_STUDIES[1]!.points.find((p) => p.id==="rerank")?.latencyMs).toBe(3706.43);
     expect(PLAYGROUND_STUDIES.every((study) => study.report.startsWith("https://github.com/"))).toBe(true);
   });
 });
