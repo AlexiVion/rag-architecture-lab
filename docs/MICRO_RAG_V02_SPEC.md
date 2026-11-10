@@ -20,7 +20,10 @@ A direct quote with a valid citation proves only where the text came from. It is
 - Reuses the existing BM25 retrieval and existing exact-offset MiniLM span decoder, with an optional local-only CPU extractive model adapter.
 - Transparent zero-neural-model structured baseline for explicit entity/field:value records; recognizes a small documented alias list only, not arbitrary narrative facts.
 - Questions naming two different stations, unsupported properties, unknown entities or missing values cannot produce ANSWER.
-- Bounded full same-entity scan avoids top-k=1 concealing another structured contradictory source; scan overflow or malformed source becomes REVIEW.
+- Bounded full same-entity scan avoids top-k=1 concealing another structured contradictory source. Malformed or unattributed records, ambiguous entity declarations and overflow become REVIEW; they may not be silently omitted.
+- Any malformed nonempty key/value line rejects the whole structured record rather than allowing a false completeness claim.
+- Unsupported entity/property questions return REVIEW, not false INSUFFICIENT. Only fully attributed recognized structured lookups can report INSUFFICIENT.
+- Optional neural top-k extraction returns REVIEW even with no extracted span, because partial retrieval cannot establish global absence.
 - Each claim carries source ID, original offsets, exact substring and document SHA256. The citation and claim are revalidated before output.
 - Decision audit carries timings for retrieval, source scan, reading, adjudication and total; reader call counts and accepted/refused states.
 - Local JSON CLI and nine entirely fictional software cases. No paid API, hosted agent, real client data, or private credentials involved.
