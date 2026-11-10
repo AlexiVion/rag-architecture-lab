@@ -6,6 +6,7 @@ on:
       - "src/raglab/evaluation/confrag_viewpoints.py"
       - "scripts/micro/confrag_viewpoint_nli_cpu.py"
       - "tests/test_confrag_viewpoints.py"
+      - "tests/test_confrag_stream_loader.py"
       - "docs/PAPER_01_CONFRAG_DEV_PROTOCOL.md"
       - ".github/workflows/paper01-confrag-nli-cpu.yml"
   workflow_dispatch:
@@ -42,7 +43,7 @@ jobs:
           python -m pip install -e ".[generation,dev]" "huggingface-hub>=0.29,<2"
           python -m pip check
       - name: Verify parser avoids conflating viewpoints and contradictions
-        run: python -m pytest -q tests/test_confrag_viewpoints.py
+        run: python -m pytest -q tests/test_confrag_viewpoints.py tests/test_confrag_stream_loader.py
       - name: Run REAL frozen NLI on bounded public ConfRAG development prefix
         shell: bash
         run: |
