@@ -91,13 +91,13 @@ function RankLane({ scene, method, step, side }: {
 }
 
 function StudyPlot({ study }: {study:Study}) {
-  const [chosen, setChosen]=useState(study.points[0].id);
-  useEffect(()=>setChosen(study.points[0].id),[study]);
+  const [chosen, setChosen]=useState(study.points[0]!.id);
+  useEffect(()=>setChosen(study.points[0]!.id),[study]);
   const logs=study.points.map(p=>Math.log10(p.latencyMs));
   const logMin=Math.min(...logs)-.16,logMax=Math.max(...logs)+.16;
   const x=(ms:number)=>86+(Math.log10(ms)-logMin)/(logMax-logMin)*500;
   const y=(mrr:number)=>213-(mrr-.585)/(.675-.585)*170;
-  const point=study.points.find(p=>p.id===chosen)??study.points[0];
+  const point=study.points.find(p=>p.id===chosen)??study.points[0]!;
   return <div className="ap-study">
     <div className="ap-study-chart" role="group" aria-label="Measured MRR@10 against mean query latency within the selected experiment">
       <svg viewBox="0 0 660 265" role="img" aria-label={"Measured quality versus latency for "+study.name} preserveAspectRatio="xMidYMid meet">
@@ -194,6 +194,7 @@ export default function ArchitecturePlayground() {
             </label>
           </div>
         </div>
+        <p className="ap-selected-question"><span>THE SAME QUESTION FOR BOTH METHODS</span><strong>{scenario.question}</strong></p>
         <div className="ap-transport">
           <div>
             <p className="ap-step-status" role="status" aria-live="polite">Stage {step+1} of 5 <span>· {STAGES[step]}</span></p>
@@ -222,7 +223,7 @@ export default function ArchitecturePlayground() {
           <legend>EXPLANATION</legend>
           {(["simple","technical","scientific"] as const).map(level=><label key={level} className={explanation===level?"selected":""}>
             <input type="radio" name="ap-level" value={level} checked={explanation===level} onChange={()=>setExplanation(level)}/>
-            {level[0].toUpperCase()+level.slice(1)}
+            {level[0]!.toUpperCase()+level.slice(1)}
           </label>)}
         </fieldset>
         <p className="ap-level-text">{LEVEL_TEXT[explanation]}</p>
