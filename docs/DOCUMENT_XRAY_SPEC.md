@@ -29,3 +29,7 @@ A reader should be able to click any one of the five ranked documents in either 
 ## Acceptance
 
 Vitest verifies document lookup, all source positions, exact component scores, negative inputs, consistency with \`rrfRanking\` for three scenarios and signs of movement. Playwright verifies click from each side, stage updates, Close, Reset, question change, explanation modes, keyboard activation, disclosure, and mobile overflow. Current React/TypeScript Vite and Python offline CI remain green.
+
+## Cross-platform source naming
+
+The pure ranking helper is `src/xrayRankMath.ts`, intentionally a distinct module stem from `src/DocumentXRay.tsx`. TypeScript may resolve `.ts` before `.tsx` on case-insensitive Windows filesystems. The Python research-surface test rejects `.ts`/`.tsx` sources sharing a case-folded stem to catch regressions in Linux CI.

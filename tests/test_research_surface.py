@@ -78,3 +78,28 @@ def test_internal_markdown_document_references_resolve():
             if not local.is_relative_to(ROOT.resolve()) or not local.is_file():
                 broken.append((path.as_posix(), target))
     assert not broken, "Broken local research document links: " + str(broken[:100])
+
+
+def test_typescript_module_stems_are_portable_on_windows():
+    """TypeScript resolves '.ts' before '.tsx' on a case-insensitive disk.
+
+    Two files with the same case-folded stem but different extensions/casing
+    may pass CI on Linux yet bind the wrong import on Windows.
+    """
+    root = ROOT / "apps" / "observatory" / "src"
+    seen = {}
+    collisions = []
+    for path in sorted(root.rglob("*")):
+        if not path.is_file() or path.suffix.lower() not in (".ts", ".tsx"):
+            continue
+        relative = path.relative_to(root)
+        normalized = (relative.parent / relative.stem).as_posix().casefold()
+        existing = seen.get(normalized)
+        if existing is not None:
+            collisions.append((existing, relative.as_posix()))
+        else:
+            seen[normalized] = relative.as_posix()
+    assert not collisions, (
+        "Nonportable TypeScript module stem collision (.ts/.tsx, case-insensitive): "
+        + str(collisions)
+    )
