@@ -110,10 +110,13 @@ export function validateMicroReplayShape(input: unknown): MicroReplay {
         throw new Error("Source citation does not match verbatim original");
       return { doc_id, start, end, quote, document_sha256 };
     });
-    if (status === "ANSWER" && !citations.length)
-      throw new Error("Answer lacks source evidence");
-    if (status === "CONFLICT" && citations.length < 2)
-      throw new Error("Conflict requires at least two source quotations");
+    if (status === "ANSWER" &&
+        (!citations.length || citations.some((cite) => cite.quote !== answer)))
+      throw new Error("Answer differs from its exact original source quotations");
+    if (status === "CONFLICT" &&
+        (new Set(citations.map((cite) => cite.doc_id)).size < 2 ||
+         new Set(citations.map((cite) => cite.quote)).size < 2))
+      throw new Error("Conflict requires incompatible values from distinct original sources");
     if (status === "REVIEW" && c.source_sweep_complete !== false)
       throw new Error("Demo review must have incomplete source coverage");
     if (typeof c.source_sweep_complete !== "boolean")
