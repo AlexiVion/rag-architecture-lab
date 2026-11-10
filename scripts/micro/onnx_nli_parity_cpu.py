@@ -33,7 +33,7 @@ ONNX_NAME="onnx/model_quint8_avx2.onnx"
 SOURCE_DATA_SHA="e973f5ac7b4881e2cafe23f39b837643878ea6afdb769d9afa30ff66e93c8285"
 # First actual CPU run freezes and reports the published checkpoint's ONNX
 # weight hash. Never use floating model branches.
-ONNX_WEIGHT_SHA: str | None = None
+ONNX_WEIGHT_SHA = "21b14751a95520953bfcc607ceeb617de7cbeaeb6d60f4c8966716c743985337"
 
 
 def sha_file(path: Path) -> str:
@@ -87,7 +87,7 @@ def main():
         cache_dir=str(out/".model-cache"),
     ))
     onnx_sha=sha_file(onnx_file)
-    if ONNX_WEIGHT_SHA is not None and onnx_sha!=ONNX_WEIGHT_SHA:
+    if onnx_sha != ONNX_WEIGHT_SHA:
         raise ValueError("Pinned quantized ONNX SHA256 differs from verified source")
 
     os.environ["HF_HUB_OFFLINE"]="1"
@@ -106,15 +106,23 @@ def main():
     opts=ort.SessionOptions()
     opts.intra_op_num_threads=2
     opts.inter_op_num_threads=1
+    # A single CPU process compares both execution paths. We explicitly
+    # report process high-water RSS as shared, not per-backend consumption.
     session=ort.InferenceSession(
         str(onnx_file),sess_options=opts,providers=["CPUExecutionProvider"]
     )
     providers=session.get_providers()
     if providers!=["CPUExecutionProvider"]:
         raise ValueError("ONNX must use CPUExecutionProvider only")
+    # Warm the ONNX path with exactly one real batch; first-run graph
+    # initialization is excluded on both paths (the FP32 sanity controls
+    # above already warmed the PyTorch model).
+    infer_onnx(session,tokenizer,source_pairs[:args.batch_size],batch_size=args.batch_size)
     onnx_fwd,onnx_rev,onnx_cost=infer_onnx(
         session,tokenizer,source_pairs,batch_size=args.batch_size
     )
+    if fp_cost["directional_pair_inputs"] != onnx_cost["directional_inputs"]:
+        raise ValueError("FP32 and ONNX executed different NLI input counts")
     fp_metrics=score_model_rows(pairs,fp_fwd,fp_rev)
     q_metrics=score_model_rows(pairs,onnx_fwd,onnx_rev)
     quality=compare_predictions(
@@ -162,6 +170,9 @@ def main():
             "Same process shared peak RSS, not isolated per-backend memory costs",
             "Published ONNX quantization is an existing external export, not our invention",
             "No energy measurements, training parity or calibrated factual reliability",
+            "Both backends are run sequentially, in one process and in fixed FP32-to-INT8 order",
+            "FP32 model used generic sanity-case warmup; ONNX model used one candidate batch warmup",
+            "Published AVX2-export format may run on different CPUs but no per-instruction-set speedups are guaranteed",
             "Quality parity thresholds are engineering preferences, not statistical safety gates",
         ],
     }
