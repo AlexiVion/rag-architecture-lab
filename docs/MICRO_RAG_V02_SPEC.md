@@ -50,7 +50,7 @@ For optional local model inference install the generation extras, download a rev
 | M5 | Real CPU performance and quantized parity | Full-stack p50/p95, RAM, disk, initial indexing, INT8/ONNX versus unquantized model with quality parity check |
 | M6 | Publicly reproducible LinkedIn research release | Verified repo, real demo, correct provenance, negative results, GitHub Release and verified Pages |
 
-**Engineering status in this PR:** M0 partial + M2 partial structured baseline + M3 structured software E2E. **M1/M4/M5/M6 still OPEN.** Do not mark scientifically complete because tests pass.
+**Verified 2026-11-10 engineering status:** M0 contract and structured M3 E2E software tests PASS (PR #29); M1 author-answer oracle CPU executed (PR #30; *not end-to-end extraction*); M2 partial NLI diagnostics integrated and fail closed (PR #31); M4 reviewer metadata/cluster-risk evaluator implemented but real human dataset OPEN (PR #32); M5 verifier-only pinned PyTorch/ONNX INT8 CPU parity PASS (PR #33; [results](MICRO_V02_ONNX_RESULTS.md)), yet repeated isolated CPU and full-stack hardware evaluation OPEN; M6 demo and release OPEN. **None of these verifies independently reliable natural-language RAG.**
 
 ## Target scientific thresholds — hypotheses, not achievements
 

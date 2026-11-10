@@ -1,13 +1,15 @@
 # RAG Architecture Lab — Project control (single operational status)
 
 > **Updated:** 2026-11-10 (America/Argentina/Buenos_Aires)  
-> **Current main science baseline:** 2026-11-10 SHA **5b751d2dbadff32e1fcd338c7dd814f0066839b8** (merged MICRO-RAGABILITY external NLI conflict benchmark); see execution log for subsequent docs-only commits  
+> **Current main engineering/research baseline:** 2026-11-10 SHA **34004081dfb9c49725463507771ef211423a0e48** (merged MICRO-RAG v0.2 source-trace E2E, oracle ablation, provisional NLI adapter, reviewed evaluation harness and quantized ONNX CPU study); **scientific reliability still NOT validated**. Prior external Ragability NLI result remains in historical section.  
 > **Program:** v0.1 portfolio source integrated and CI PASS; **public Pages deployment still blocked** by repository admin configuration. Full scientific WOW v1.0 **NOT APPROVED**.  
 > **Tracker:** [master issue #9](https://github.com/AlexiVion/rag-architecture-lab/issues/9) · [merged research PR #2](https://github.com/AlexiVion/rag-architecture-lab/pull/2) · [append-only execution log](EXECUTION_LOG.md)
 
 > **Research focus amendment (2026-11-08):** owner-selected **Extreme Efficiency / Tiny-Model RAG** is the proposed primary direction: 135M–600M open-weight generators, CPU-first, optimize useful evidence per token and supported-answer quality per latency/RAM. See [ADR-0005](adr/0005-tiny-model-efficiency-research-pivot.md) and [MICRO issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11). This research pivot now has experimental tools and actual 14M/135M CPU inference and SQuAD2 public-DEV results; **no reliable grounded-answer improvement has been measured**. The earlier ten-model/full-v1.0 scope remains a historical signed-off plan and must be explicitly reconciled in issue #9 before changing final release acceptance.
 
 > **Future research reservation (2026-11-08):** [PHY issue #12](https://github.com/AlexiVion/rag-architecture-lab/issues/12) and [ADR-0006](adr/0006-tiny-world-models-physical-ai-future-track.md) track **Tiny World Models, bio-inspired physical AI, bacterial/cellular adaptation (BIO-CELL) and minimum viable embodied intelligence**. This is **PROPOSED / NOT IMPLEMENTED** and explicitly **out of scope of current WOW v1.0 / MICRO milestone** until a separate reviewed roadmap decision. Never confuse an 867-parameter controller with total system parameters.
+
+> **UPDATED USER PRIORITY (2026-11-10):** Complete MICRO-RAG v0.2 evidence-grounded CPU research system for the *LinkedIn release* before publishing a simple v0.1 portfolio. PR #29–#33 engineering/research integrations are merged, but the independent scientific holdout, query-aware semantic claim support, full-stack CPU measurement and public Pages deployment remain OPEN. [MICRO-RAG v0.2 spec](MICRO_RAG_V02_SPEC.md) · [Tracker #28](https://github.com/AlexiVion/rag-architecture-lab/issues/28).
 
 > **ACTIVE SHIP DIRECTIVE (2026-11-09):** [REL-PORTFOLIO-01 #13](https://github.com/AlexiVion/rag-architecture-lab/issues/13) is the current P0 priority: publish the *scoped v0.1.0 retrieval research portfolio*, with real Pages/CI verification, provenance and honest negative studies. The previous full scientific WOW v1.0 gates are **not waived or completed**; they remain tracked in issue #9. Proposed MICRO and PHY/BIO research remain future, explicitly not blockers for v0.1.0. [Portfolio scope](PORTFOLIO_RELEASE.md) · [LinkedIn package](LINKEDIN_LAUNCH.md).
 
@@ -20,6 +22,16 @@ This document is the **single operational status** for current gates, next actio
 **Status vocabulary:** `PASS` = verified against stated scope; `PARTIAL` = some accepted substeps; `OPEN` = required work missing; `NO_GO` = evidence rejects candidate under measured conditions; `BLOCKED` = dependency/acceptance gate unresolved. Never turn a negative study into a general claim.
 
 **Safety and publication:** keep private/raw model reports, secrets and restricted datasets out of Git. Do not promote a model for automatic answer publication from citation syntax, synthetic templated proxies or exposed test cohorts. Run paid model calls only with explicit setup; this project is CPU-first and no-paid-API by default. Model weights and benchmark corpora may need downloads; no GitHub CI job should run large model sweeps.
+
+## New MICRO-RAG v0.2 engineering checkpoint — 2026-11-10
+
+- **M0/M3 baseline**: PR #29 merged: BM25 + structured literal scan of all matching entity records, exact-offset SHA256 citations, typed ANSWER/CONFLICT/INSUFFICIENT/REVIEW, local CLI. Nine artificial stations test software correctness only; no open-domain semantic answer validation.
+- **M1 oracle**: PR #30 merged: real pinned CPU Ragability run comparing raw docs to author-provided short and long answers. DeBERTa original 35/53 contradictions detected vs **49/53** with author short answers, but the claims were provided as oracle inputs and *not extracted by our pipeline*.
+- **M2 partial**: PR #31 merged: local optional NLI traces on model-extracted claims, never promotes unsupported generated/source-copied spans to publishable factual ANSWER. Natural-language semantic evidence verification and source authority/date remain unvalidated.
+- **M4 infrastructure**: PR #32 merged: two-reviewer metadata/independent source-group split and risk/coverage evaluator. No actual independent human-labeled holdout; software cannot authenticate reviewer identity, so scientific approval remains false.
+- **M5 verifier-only**: PR #33 merged as `34004081dfb9c49725463507771ef211423a0e48`. Same pinned DeBERTa + 318 public Ragability pairs: **FP32 261/318 (82.08%)**, **INT8 ONNX 269/318 (84.59%)**; recall 74.53% vs **76.42%**, false-positive conflicts 30 vs **24**. One sequential GitHub CPU run: batch wall 24.37s vs **15.08s** and weights 283.35MB vs **87.38MB**. Engineered quality-parity gate PASS, **not independent speed superiority or full-stack performance**; process RSS shared. [Exact CPU run](https://github.com/AlexiVion/rag-architecture-lab/actions/runs/42834352753) and [verified report](MICRO_V02_ONNX_RESULTS.md).
+- **M6 open**: no public v0.2 demo, no peer-reviewed reliability claim, no GitHub release. Pages requires repository admin settings (issue #13). LinkedIn scope must not claim a production factual assistant.
+- **Next:** new natural-language source-claim extraction benchmark; independently reviewed heldout source groups; repeated isolated CPU FP32 vs INT8 runs and whole-stack latency/RSS; v0.2 observatory case inspector.
 
 ## Current measured MICRO-RAGABILITY checkpoint — 2026-11-10
 
