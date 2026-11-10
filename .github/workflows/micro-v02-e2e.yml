@@ -5,6 +5,7 @@ on:
     paths:
       - "src/raglab/micro_v02/**"
       - "tests/test_micro_v02.py"
+      - "tests/test_micro_v02_interventions.py"
       - "examples/micro-v02/**"
       - "docs/MICRO_RAG_V02_SPEC.md"
       - ".github/workflows/micro-v02-e2e.yml"
@@ -34,7 +35,7 @@ jobs:
           python -m pip install -e ".[dev]"
       - name: Run source identity and wrong-accept tests
         run: |
-          python -m pytest -q tests/test_micro_v02.py
+          python -m pytest -q tests/test_micro_v02.py tests/test_micro_v02_interventions.py
       - name: Run real software E2E without external model/API
         shell: bash
         run: |
@@ -43,6 +44,8 @@ jobs:
             --documents examples/micro-v02/documents.json \
             --question "What is the start year for Station Aurora?" \
             --output runs/micro-v02/conflict.json
+          python -m raglab.micro_v02.intervention_audit \
+            --output runs/micro-v02/paired-interventions.json
           python -m raglab.micro_v02 evaluate \
             --documents examples/micro-v02/documents.json \
             --cases examples/micro-v02/cases.json \
@@ -52,11 +55,15 @@ jobs:
           from pathlib import Path
           conflict=json.loads(Path("runs/micro-v02/conflict.json").read_text())
           score=json.loads(Path("runs/micro-v02/evaluation.json").read_text())
+          paired=json.loads(Path("runs/micro-v02/paired-interventions.json").read_text())
           assert conflict["status"] == "CONFLICT" and conflict["answer"] is None
           assert conflict["source_sweep_complete"] and len(conflict["citations"]) == 2
           assert score["strict_correct"] == score["n"] == 9
           assert score["wrong_accepts"] == 0
           assert score["status"].startswith("VISIBLE_SYNTHETIC")
+          assert paired["n"] == 108 and paired["compliant"] == 108
+          assert paired["accepted"] == 60 and paired["wrong_accepts"] == 0
+          assert paired["status"].startswith("VISIBLE_AUTHOR_GENERATED")
           print("MICRO_V02_SOFTWARE_FIXTURE_PASS (not independent factual validation)")
           PY
       - name: Upload synthetic research evidence, no model weights
@@ -67,5 +74,6 @@ jobs:
           path: |
             runs/micro-v02/conflict.json
             runs/micro-v02/evaluation.json
+            runs/micro-v02/paired-interventions.json
           retention-days: 30
           if-no-files-found: warn
