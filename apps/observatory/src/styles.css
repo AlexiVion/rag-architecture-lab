@@ -197,6 +197,9 @@ button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px soli
 .ap-form-control select:focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
 .ap-method-controls { display:grid; grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr); gap:10px; align-items:end; }
 .ap-versus { font-size:12px; color:var(--ink-muted); font-weight:750; align-self:end; padding-bottom:13px; text-align:center; }
+.ap-selected-question {display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 20px;background:var(--accent-soft);border-bottom:1px solid var(--line);padding:13px 28px;margin:0;}
+.ap-selected-question span {font-size:10px;letter-spacing:.06em;font-weight:800;color:var(--accent);}
+.ap-selected-question strong {font:750 14px "Manrope",sans-serif;color:var(--ink);}
 .ap-transport { padding:22px 28px; border-bottom:1px solid var(--line); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:18px; }
 .ap-step-status { font-size:13px; font-weight:800; margin:0 0 8px; color:var(--ink); }
 .ap-step-status span { color:var(--ink-muted); font-weight:500; }
@@ -283,6 +286,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px soli
 @media(max-width:650px) {
   .ap-section {padding:55px 0 67px;}
   .ap-controls,.ap-transport {padding:18px 15px;}
+  .ap-selected-question {padding:13px 15px;}
   .ap-method-controls {gap:5px;}
   .ap-versus {font-size:11px;padding-bottom:13px;}
   .ap-lanes {grid-template-columns:1fr;}
