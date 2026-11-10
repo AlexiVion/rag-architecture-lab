@@ -13,13 +13,12 @@ from __future__ import annotations
 
 import csv
 import hashlib
-import json
 import random
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from statistics import mean
-from typing import Any, Iterable, Sequence
+from typing import Any, Sequence
 
 NLI_LABELS = ("contradiction", "entailment", "neutral")
 CONFLICT = "contradiction"
