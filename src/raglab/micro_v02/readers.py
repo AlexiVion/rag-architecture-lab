@@ -47,9 +47,14 @@ _LINE_RE = re.compile(r"(?m)^([a-z_]+):[ \t]*([^\r\n]+?)[ \t]*$")
 
 def parse_question(question: str) -> QuestionSpec | None:
     """Exact recognized field + named entity required; no inferred metadata."""
-    entity_match = _ENTITY_RE.search(question)
-    if not entity_match:
+    entity_matches = list(_ENTITY_RE.finditer(question))
+    # A question naming two stations is ambiguous; do not silently choose
+    # the first mention and return an unrelated entity's value.
+    if not entity_matches or len({
+        match.group(1).casefold() for match in entity_matches
+    }) != 1:
         return None
+    entity_match = entity_matches[0]
     lowered = question.casefold()
     matches = [
         field for field, aliases in _FIELD_ALIASES.items()
@@ -77,10 +82,18 @@ def _records(document: Document) -> dict[str, tuple[str, int, int]] | None:
 
 
 def source_entity(document: Document) -> str | None:
-    fields = _records(document)
-    if fields is None:
-        return None
-    return fields["entity"][0].casefold()
+    # Identify an entity even if another field is malformed. The pipeline
+    # must scan and REVIEW that source instead of silently hiding its values.
+    matches = [
+        match.group(2).strip().casefold()
+        for match in _LINE_RE.finditer(document.text)
+        if match.group(1).casefold() == "entity"
+    ]
+    return matches[0] if len(matches) == 1 else None
+
+
+def structured_source_invalid(document: Document) -> bool:
+    return _records(document) is None
 
 
 class StructuredFactReader:
