@@ -1,0 +1,27 @@
+[
+  {
+    "id": "aurora-registry",
+    "title": "Station Aurora registry",
+    "text": "entity: Station Aurora\nstart_year: 2012\nmanager: Camille\ncapacity: 8\n"
+  },
+  {
+    "id": "aurora-operations",
+    "title": "Station Aurora operations",
+    "text": "entity: Station Aurora\nstart_year: 2015\nmanager: Camille\ncapacity: 8\n"
+  },
+  {
+    "id": "boreal-registry",
+    "title": "Station Boreal registry",
+    "text": "entity: Station Boreal\nstart_year: 2019\nmanager: Dana\ncapacity: 4\n"
+  },
+  {
+    "id": "boreal-operations",
+    "title": "Station Boreal operations",
+    "text": "entity: Station Boreal\nstart_year: 2019\nmanager: Dana\ncapacity: 4\n"
+  },
+  {
+    "id": "cosmos-registry",
+    "title": "Station Cosmos registry",
+    "text": "entity: Station Cosmos\nmanager: Eli\n"
+  }
+]

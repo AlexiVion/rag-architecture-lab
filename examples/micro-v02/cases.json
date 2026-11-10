@@ -1,0 +1,61 @@
+[
+  {
+    "id": "aurora-conflict",
+    "group_id": "aurora",
+    "question": "What is the start year for Station Aurora?",
+    "expected_status": "CONFLICT"
+  },
+  {
+    "id": "aurora-manager",
+    "group_id": "aurora",
+    "question": "Who is the manager of Station Aurora?",
+    "expected_status": "ANSWER",
+    "expected_answer": "Camille"
+  },
+  {
+    "id": "aurora-capacity",
+    "group_id": "aurora",
+    "question": "What is the capacity of Station Aurora?",
+    "expected_status": "ANSWER",
+    "expected_answer": "8"
+  },
+  {
+    "id": "boreal-year",
+    "group_id": "boreal",
+    "question": "What is the start year for Station Boreal?",
+    "expected_status": "ANSWER",
+    "expected_answer": "2019"
+  },
+  {
+    "id": "boreal-manager",
+    "group_id": "boreal",
+    "question": "Who is the manager of Station Boreal?",
+    "expected_status": "ANSWER",
+    "expected_answer": "Dana"
+  },
+  {
+    "id": "cosmos-year",
+    "group_id": "cosmos",
+    "question": "What is the start year for Station Cosmos?",
+    "expected_status": "INSUFFICIENT"
+  },
+  {
+    "id": "unknown-entity",
+    "group_id": "unknown",
+    "question": "What is the capacity of Station Horizon?",
+    "expected_status": "INSUFFICIENT"
+  },
+  {
+    "id": "unrecognized-field",
+    "group_id": "unknown",
+    "question": "What is the budget of Station Boreal?",
+    "expected_status": "INSUFFICIENT"
+  },
+  {
+    "id": "other-entity",
+    "group_id": "cosmos",
+    "question": "What is the manager of Station Cosmos?",
+    "expected_status": "ANSWER",
+    "expected_answer": "Eli"
+  }
+]
