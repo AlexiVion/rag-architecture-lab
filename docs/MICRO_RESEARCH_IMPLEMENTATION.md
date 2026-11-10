@@ -8,7 +8,7 @@ Primary idea: compare the **same tiny generator** with controlled evidence packi
 
 - [MICRO issue #11](https://github.com/AlexiVion/rag-architecture-lab/issues/11)
 - [Research hypothesis / ADR-0005](adr/0005-tiny-model-efficiency-research-pivot.md)
-- [Canonical current project gates](PROJECT_CONTROL.md)
+- [Canonical current project gates](RESEARCH_STATUS.md)
 - [Scientific protocol](EXPERIMENT_PROTOCOL.md)
 
 ## What was implemented in this research iteration
@@ -25,7 +25,7 @@ Primary idea: compare the **same tiny generator** with controlled evidence packi
 
 ## Reproduce locally without paid APIs or model downloads
 
-From repository root after installing the Python package as in [RELEASE_INSTALLATION.md](RELEASE_INSTALLATION.md):
+From repository root after installing the Python package as in [RELEASE_INSTALLATION.md](REPRODUCIBILITY.md):
 
 ```bash
 python -m raglab.micro registry --output runs/micro-registry.json
