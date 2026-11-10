@@ -41,6 +41,12 @@ describe("MICRO-RAG verified Python software replay", () => {
     }
   });
 
+  it("rejects an answer that disagrees with its cited original value", () => {
+    const data = structuredClone(sourceReplay);
+    data.cases[1]!.answer = "2020";
+    expect(() => validateMicroReplayShape(data)).toThrow(/Answer differs from/);
+  });
+
   it("requires a truthful fixed fictional-software-replay label", () => {
     const data = structuredClone(sourceReplay);
     data.status = "PRODUCTION_CERTIFIED" as typeof data.status;
