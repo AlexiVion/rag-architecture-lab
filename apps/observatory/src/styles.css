@@ -310,3 +310,65 @@ button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px soli
 
 .ap-svg-point {cursor:pointer;}
 .ap-study-point:focus-visible {outline:3px solid var(--accent);outline-offset:2px;}
+
+
+/* Document X-Ray: optional inline, keyboard-accessible explanation of authored rankings. */
+.ap-rank-card {padding:0;}
+.ap-rank-select {width:100%;height:100%;display:flex;align-items:center;gap:9px;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:var(--ink);text-align:left;cursor:pointer;}
+.ap-rank-select:hover {background:color-mix(in srgb,var(--accent) 8%,transparent);}
+.ap-rank-select:focus-visible {outline:3px solid var(--accent);outline-offset:-3px;}
+.ap-rank-card.is-selected {border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);}
+.ap-rank-open {flex:none;color:var(--accent);font-size:12px;font-weight:750;}
+.ap-legend-inspect {color:var(--accent);font-weight:750;}
+.ap-xray {scroll-margin-top:115px;border-top:1px solid var(--line-strong);background:var(--paper);padding:30px 27px 27px;display:grid;gap:22px;}
+.ap-xray-heading {display:flex;justify-content:space-between;gap:22px;align-items:flex-start;}
+.ap-xray-heading h3 {font:750 clamp(22px,2.7vw,31px)/1.25 "Manrope",sans-serif;letter-spacing:-.05em;margin:6px 0 8px;}
+.ap-xray-heading p:not(.ap-small) {margin:0;color:var(--ink-muted);font-size:14px;max-width:680px;}
+.ap-xray-close {flex:none;border:1px solid var(--line-strong);border-radius:7px;background:var(--paper);color:var(--ink-muted);font-size:12px;font-weight:750;padding:8px 10px;}
+.ap-xray-close:hover {background:var(--accent-soft);color:var(--ink);}
+.ap-xray-close span {margin-left:4px;font-size:16px;line-height:0;}
+.ap-xray-relevance {display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;color:var(--ink-muted);font-size:12px;}
+.ap-xray-status {display:inline-block;border:1px solid var(--line-strong);border-radius:20px;padding:3px 10px;color:var(--ink-muted);font-size:11px;font-weight:750;}
+.ap-xray-status.helpful {border-color:var(--accent);background:var(--accent-soft);color:var(--accent);}
+.ap-xray-journey {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+.ap-xray-stop {border:1px solid var(--line);border-radius:10px;background:var(--background);padding:14px 13px 13px;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:7px;}
+.ap-xray-stop-index {display:flex;justify-content:space-between;width:100%;font-size:10px;color:var(--accent);font-weight:800;}
+.ap-xray-stop:last-child .ap-xray-stop-index span {visibility:hidden;}
+.ap-xray-stop h4 {font-size:12px;font-weight:800;margin:2px 0 0;line-height:1.35;min-height:30px;}
+.ap-xray-position {font:800 clamp(26px,3vw,38px)/1 "Manrope",sans-serif;letter-spacing:-.05em;}
+.ap-xray-stop small {font-size:11px;color:var(--ink-muted);line-height:1.5;min-height:34px;}
+.ap-xray-tag {color:var(--ink-muted);border:1px solid var(--line-strong);padding:3px 7px;border-radius:5px;font-size:10px;margin-top:auto;}
+.ap-xray-tag.computed {color:var(--accent);background:var(--accent-soft);border-color:var(--accent);}
+.ap-xray-current {display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;font-size:12px;color:var(--ink-muted);border-block:1px solid var(--line);padding:13px 0;}
+.ap-xray-current strong {font-weight:800;color:var(--ink);}
+.ap-xray-current span:nth-child(2),.ap-xray-current span:nth-child(3) {color:var(--accent);font-weight:800;}
+.ap-xray-movement {margin-left:auto;}
+.ap-xray-explain {display:grid;grid-template-columns:1fr 1.1fr;gap:25px;align-items:start;}
+.ap-xray-meaning {font-size:14px;color:var(--ink-muted);line-height:1.8;}
+.ap-xray-meaning p {margin:0;}
+.ap-xray-meaning strong {color:var(--ink);}
+.ap-xray-meaning code {background:var(--accent-soft);color:var(--accent);padding:2px 5px;border-radius:3px;font-size:12px;}
+.ap-xray-equation {background:var(--background);border:1px solid var(--line);border-radius:10px;padding:17px;min-width:0;}
+.ap-xray-equation .ap-small {margin:0 0 10px;}
+.ap-xray-fractions,.ap-xray-values {display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12px;}
+.ap-xray-fractions code {font:700 12px "DM Sans",sans-serif;white-space:nowrap;color:var(--ink);}
+.ap-xray-values {font-variant-numeric:tabular-nums;color:var(--ink-muted);font-size:11px;margin-top:3px;}
+.ap-xray-total {display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between;border-top:1px solid var(--line);margin-top:13px;padding-top:11px;font-size:12px;color:var(--ink-muted);}
+.ap-xray-total strong {font:750 19px "Manrope",sans-serif;color:var(--accent);font-variant-numeric:tabular-nums;}
+.ap-xray-equation > p:last-child {font-size:11px;color:var(--ink-muted);margin:10px 0 0;line-height:1.6;}
+.ap-xray-disclaimer {margin:0;color:var(--ink-muted);font-size:11px;line-height:1.8;}
+.ap-xray-disclaimer strong {color:var(--ink);}
+@media(max-width:880px) {
+  .ap-xray-journey {grid-template-columns:repeat(2,minmax(0,1fr));}
+  .ap-xray-explain {grid-template-columns:1fr;}
+}
+@media(max-width:650px) {
+  .ap-xray {padding:23px 15px;}
+  .ap-xray-heading {gap:10px;}
+  .ap-xray-heading h3 {font-size:23px;}
+  .ap-xray-stop {padding:12px;}
+  .ap-xray-stop h4 {min-height:0;}
+  .ap-xray-current {gap:8px 16px;}
+  .ap-xray-movement {width:100%;margin-left:0;}
+  .ap-rank-select {padding:8px 7px;}
+}

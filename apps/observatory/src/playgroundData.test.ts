@@ -54,3 +54,36 @@ describe("Architecture Playground data integrity", () => {
     expect(PLAYGROUND_STUDIES.every((study) => study.report.startsWith("https://github.com/"))).toBe(true);
   });
 });
+
+import { getDocumentXRay } from "./documentXRay";
+
+describe("Document X-Ray fidelity to authored teaching rankings", () => {
+  it("returns actual authored positions and deterministic RRF contributions for the roots example", () => {
+    const s=validatePlayground(input).scenarios[0]!;
+    const item=getDocumentXRay(s,"p1");
+    expect(item.document.id).toBe("p1");
+    expect(item.positions).toEqual({bm25:2,dense:1,hybrid:1,rerank:1});
+    expect(item.parts.bm25).toBeCloseTo(1/62,12);
+    expect(item.parts.dense).toBeCloseTo(1/61,12);
+    expect(item.parts.total).toBeCloseTo(1/62+1/61,12);
+    expect(item.movement.hybridFromBm25).toBe(1);
+    expect(item.movement.rerankFromHybrid).toBe(0);
+  });
+  it("refuses unknown documents without fabricating a result", () => {
+    const s=validatePlayground(input).scenarios[0]!;
+    expect(() => getDocumentXRay(s,"unlisted")).toThrow(/unknown document/i);
+  });
+  it("keeps all three scenarios consistent with RRF and their authored reranking", () => {
+    for(const scene of validatePlayground(input).scenarios){
+      const ranks=rrfRanking(scene.rankings.bm25,scene.rankings.dense);
+      for(const document of scene.documents){
+        const view=getDocumentXRay(scene,document.id);
+        expect(view.positions.bm25).toBe(scene.rankings.bm25.indexOf(document.id)+1);
+        expect(view.positions.dense).toBe(scene.rankings.dense.indexOf(document.id)+1);
+        expect(view.positions.hybrid).toBe(ranks.indexOf(document.id)+1);
+        expect(view.positions.rerank).toBe(scene.rankings.rerank.indexOf(document.id)+1);
+        expect(view.parts.total).toBeCloseTo(view.parts.bm25+view.parts.dense,12);
+      }
+    }
+  });
+});
