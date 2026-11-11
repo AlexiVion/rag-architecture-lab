@@ -240,7 +240,8 @@ test("real retrieval is usable in mobile dark theme without horizontal clipping"
   await section.locator(".rr-lane").last().getByRole("button").first().click();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+3)).toBe(false);
   await mkdir("artifacts/screens",{recursive:true});
-  await section.screenshot({path:"artifacts/screens/08-real-retrieval-mobile.png"});
+  await page.evaluate(()=>window.scrollTo(0,0));
+  await page.screenshot({path:"artifacts/screens/08-real-retrieval-mobile.png",fullPage:true});
 });
 
 
@@ -263,7 +264,7 @@ test("an existing saved benchmark can be inspected locally without submitting da
     name:"local-query-replay.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(data))
   });
   const box=section.getByRole("region",{name:"Locally imported original benchmark ranks"});
-  await expect(box.getByText("An archived SciFact question")).toBeVisible();
+  await expect(box.getByLabel("Recorded query")).toHaveValue("1");
   await expect(box.getByText("123",{exact:true})).toBeVisible();
   await expect(box.getByText("456",{exact:true})).toBeVisible();
   await expect(box.getByText(/not independently verified by this browser/i)).toBeVisible();
