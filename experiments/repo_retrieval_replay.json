@@ -70,7 +70,7 @@
       },
       {
         "path": "scripts/observatory/export_repo_retrieval_replay.py",
-        "sha256": "408fbcf792a8642ebc9c819c1cb84ef52effeee3e6172d78220573830a09e975"
+        "sha256": "d10e204f02a7532c4b968708baf5b0d530c2b69123f27589ecd8cc5b93e18e04"
       }
     ],
     "corpus_sha256": "03ccde9544b8ed53d6508c12fe0bbbad966782076b579fcbd2a7e060f1efe0e5",
