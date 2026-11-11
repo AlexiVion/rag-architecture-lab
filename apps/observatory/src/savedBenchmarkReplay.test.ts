@@ -12,7 +12,7 @@ const base={
 };
 describe("saved local benchmark replay",()=>{
   it("accepts matched original score/position records",()=>{
-    expect(validateSavedReplay(base).queries[0]!.rankings.bm25[0]!.doc_id).toBe("a");
+    expect(validateSavedReplay(base).queries[0]!.rankings.bm25![0]!.doc_id).toBe("a");
   });
   it("rejects mismatched scores, claimed validation and changed method cohorts",()=>{
     expect(()=>validateSavedReplay({...base,status:"scientifically_validated"})).toThrow();
