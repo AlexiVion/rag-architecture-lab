@@ -8,7 +8,7 @@ The repository's Python experiments, methods, versioned data, source code and te
 2. Verify that main passes Offline research integrity, including the repository-replay and source-fingerprint checks.
 3. Manually run .github/workflows/pages.yml (Publish static RAG evidence observatory) on main.
 4. Open the URL returned by the deploy job. Verify all three navigation sections, the fictional Architecture Playground, the authenticated repository-document trace, original-source links and the local JSON import. Verify mobile and HTTPS.
-5. Only after the public URL is independently verified, add it to LinkedIn if desired.
+5. Only after the public URL is independently verified, reference it as an optional research viewing resource.
 
 GitHub Pages is not considered deployed merely because main builds. The Pages workflow is intentionally manual, so code updates do not automatically publish a new site.
 
