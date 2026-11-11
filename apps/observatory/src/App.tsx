@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { loadObservatory } from "./contracts";
 import type { GRF00, GRF01, ObservatoryData } from "./contracts";
 import ResearchDemo from "./ResearchDemo";
+import RealRetrievalReplay from "./RealRetrievalReplay";
 import ArchitecturePlayground from "./ArchitecturePlayground";
 
 type Page = "research" | "experiments" | "methodology";
@@ -190,6 +191,7 @@ function Experiments({data}:{data:ObservatoryData}) {
       <p className="study-note">The 240 pairs are <strong>not independent questions</strong>. Different annotated viewpoints do not necessarily contradict each other; this is not an end-to-end factual QA score.</p>
       <SourceLink href={docs("docs/PAPER_01_CONFRAG_DEV_RESULTS.md")}>Read the source and uncertainty audit</SourceLink>
     </section>
+    <RealRetrievalReplay />
   </article>;
 }
 function Methodology() {

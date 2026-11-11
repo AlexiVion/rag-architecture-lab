@@ -1,0 +1,291 @@
+{
+  "dataset": "versioned_rag_lab_research_documents",
+  "documents": [
+    {
+      "id": "README.md",
+      "sha256": "122ae4fdcaa4b5c1ccdbfa72bc6bbc9ef792390686ad7cd98a15febc63770072",
+      "title": "README",
+      "url": "https://github.com/AlexiVion/rag-architecture-lab/blob/main/README.md"
+    },
+    {
+      "id": "docs/RESEARCH_STATUS.md",
+      "sha256": "9260127e594bfa5db8861ba1504d7657ca3ebed12671558622dd1a1f46992884",
+      "title": "RESEARCH STATUS",
+      "url": "https://github.com/AlexiVion/rag-architecture-lab/blob/main/docs/RESEARCH_STATUS.md"
+    },
+    {
+      "id": "docs/EXPERIMENT_PROTOCOL.md",
+      "sha256": "1b9f8e5d62c4eaf0851bd52029fea40c757b4fcd8e32bfae56b4e6bb9624cab6",
+      "title": "EXPERIMENT PROTOCOL",
+      "url": "https://github.com/AlexiVion/rag-architecture-lab/blob/main/docs/EXPERIMENT_PROTOCOL.md"
+    },
+    {
+      "id": "docs/MICRO_RAG_V02_SPEC.md",
+      "sha256": "3fef1f9bfee7838cf0af1e38a73e41cf488561c0dec00826258d0733079dcfb0",
+      "title": "MICRO RAG V02 SPEC",
+      "url": "https://github.com/AlexiVion/rag-architecture-lab/blob/main/docs/MICRO_RAG_V02_SPEC.md"
+    },
+    {
+      "id": "benchmarks/V0_RESULTS.md",
+      "sha256": "bd324cca04f6d45d98a110929d3c1d77d5f2601b05501f7e32454f72e4b387c0",
+      "title": "V0 RESULTS",
+      "url": "https://github.com/AlexiVion/rag-architecture-lab/blob/main/benchmarks/V0_RESULTS.md"
+    },
+    {
+      "id": "benchmarks/V1_RESULTS.md",
+      "sha256": "4bf199015333daa399d50b0f43e891d075bdb47a8e5b727ae9d02f9be1748bf0",
+      "title": "V1 RESULTS",
+      "url": "https://github.com/AlexiVion/rag-architecture-lab/blob/main/benchmarks/V1_RESULTS.md"
+    },
+    {
+      "id": "benchmarks/V1_1_RESULTS.md",
+      "sha256": "9526fd516c71c832d5290f60455cbf9ca0a7503824b2af38ed01aa852e846dea",
+      "title": "V1 1 RESULTS",
+      "url": "https://github.com/AlexiVion/rag-architecture-lab/blob/main/benchmarks/V1_1_RESULTS.md"
+    },
+    {
+      "id": "docs/PAPER_01_MICRO_CPU_FRONTIER_PROTOCOL.md",
+      "sha256": "3ed022c5b2b854d54549b5bb91992938c9f3ea294f115eaf3058de1189bdc8b9",
+      "title": "PAPER 01 MICRO CPU FRONTIER PROTOCOL",
+      "url": "https://github.com/AlexiVion/rag-architecture-lab/blob/main/docs/PAPER_01_MICRO_CPU_FRONTIER_PROTOCOL.md"
+    }
+  ],
+  "execution": {
+    "bm25": {
+      "b": 0.75,
+      "k1": 1.5
+    },
+    "code_sources": [
+      {
+        "path": "src/raglab/retrieval/bm25.py",
+        "sha256": "44782f4b7877dbe8a8e2d6cbd2736fe8e29d5d7131c693d2507ede190ee2661c"
+      },
+      {
+        "path": "src/raglab/architectures/parent_child.py",
+        "sha256": "d5ea0c25ed9eae02aac6f136ce19c6b225b46fb6458302af96ec088ec4907a42"
+      },
+      {
+        "path": "src/raglab/core/types.py",
+        "sha256": "fd34728976ed40057bbcdc11b6d0644f28f76a8ad11f9fb434c2dcd9120839c7"
+      },
+      {
+        "path": "scripts/observatory/export_repo_retrieval_replay.py",
+        "sha256": "d10e204f02a7532c4b968708baf5b0d530c2b69123f27589ecd8cc5b93e18e04"
+      }
+    ],
+    "corpus_sha256": "03ccde9544b8ed53d6508c12fe0bbbad966782076b579fcbd2a7e060f1efe0e5",
+    "parent_child": {
+      "candidate_k": 100,
+      "chunk_chars": 480,
+      "overlap_chars": 60
+    },
+    "pipelines": [
+      "bm25",
+      "parent_child_bm25"
+    ],
+    "software": "raglab Python retrievers",
+    "top_k": 5
+  },
+  "kind": "repository_retrieval_execution",
+  "limitations": [
+    "Real Python retrieval on versioned repository documents, not BEIR SciFact.",
+    "Three authored teaching questions; no relevance labels or independent human review.",
+    "No measured MRR, Recall, nDCG, answer accuracy, or neural model inference.",
+    "BM25 full-document and child-passage scores have different scales; compare ranks, not score magnitudes.",
+    "Small repository-specific corpus; numerical ties may depend on NumPy version."
+  ],
+  "queries": [
+    {
+      "answer": null,
+      "answer_evaluation": "not_evaluated",
+      "id": "q01",
+      "qrels": null,
+      "rankings": {
+        "bm25": [
+          {
+            "doc_id": "benchmarks/V0_RESULTS.md",
+            "rank": 1,
+            "score": 6.265406713
+          },
+          {
+            "doc_id": "README.md",
+            "rank": 2,
+            "score": 5.816743639
+          },
+          {
+            "doc_id": "benchmarks/V1_RESULTS.md",
+            "rank": 3,
+            "score": 4.516424183
+          },
+          {
+            "doc_id": "benchmarks/V1_1_RESULTS.md",
+            "rank": 4,
+            "score": 4.347294788
+          },
+          {
+            "doc_id": "docs/MICRO_RAG_V02_SPEC.md",
+            "rank": 5,
+            "score": 3.120240465
+          }
+        ],
+        "parent_child_bm25": [
+          {
+            "doc_id": "benchmarks/V0_RESULTS.md",
+            "rank": 1,
+            "score": 16.522187291
+          },
+          {
+            "doc_id": "README.md",
+            "rank": 2,
+            "score": 12.319226435
+          },
+          {
+            "doc_id": "benchmarks/V1_RESULTS.md",
+            "rank": 3,
+            "score": 10.220840754
+          },
+          {
+            "doc_id": "benchmarks/V1_1_RESULTS.md",
+            "rank": 4,
+            "score": 8.263405936
+          },
+          {
+            "doc_id": "docs/RESEARCH_STATUS.md",
+            "rank": 5,
+            "score": 7.616723896
+          }
+        ]
+      },
+      "text": "How does BM25 compare with dense retrieval and hybrid RRF on SciFact?"
+    },
+    {
+      "answer": null,
+      "answer_evaluation": "not_evaluated",
+      "id": "q02",
+      "qrels": null,
+      "rankings": {
+        "bm25": [
+          {
+            "doc_id": "benchmarks/V1_RESULTS.md",
+            "rank": 1,
+            "score": 10.444062584
+          },
+          {
+            "doc_id": "benchmarks/V1_1_RESULTS.md",
+            "rank": 2,
+            "score": 6.899771692
+          },
+          {
+            "doc_id": "README.md",
+            "rank": 3,
+            "score": 4.348345168
+          },
+          {
+            "doc_id": "docs/RESEARCH_STATUS.md",
+            "rank": 4,
+            "score": 2.537210549
+          },
+          {
+            "doc_id": "benchmarks/V0_RESULTS.md",
+            "rank": 5,
+            "score": 2.464704268
+          }
+        ],
+        "parent_child_bm25": [
+          {
+            "doc_id": "benchmarks/V1_RESULTS.md",
+            "rank": 1,
+            "score": 15.221805748
+          },
+          {
+            "doc_id": "benchmarks/V1_1_RESULTS.md",
+            "rank": 2,
+            "score": 13.30472469
+          },
+          {
+            "doc_id": "README.md",
+            "rank": 3,
+            "score": 10.825289223
+          },
+          {
+            "doc_id": "docs/RESEARCH_STATUS.md",
+            "rank": 4,
+            "score": 8.266714767
+          },
+          {
+            "doc_id": "docs/PAPER_01_MICRO_CPU_FRONTIER_PROTOCOL.md",
+            "rank": 5,
+            "score": 5.290359476
+          }
+        ]
+      },
+      "text": "Why was cross-encoder reranking on CPU rejected at 50 candidates?"
+    },
+    {
+      "answer": null,
+      "answer_evaluation": "not_evaluated",
+      "id": "q03",
+      "qrels": null,
+      "rankings": {
+        "bm25": [
+          {
+            "doc_id": "docs/RESEARCH_STATUS.md",
+            "rank": 1,
+            "score": 9.252461721
+          },
+          {
+            "doc_id": "docs/EXPERIMENT_PROTOCOL.md",
+            "rank": 2,
+            "score": 5.801736028
+          },
+          {
+            "doc_id": "docs/PAPER_01_MICRO_CPU_FRONTIER_PROTOCOL.md",
+            "rank": 3,
+            "score": 5.774497847
+          },
+          {
+            "doc_id": "docs/MICRO_RAG_V02_SPEC.md",
+            "rank": 4,
+            "score": 3.527300308
+          },
+          {
+            "doc_id": "README.md",
+            "rank": 5,
+            "score": 3.50517359
+          }
+        ],
+        "parent_child_bm25": [
+          {
+            "doc_id": "docs/RESEARCH_STATUS.md",
+            "rank": 1,
+            "score": 13.621409862
+          },
+          {
+            "doc_id": "docs/EXPERIMENT_PROTOCOL.md",
+            "rank": 2,
+            "score": 9.459871699
+          },
+          {
+            "doc_id": "docs/PAPER_01_MICRO_CPU_FRONTIER_PROTOCOL.md",
+            "rank": 3,
+            "score": 8.603832713
+          },
+          {
+            "doc_id": "docs/MICRO_RAG_V02_SPEC.md",
+            "rank": 4,
+            "score": 8.113064784
+          },
+          {
+            "doc_id": "README.md",
+            "rank": 5,
+            "score": 8.037478157
+          }
+        ]
+      },
+      "text": "What evidence verification, abstention and held-out evaluation remain unverified?"
+    }
+  ],
+  "schema_version": 1,
+  "selection": "fixed_eight_documents_three_questions",
+  "status": "measured_software_trace_unlabelled"
+}
