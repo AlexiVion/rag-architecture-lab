@@ -109,7 +109,24 @@ def validate_replay(payload: dict, root: Path = ROOT) -> None:
         raise ValueError("Unexpected replay schema")
     if payload.get("status") != "measured_software_trace_unlabelled":
         raise ValueError("An unlabelled trace must not claim benchmark validation")
-    if payload != build_replay(root):
+    # Do not mistake harmless sub-micro floating-point differences across NumPy
+    # builds for corrupted source data. Positions and fingerprints remain exact.
+    expected = build_replay(root)
+    import copy
+    normalized = copy.deepcopy(payload)
+    for case_actual, case_expected in zip(normalized.get("queries", []), expected["queries"]):
+        for method in ("bm25", "parent_child_bm25"):
+            for item_actual, item_expected in zip(
+                case_actual.get("rankings", {}).get(method, []),
+                case_expected["rankings"][method],
+            ):
+                score = item_actual.get("score")
+                if (not isinstance(score, (float, int)) or isinstance(score, bool)
+                    or not math.isfinite(score)
+                    or not math.isclose(score, item_expected["score"], rel_tol=1e-7, abs_tol=1e-7)):
+                    raise ValueError("Replay contains a changed retrieval score")
+                item_actual["score"] = item_expected["score"]
+    if normalized != expected:
         raise ValueError("Replay differs from source hashes or actual Python retrieval")
 
 
